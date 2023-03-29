@@ -6,17 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "inngest:dev": "inngest-cli dev"
   },
   "dependencies": {
     "@types/node": "18.15.11",
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
+    "alby-js-sdk": "^1.4.2",
+    "alby-tools": "^2.1.0",
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",
+    "inngest": "^1.5.3",
     "next": "13.2.4",
+    "nostr-tools": "^1.8.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "5.0.2"
+    "typescript": "5.0.2",
+    "websocket-polyfill": "^0.0.3"
+  },
+  "devDependencies": {
+    "inngest-cli": "^0.11.0"
   }
 }
