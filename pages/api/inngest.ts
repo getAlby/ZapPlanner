@@ -10,7 +10,7 @@ import { signEvent, getPublicKey, getEventHash } from "nostr-tools";
 
 global.crypto = crypto;
 
-const ENABLE_REPEAT_EVENTS = false;
+const ENABLE_REPEAT_EVENTS = true;
 
 type PeriodicZapEvent = {
   name: "zap";
