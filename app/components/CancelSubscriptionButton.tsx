@@ -22,5 +22,9 @@ export function CancelSubscriptionButton({
     }
   }, [refresh, subscriptionId]);
 
-  return <button onClick={cancelSubscription}>Cancel subscription</button>;
+  return (
+    <button className="btn btn-sm btn-error" onClick={cancelSubscription}>
+      Cancel
+    </button>
+  );
 }

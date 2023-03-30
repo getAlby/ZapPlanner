@@ -31,23 +31,31 @@ export function CreateSubscriptionForm() {
   });
   // firstName and lastName will have correct type
 
+  const inputClassName = "input input-bordered w-full mb-4";
+
   return (
-    <form onSubmit={onSubmit}>
-      <label>Nostr Wallet Connect URL</label>
-      <input
-        {...register("nostrWalletConnectUrl")}
-        placeholder="nostrwalletconnect://..."
-      />
-      <label>Recipient Lightning address</label>
-      <input {...register("lightningAddress")} />
-      <label>Amount in sats</label>
-      <input {...register("amount")} />
-      <label>Message</label>
-      <input {...register("message")} />
-      <label>Repeat every</label>
-      <input {...register("sleepDuration")} />
-      <button type="submit">Create Subscription</button>
-    </form>
+    <div className="flex flex-col gap-4 w-full lg:max-w-xs items-center bg-base-200 p-4 rounded-lg">
+      <h1 className="text-lg">Add new subscription</h1>
+      <form onSubmit={onSubmit} className="flex flex-col gap-2 w-full">
+        <label>Nostr Wallet Connect URL</label>
+        <input
+          {...register("nostrWalletConnectUrl")}
+          placeholder="nostrwalletconnect://..."
+          className={inputClassName}
+        />
+        <label>Recipient Lightning address</label>
+        <input {...register("lightningAddress")} className={inputClassName} />
+        <label>Amount in sats</label>
+        <input {...register("amount")} className={inputClassName} />
+        <label>Message</label>
+        <input {...register("message")} className={inputClassName} />
+        <label>Repeat every</label>
+        <input {...register("sleepDuration")} className={inputClassName} />
+        <button type="submit" className="btn btn-primary">
+          Create Subscription
+        </button>
+      </form>
+    </div>
   );
 }
 
