@@ -10,6 +10,8 @@ import { signEvent, getPublicKey, getEventHash } from "nostr-tools";
 
 global.crypto = crypto;
 
+const ENABLE_REPEAT_EVENTS = false;
+
 type PeriodicZapEvent = {
   name: "zap";
   data: {
@@ -17,13 +19,23 @@ type PeriodicZapEvent = {
     amount: number;
     message?: string;
     nostrWalletConnectUrl: string;
+    subscriptionId: string;
+    sleepDuration: string;
   };
   user: {
-    // TODO: add user ID
+    userId: string;
   };
 };
+type CancelSubscriptionEvent = {
+  name: "cancel";
+  data: {
+    subscriptionId: string;
+  };
+};
+
 type Events = {
   zap: PeriodicZapEvent;
+  cancel: CancelSubscriptionEvent;
 };
 
 export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
@@ -31,40 +43,57 @@ export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
 const SEND_ZAP = false;
 
 const periodicZap = inngest.createFunction(
-  { name: "Periodic Zap" },
+  {
+    name: "Periodic Zap",
+    cancelOn: [
+      {
+        event: "cancel",
+        match: "data.subscriptionId",
+      },
+    ],
+  },
   { event: "zap" },
   async ({ event, step }) => {
-    // console.log("Sleep start");
-    // await step.sleep("1s");
-    // console.log("Sleep end");
+    const {
+      nostrWalletConnectUrl,
+      lightningAddress,
+      amount,
+      message,
+      sleepDuration,
+    } = event.data;
 
-    try {
-      const { nostrWalletConnectUrl, lightningAddress, amount, message } =
-        event.data;
-      const noswebln = new webln.NostrWebLNProvider({
-        relayUrl: "wss://nostr.bitcoiner.social",
-        nostrWalletConnectUrl,
-      });
+    console.log(`Sleeping for ${sleepDuration}`);
+    await step.sleep(sleepDuration);
+    console.log("Sleep end");
 
-      // FIXME: noswebln does not fully implement WebLNProvider
-      const ln = new LightningAddress(lightningAddress, {
-        webln: noswebln as unknown as WebLNProvider,
-      });
-      await ln.fetch();
+    await step.run("Execute payment", async () => {
+      try {
+        const noswebln = new webln.NostrWebLNProvider({
+          relayUrl: "wss://nostr.bitcoiner.social",
+          nostrWalletConnectUrl,
+        });
 
-      if (SEND_ZAP) {
-        await sendZap(ln, nostrWalletConnectUrl, amount, message);
-      } else {
-        await sendStandardPayment(ln, amount, message, noswebln);
+        // FIXME: noswebln does not fully implement WebLNProvider
+        const ln = new LightningAddress(lightningAddress, {
+          webln: noswebln as unknown as WebLNProvider,
+        });
+        await ln.fetch();
+
+        if (SEND_ZAP) {
+          await sendZap(ln, nostrWalletConnectUrl, amount, message);
+        } else {
+          await sendStandardPayment(ln, amount, message, noswebln);
+        }
+
+        return { event, body: "OK" };
+      } catch (error) {
+        console.error("Failed to send periodic zap", error);
+        throw error;
       }
+    });
 
-      // TODO: sleep the specified amount of time
-      // FIXME: for some reason sleeping here freezes the process
-      // TODO: call the function again if the subscription is still enabled
-      return { event, body: "OK" };
-    } catch (error) {
-      console.error("Failed to send periodic zap", error);
-      throw error;
+    if (ENABLE_REPEAT_EVENTS) {
+      await step.sendEvent(event);
     }
   }
 );

@@ -1,5 +1,6 @@
 import { CreateSubscriptionForm } from "app/components/CreateSubscriptionForm";
 import { LoginButton } from "app/components/LoginButton";
+import { SubscriptionsList } from "app/components/SubscriptionsList";
 import { getServerSession } from "next-auth";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 
@@ -24,6 +25,8 @@ function Dashboard() {
   return (
     <div>
       <CreateSubscriptionForm />
+      {/* @ts-expect-error Server Component */}
+      <SubscriptionsList />
     </div>
   );
 }

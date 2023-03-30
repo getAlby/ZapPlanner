@@ -3,4 +3,5 @@ export type CreateSubscriptionRequest = {
   amount: string;
   message?: string;
   nostrWalletConnectUrl: string;
+  sleepDuration: string;
 };

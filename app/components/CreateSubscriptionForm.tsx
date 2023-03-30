@@ -2,13 +2,13 @@
 
 import { useForm } from "react-hook-form";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
+import { useRouter } from "next/navigation";
 
 type FormData = CreateSubscriptionRequest;
 
 export function CreateSubscriptionForm() {
   const {
     register,
-    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
@@ -20,9 +20,15 @@ export function CreateSubscriptionForm() {
         process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS ||
         "hello@getalby.com",
       message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
+      sleepDuration: process.env.NEXT_PUBLIC_DEFAULT_SLEEP_DURATION || "30d",
     },
   });
-  const onSubmit = handleSubmit(createSubscription);
+  const { refresh } = useRouter();
+  const onSubmit = handleSubmit(async (data) => {
+    if (await createSubscription(data)) {
+      refresh();
+    }
+  });
   // firstName and lastName will have correct type
 
   return (
@@ -32,12 +38,14 @@ export function CreateSubscriptionForm() {
         {...register("nostrWalletConnectUrl")}
         placeholder="nostrwalletconnect://..."
       />
-      <label>Recipient Lightning Address</label>
+      <label>Recipient Lightning address</label>
       <input {...register("lightningAddress")} />
       <label>Amount in sats</label>
       <input {...register("amount")} />
       <label>Message</label>
       <input {...register("message")} />
+      <label>Repeat every</label>
+      <input {...register("sleepDuration")} />
       <button type="submit">Create Subscription</button>
     </form>
   );
@@ -51,5 +59,8 @@ async function createSubscription(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(createSubscriptionRequest),
   });
-  alert(JSON.stringify(await res.json()));
+  if (!res.ok) {
+    alert(JSON.stringify(await res.json()));
+  }
+  return res.ok;
 }

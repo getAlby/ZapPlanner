@@ -39,4 +39,16 @@ model User {
   image         String?
   accounts      Account[]
   createdDateTime DateTime @default(now())
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nostrWalletConnectUrl String
+  recipientLightningAddress String
+  amount Int
+  message String?
+  sleepDuration String
 }
