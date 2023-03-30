@@ -7,6 +7,7 @@ import { serve } from "inngest/next";
 import { WebLNProvider } from "@webbtc/webln-types";
 import { Event, NostrProvider } from "alby-tools/dist/types";
 import { signEvent, getPublicKey, getEventHash } from "nostr-tools";
+import { prismaClient } from "lib/server/prisma";
 
 global.crypto = crypto;
 
@@ -15,15 +16,7 @@ const ENABLE_REPEAT_EVENTS = true;
 type PeriodicZapEvent = {
   name: "zap";
   data: {
-    lightningAddress: string;
-    amount: number;
-    message?: string;
-    nostrWalletConnectUrl: string;
     subscriptionId: string;
-    sleepDuration: string;
-  };
-  user: {
-    userId: string;
   };
 };
 type CancelSubscriptionEvent = {
@@ -54,19 +47,26 @@ const periodicZap = inngest.createFunction(
   },
   { event: "zap" },
   async ({ event, step }) => {
-    const {
-      nostrWalletConnectUrl,
-      lightningAddress,
-      amount,
-      message,
-      sleepDuration,
-    } = event.data;
+    const sleepDuration = await step.run("Send payment", async () => {
+      const { subscriptionId } = event.data;
+      const subscription = await prismaClient.subscription.findUnique({
+        where: {
+          id: subscriptionId,
+        },
+      });
+      if (!subscription) {
+        console.log(
+          "No subscription found matching " +
+            subscriptionId +
+            ". Cancelling zap"
+        );
+        return undefined;
+      }
 
-    console.log(`Sleeping for ${sleepDuration}`);
-    await step.sleep(sleepDuration);
-    console.log("Sleep end");
+      const { nostrWalletConnectUrl, recipientLightningAddress, amount } =
+        subscription;
+      const message = subscription.message ?? undefined;
 
-    await step.run("Execute payment", async () => {
       try {
         const noswebln = new webln.NostrWebLNProvider({
           relayUrl: "wss://nostr.bitcoiner.social",
@@ -74,7 +74,7 @@ const periodicZap = inngest.createFunction(
         });
 
         // FIXME: noswebln does not fully implement WebLNProvider
-        const ln = new LightningAddress(lightningAddress, {
+        const ln = new LightningAddress(recipientLightningAddress, {
           webln: noswebln as unknown as WebLNProvider,
         });
         await ln.fetch();
@@ -84,17 +84,28 @@ const periodicZap = inngest.createFunction(
         } else {
           await sendStandardPayment(ln, amount, message, noswebln);
         }
-
-        return { event, body: "OK" };
       } catch (error) {
         console.error("Failed to send periodic zap", error);
-        throw error;
+        //throw error;
       }
+      return subscription.sleepDuration;
     });
 
-    if (ENABLE_REPEAT_EVENTS) {
-      await step.sendEvent(event);
+    if (!sleepDuration) {
+      return;
     }
+
+    console.log(`Sleeping for ${sleepDuration}`);
+    await step.sleep(sleepDuration);
+    console.log("Sleep end");
+
+    if (ENABLE_REPEAT_EVENTS) {
+      // create a new event object without inngest-added properties (id, ts)
+      const newEvent: typeof event = { data: event.data, name: event.name };
+      await step.sendEvent(newEvent);
+    }
+
+    return { event, body: "OK" };
   }
 );
 

@@ -30,15 +30,7 @@ export async function POST(request: Request) {
   await inngest.send({
     name: "zap",
     data: {
-      lightningAddress: subscription.recipientLightningAddress,
-      amount: subscription.amount,
-      message: subscription.message ?? undefined,
-      nostrWalletConnectUrl: subscription.nostrWalletConnectUrl,
       subscriptionId: subscription.id,
-      sleepDuration: subscription.sleepDuration,
-    },
-    user: {
-      userId: session.user.id,
     },
   });
 
