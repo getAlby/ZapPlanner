@@ -18,7 +18,7 @@ export const albyProviderConfig = {
 };
 
 if (!albyProviderConfig.clientId || !albyProviderConfig.clientSecret) {
-  throw new Error("Alby OAuth environment variables are unset");
+  console.error("Alby OAuth environment variables are unset");
 }
 
 export const albyProvider: Provider = {

@@ -15,7 +15,9 @@
     "db:migrate:local:createonly": "dotenv -e .env.local -- prisma migrate dev --create-only",
     "db:connect:local": "psql postgres://user:password@localhost:5432/boostagram-viewer",
     "db:studio:local": "dotenv -e .env.local -- prisma studio",
-    "db:reset:local": "dotenv -e .env.local -- prisma migrate reset"
+    "db:reset:local": "dotenv -e .env.local -- prisma migrate reset",
+    "deploy": "fly deploy --remote-only --build-secret DATABASE_URL=$DATABASE_URL",
+    "db:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.5",
@@ -25,6 +27,7 @@
     "@types/react-dom": "18.0.11",
     "alby-js-sdk": "^1.4.2",
     "alby-tools": "^2.1.0",
+    "encoding": "^0.1.13",
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",
     "http-status-codes": "^2.2.0",

@@ -5,7 +5,7 @@ import { LightningAddress } from "alby-tools";
 import { Inngest } from "inngest";
 import { serve } from "inngest/next";
 import { WebLNProvider } from "@webbtc/webln-types";
-import { NostrProvider } from "alby-tools/dist/types";
+import { Event, NostrProvider } from "alby-tools/dist/types";
 import { signEvent, getPublicKey, getEventHash } from "nostr-tools";
 
 global.crypto = crypto;
@@ -118,7 +118,7 @@ async function sendZap(
   const pubkey = getPublicKey(privateKey);
   const nostr: NostrProvider = {
     getPublicKey: () => Promise.resolve(pubkey),
-    signEvent: (event) => {
+    signEvent: ((event: Event) => {
       const signedEvent = {
         ...event,
         pubkey,
@@ -128,7 +128,7 @@ async function sendZap(
       signedEvent.sig = signEvent(signedEvent, privateKey);
       console.error("Signed event: " + event.kind);
       return Promise.resolve(signedEvent);
-    },
+    }) as unknown as () => Promise<Event> /*FIXME: remove cast when alby-tools is updated*/,
   };
 
   console.log("Sending zap...");
