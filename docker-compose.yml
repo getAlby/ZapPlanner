@@ -1,0 +1,14 @@
+version: "3"
+name: nwc-periodic-payments
+
+services:
+  database:
+    image: "postgres:latest"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nwc-periodic-payments
+    volumes:
+      - ./.db/:/var/lib/postgresql/data/
