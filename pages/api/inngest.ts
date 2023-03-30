@@ -11,7 +11,7 @@ import { prismaClient } from "lib/server/prisma";
 
 global.crypto = crypto;
 
-const ENABLE_REPEAT_EVENTS = true;
+const ENABLE_REPEAT_EVENTS = false;
 
 type PeriodicZapEvent = {
   name: "zap";
@@ -80,7 +80,7 @@ const periodicZap = inngest.createFunction(
         await ln.fetch();
 
         if (SEND_ZAP) {
-          await sendZap(ln, nostrWalletConnectUrl, amount, message);
+          await sendZap(ln, noswebln, amount, message);
         } else {
           await sendStandardPayment(ln, amount, message, noswebln);
         }
@@ -113,20 +113,19 @@ export default serve(inngest, [periodicZap]);
 
 async function sendZap(
   ln: LightningAddress,
-  nostrWalletConnectUrl: string,
+  noswebln: webln.NostrWebLNProvider,
   amount: number,
   message: string | undefined
 ) {
   const DEFAULT_ZAP_RELAYS = ["wss://relay.damus.io"];
 
-  const privateKey = nostrWalletConnectUrl
-    .toLowerCase()
-    .match(/secret=[a-f0-9]+/)?.[0]
-    .substring("secret=".length);
+  const privateKey = noswebln.secret;
+
   if (!privateKey || privateKey.length !== 64) {
     throw new Error("nostrWalletConnectUrl does not contain a valid secret");
   }
   const pubkey = getPublicKey(privateKey);
+  // TODO: use noswebln instead of creating a NostrProvider
   const nostr: NostrProvider = {
     getPublicKey: () => Promise.resolve(pubkey),
     signEvent: ((event: Event) => {
@@ -153,7 +152,7 @@ async function sendZap(
       nostr,
     }
   );
-  console.error("Zap done", response, event);
+  console.error("Zap done", response);
 }
 
 async function sendStandardPayment(
