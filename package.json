@@ -6,7 +6,9 @@
     "dev": "next dev -p 8080",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "tsc -noEmit && next lint && yarn format:check",
+    "format:fix": "yarn prettier --write . --check '!.db'",
+    "format:check": "yarn prettier --check . --check '!.db'",
     "inngest:local": "inngest-cli dev",
     "docker:start": "docker-compose up",
     "docker:stop": "docker-compose stop",
@@ -17,7 +19,8 @@
     "db:studio:local": "dotenv -e .env.local -- prisma studio",
     "db:reset:local": "dotenv -e .env.local -- prisma migrate reset",
     "deploy": "fly deploy --remote-only --build-secret DATABASE_URL=$DATABASE_URL",
-    "db:migrate:deploy": "prisma migrate deploy"
+    "db:migrate:deploy": "prisma migrate deploy",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.5",
@@ -44,6 +47,8 @@
   },
   "devDependencies": {
     "dotenv-cli": "^7.1.0",
-    "inngest-cli": "^0.11.0"
+    "husky": "^8.0.0",
+    "inngest-cli": "^0.11.0",
+    "prettier": "^2.8.7"
   }
 }

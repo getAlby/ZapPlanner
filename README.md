@@ -1,5 +1,11 @@
 # NWC Periodic Payments
 
+## Installation
+
+Run `yarn install`
+
+Run `cp .env.example .env.local && husky install`
+
 ## Development
 
 Run `yarn inngest:local`
