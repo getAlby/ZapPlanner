@@ -14,11 +14,10 @@ In the inngest development server create a new event:
   "data": {
     "lightningAddress": "hello@getalby.com",
     "amount": 1,
-    "message": "nwc periodic sats"
-  },
-  "user": {
+    "message": "nwc periodic sats",
     "nostrWalletConnectUrl": "your-nostr-wallet-connect-url-here"
-  }
+  },
+  "user": {}
 }
 ```
 
