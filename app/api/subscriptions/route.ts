@@ -4,14 +4,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import { inngest } from "pages/api/inngest";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
+import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return new Response(undefined, {
-      status: StatusCodes.UNAUTHORIZED,
-    });
-  }
 
   const createSubscriptionRequest: CreateSubscriptionRequest =
     await request.json();
@@ -23,7 +18,7 @@ export async function POST(request: Request) {
       nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,
       message: createSubscriptionRequest.message,
       sleepDuration: createSubscriptionRequest.sleepDuration,
-      userId: session.user.id,
+      userId: session?.user.id,
     },
   });
 
@@ -34,7 +29,11 @@ export async function POST(request: Request) {
     },
   });
 
-  return new Response(undefined, {
-    status: StatusCodes.NO_CONTENT,
+  const createSubscriptionResponse: CreateSubscriptionResponse = {
+    subscriptionId: subscription.id,
+  };
+
+  return new Response(JSON.stringify(createSubscriptionResponse), {
+    status: StatusCodes.CREATED,
   });
 }

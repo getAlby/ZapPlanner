@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
+import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
+import Link from "next/link";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -23,10 +25,11 @@ export function CreateSubscriptionForm() {
       sleepDuration: process.env.NEXT_PUBLIC_DEFAULT_SLEEP_DURATION || "30d",
     },
   });
-  const { refresh } = useRouter();
+  const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
-    if (await createSubscription(data)) {
-      refresh();
+    const subscriptionId = await createSubscription(data);
+    if (subscriptionId) {
+      push(`/subscriptions/${subscriptionId}`);
     }
   });
   // firstName and lastName will have correct type
@@ -38,6 +41,16 @@ export function CreateSubscriptionForm() {
       <h1 className="text-lg">Add new subscription</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-2 w-full">
         <label>Nostr Wallet Connect URL</label>
+        <label className="text-sm">
+          {"Don't have a URL? Get one with"}&nbsp;
+          <Link
+            className="link"
+            href="https://nostr-wallet-connect.getalby.com/"
+            target="_blank"
+          >
+            Alby
+          </Link>
+        </label>
         <input
           {...register("nostrWalletConnectUrl")}
           placeholder="nostrwalletconnect://..."
@@ -61,14 +74,17 @@ export function CreateSubscriptionForm() {
 
 async function createSubscription(
   createSubscriptionRequest: CreateSubscriptionRequest
-) {
+): Promise<string | undefined> {
   const res = await fetch("/api/subscriptions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(createSubscriptionRequest),
   });
   if (!res.ok) {
-    alert(JSON.stringify(await res.json()));
+    alert(res.status + " " + res.statusText);
+    return undefined;
   }
-  return res.ok;
+  const createSubscriptionResponse =
+    (await res.json()) as CreateSubscriptionResponse;
+  return createSubscriptionResponse.subscriptionId;
 }

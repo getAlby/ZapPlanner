@@ -8,7 +8,7 @@ type AlbyMeResponse = {
   avatar: string;
 };
 
-export const albyProviderConfig = {
+const albyProviderConfig = {
   id: albyProviderId,
   name: "Alby",
   origin: "https://getalby.com",

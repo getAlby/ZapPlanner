@@ -6,6 +6,9 @@ import { authOptions } from "pages/api/auth/[...nextauth]";
 
 export async function SubscriptionsList() {
   const session = await getServerSession(authOptions);
+  if (!session) {
+    return null;
+  }
   const subscriptions = await prismaClient.subscription.findMany({
     where: {
       userId: session?.user.id,

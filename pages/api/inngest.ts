@@ -11,8 +11,6 @@ import { prismaClient } from "lib/server/prisma";
 
 global.crypto = crypto;
 
-const ENABLE_REPEAT_EVENTS = false;
-
 type PeriodicZapEvent = {
   name: "zap";
   data: {
@@ -33,6 +31,7 @@ type Events = {
 
 export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
 
+const ENABLE_REPEAT_EVENTS = true;
 const SEND_ZAP = false;
 
 const periodicZap = inngest.createFunction(
@@ -69,7 +68,7 @@ const periodicZap = inngest.createFunction(
 
       try {
         const noswebln = new webln.NostrWebLNProvider({
-          relayUrl: "wss://nostr.bitcoiner.social",
+          relayUrl: "wss://relay.getalby.com/v1",
           nostrWalletConnectUrl,
         });
 

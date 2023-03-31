@@ -9,12 +9,6 @@ export async function DELETE(
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return new Response(undefined, {
-      status: StatusCodes.UNAUTHORIZED,
-    });
-  }
-
   const subscriptionId = params.id;
   if (!subscriptionId) {
     return new Response(undefined, {
@@ -34,18 +28,22 @@ export async function DELETE(
     });
   }
 
-  if (subscription.userId !== session.user.id) {
+  if (subscription.userId && session?.user.id !== subscription.userId) {
     return new Response(undefined, {
       status: StatusCodes.FORBIDDEN,
     });
   }
 
-  await inngest.send({
-    name: "cancel",
-    data: {
-      subscriptionId: subscription.id,
-    },
-  });
+  try {
+    await inngest.send({
+      name: "cancel",
+      data: {
+        subscriptionId: subscription.id,
+      },
+    });
+  } catch (error) {
+    console.warn("Failed to cancel inngest event", error);
+  }
 
   await prismaClient.subscription.delete({
     where: {

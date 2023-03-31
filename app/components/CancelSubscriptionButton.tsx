@@ -5,26 +5,32 @@ import React from "react";
 
 type CancelSubscriptionButtonProps = {
   subscriptionId: string;
+  goHome?: boolean;
 };
 
 export function CancelSubscriptionButton({
   subscriptionId,
+  goHome,
 }: CancelSubscriptionButtonProps) {
-  const { refresh } = useRouter();
+  const { refresh, push } = useRouter();
   const cancelSubscription = React.useCallback(async () => {
     const res = await fetch(`/api/subscriptions/${subscriptionId}`, {
       method: "DELETE",
     });
     if (!res.ok) {
-      alert(JSON.stringify(await res.json()));
+      alert(res.status + " " + res.statusText);
     } else {
-      refresh();
+      if (goHome) {
+        push("/");
+      } else {
+        refresh();
+      }
     }
-  }, [refresh, subscriptionId]);
+  }, [goHome, push, refresh, subscriptionId]);
 
   return (
     <button className="btn btn-sm btn-error" onClick={cancelSubscription}>
-      Cancel
+      Cancel Subscription
     </button>
   );
 }
