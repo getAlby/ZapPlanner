@@ -32,7 +32,7 @@ type Events = {
 export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
 
 const ENABLE_REPEAT_EVENTS = true;
-const SEND_ZAP = false;
+const SEND_ZAP = true;
 
 const periodicZap = inngest.createFunction(
   {
@@ -116,7 +116,12 @@ async function sendZap(
   amount: number,
   message: string | undefined
 ) {
-  const DEFAULT_ZAP_RELAYS = ["wss://relay.damus.io"];
+  const DEFAULT_ZAP_RELAYS = [
+    "wss://relay.damus.io",
+    "wss://nos.lol",
+    "wss://relay.nostr.bg",
+    "wss://brb.io",
+  ];
 
   const privateKey = noswebln.secret;
 
