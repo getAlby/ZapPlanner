@@ -46,7 +46,7 @@ model Subscription {
   id String @id @default(cuid())
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  nostrWalletConnectUrl String
+  nostrWalletConnectUrl String /// @encrypted
   recipientLightningAddress String
   amount Int
   message String?
