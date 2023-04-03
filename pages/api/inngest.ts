@@ -32,7 +32,7 @@ type Events = {
 export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
 
 const ENABLE_REPEAT_EVENTS = true;
-const SEND_ZAP = true;
+const SEND_ZAP = false;
 
 const periodicZap = inngest.createFunction(
   {
@@ -165,6 +165,8 @@ async function sendStandardPayment(
   message: string | undefined,
   noswebln: webln.NostrWebLNProvider
 ) {
+  console.log("Enabling noswebln");
+  await noswebln.enable();
   console.log("Requesting invoice");
   const invoice = await ln.requestInvoice({
     satoshi: amount,
