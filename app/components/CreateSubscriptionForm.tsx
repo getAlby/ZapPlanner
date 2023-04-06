@@ -46,12 +46,21 @@ export function CreateSubscriptionForm() {
       <label className={labelClassName}>Recipient Lightning address</label>
       <input
         {...register("recipientLightningAddress")}
+        placeholder="hello@getalby.com"
         className={inputClassName}
       />
       <label className={labelClassName}>Amount in sats</label>
-      <input {...register("amount")} className={inputClassName} />
+      <input
+        {...register("amount")}
+        placeholder="21"
+        className={inputClassName}
+      />
       <label className={labelClassName}>Message</label>
-      <input {...register("message")} className={inputClassName} />
+      <input
+        {...register("message")}
+        placeholder="Keep going, you're doing great!"
+        className={inputClassName}
+      />
       <label className={labelClassName}>Repeat every</label>
       <input {...register("sleepDuration")} className={inputClassName} />
     </form>
