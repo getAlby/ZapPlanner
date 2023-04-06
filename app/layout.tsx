@@ -17,14 +17,24 @@ export default async function RootLayout({
     <html lang="en">
       <body className="bg-gray-50">
         <div className="flex flex-col gap-8 px-4 py-14 lg:px-14 items-center justify-start">
-          <Link href="/">
-            <h1
-              className="font-heading font-bold text-3xl text-black text-center
+          <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-4">
+            <Image
+              className="rounded"
+              src="/nwc-periodic-payments.png"
+              alt="Periodic Payments Logo"
+              width={72}
+              height={72}
+              priority
+            />
+            <Link href="/">
+              <h1
+                className="font-heading font-bold text-3xl text-black text-center
 "
-            >
-              Periodic Payments Creator
-            </h1>
-          </Link>
+              >
+                Periodic Payments Creator
+              </h1>
+            </Link>
+          </div>
           <div className="flex flex-col p-10 gap-8 bg-white shadow rounded-lg max-w-xl">
             {children}
           </div>
