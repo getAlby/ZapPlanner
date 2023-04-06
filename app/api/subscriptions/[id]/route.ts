@@ -1,14 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import { prismaClient } from "lib/server/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "pages/api/auth/[...nextauth]";
 import { inngest } from "pages/api/inngest";
 export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-
   const subscriptionId = params.id;
   if (!subscriptionId) {
     return new Response(undefined, {
@@ -25,12 +21,6 @@ export async function DELETE(
   if (!subscription) {
     return new Response(undefined, {
       status: StatusCodes.NOT_FOUND,
-    });
-  }
-
-  if (subscription.userId && session?.user.id !== subscription.userId) {
-    return new Response(undefined, {
-      status: StatusCodes.FORBIDDEN,
     });
   }
 

@@ -1,6 +1,4 @@
 import { prismaClient } from "lib/server/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "pages/api/auth/[...nextauth]";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
@@ -11,7 +9,6 @@ export default async function SubscriptionPage({
 }: {
   params: { id: string };
 }) {
-  const session = await getServerSession(authOptions);
   const subscriptionId = params.id;
 
   const subscription = await prismaClient.subscription.findUnique({
@@ -22,21 +19,10 @@ export default async function SubscriptionPage({
   if (!subscription) {
     notFound();
   }
-  if (session && !subscription?.userId) {
-    // assign the subscription to the user after login
-    await prismaClient.subscription.update({
-      where: {
-        id: subscriptionId,
-      },
-      data: {
-        userId: session.user.id,
-      },
-    });
-  }
 
   return (
     <div className="flex flex-1 flex-col p-4">
-      {!session && <SaveSubscriptionAlert />}
+      <SaveSubscriptionAlert />
       <div className="">
         <h1 className="text-xl">
           Subscription to {subscription.recipientLightningAddress}
