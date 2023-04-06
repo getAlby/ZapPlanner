@@ -4,17 +4,26 @@ import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
 
 export default function ConfirmSubscriptionPage() {
-  const subscriptionFields = sessionStorage.getItem("fields");
-  const subscriptionValues =
-    subscriptionFields && JSON.parse(subscriptionFields);
+  const [subscriptionValues, setSubscriptionValues] = React.useState<
+    CreateSubscriptionFormData | undefined
+  >();
   const { replace } = useRouter();
+
   React.useEffect(() => {
-    if (!subscriptionValues) {
+    const subscriptionFields = sessionStorage.getItem("fields");
+    if (!subscriptionFields) {
       replace("/");
+    } else {
+      setSubscriptionValues(JSON.parse(subscriptionFields));
     }
-  }, [replace, subscriptionValues]);
+  }, [replace]);
+
+  if (!subscriptionValues) {
+    return null;
+  }
 
   return (
     <>
