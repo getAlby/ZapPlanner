@@ -1,5 +1,5 @@
 export type CreateSubscriptionRequest = {
-  lightningAddress: string;
+  recipientLightningAddress: string;
   amount: string;
   message?: string;
   nostrWalletConnectUrl: string;

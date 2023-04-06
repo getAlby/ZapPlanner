@@ -10,7 +10,8 @@ export async function POST(request: Request) {
   const subscription = await prismaClient.subscription.create({
     data: {
       amount: parseInt(createSubscriptionRequest.amount),
-      recipientLightningAddress: createSubscriptionRequest.lightningAddress,
+      recipientLightningAddress:
+        createSubscriptionRequest.recipientLightningAddress,
       nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,
       message: createSubscriptionRequest.message,
       sleepDuration: createSubscriptionRequest.sleepDuration,

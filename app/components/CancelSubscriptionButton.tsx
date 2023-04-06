@@ -5,14 +5,12 @@ import React from "react";
 
 type CancelSubscriptionButtonProps = {
   subscriptionId: string;
-  goHome?: boolean;
 };
 
 export function CancelSubscriptionButton({
   subscriptionId,
-  goHome,
 }: CancelSubscriptionButtonProps) {
-  const { refresh, push } = useRouter();
+  const { push } = useRouter();
   const cancelSubscription = React.useCallback(async () => {
     const res = await fetch(`/api/subscriptions/${subscriptionId}`, {
       method: "DELETE",
@@ -20,17 +18,16 @@ export function CancelSubscriptionButton({
     if (!res.ok) {
       alert(res.status + " " + res.statusText);
     } else {
-      if (goHome) {
-        push("/");
-      } else {
-        refresh();
-      }
+      push("/");
     }
-  }, [goHome, push, refresh, subscriptionId]);
+  }, [push, subscriptionId]);
 
   return (
-    <button className="btn btn-sm btn-error" onClick={cancelSubscription}>
-      Cancel Subscription
+    <button
+      className="btn btn-outline btn-sm btn-error normal-case"
+      onClick={cancelSubscription}
+    >
+      Cancel This Periodic Payment
     </button>
   );
 }

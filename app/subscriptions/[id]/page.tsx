@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
 import { SaveSubscriptionAlert } from "app/subscriptions/[id]/components/SaveSubcriptionAlert";
+import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 
 export default async function SubscriptionPage({
   params,
@@ -21,24 +22,20 @@ export default async function SubscriptionPage({
   }
 
   return (
-    <div className="flex flex-1 flex-col p-4">
+    <>
+      <h2 className="font-heading font-bold text-2xl">Periodic payment</h2>
+      <SubscriptionSummary
+        values={{
+          amount: subscription.amount.toString(),
+          recipientLightningAddress: subscription.recipientLightningAddress,
+          sleepDuration: subscription.sleepDuration,
+          message: subscription.message || undefined,
+        }}
+      />
+      <div className="divider my-0" />
+
       <SaveSubscriptionAlert />
-      <div className="">
-        <h1 className="text-xl">
-          Subscription to {subscription.recipientLightningAddress}
-        </h1>
-        <p>
-          {subscription.amount}⚡ every {subscription.sleepDuration}
-        </p>
-      </div>
-      <div className="flex flex-1 gap-2 mt-4 items-end justify-end">
-        <Link href="/">
-          <button className="btn btn-sm btn-primary">
-            Create Another Subscription
-          </button>
-        </Link>
-        <CancelSubscriptionButton subscriptionId={subscription.id} goHome />
-      </div>
-    </div>
+      <CancelSubscriptionButton subscriptionId={subscription.id} />
+    </>
   );
 }
