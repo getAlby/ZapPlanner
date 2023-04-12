@@ -65,28 +65,36 @@ export function CreateSubscriptionForm() {
         placeholder="21"
         className={inputClassName}
       />
-      <label className={labelClassName}>Message</label>
-      <input
-        {...register("message")}
-        placeholder="Providing continual support ⚡"
-        className={inputClassName}
-      />
-      <label className={labelClassName}>Repeat every</label>
-      <div className="flex justify-center gap-2 items-">
-        <input {...register("timeframeValue")} className={inputClassName} />
+      <label className={labelClassName}>Frequency</label>
+      <div className="flex justify-center gap-2 items-center">
+        <p className="lg:flex-shrink-0">Repeat payment every</p>
+        <input
+          {...register("timeframeValue")}
+          className={`${inputClassName} w-full mb-0`}
+        />
         <select
-          className="select select-bordered w-full max-w-xs"
+          className="select select-bordered"
           onChange={(event) =>
             setSelectedTimeframe(event.target.value as Timeframe)
           }
         >
           {timeframes.map((timeframe) => (
-            <option key={timeframe} value={timeframe}>
+            <option
+              key={timeframe}
+              value={timeframe}
+              selected={timeframe === watchedTimeframe}
+            >
               {timeframe}
             </option>
           ))}
         </select>
       </div>
+      <label className={labelClassName}>Message attached</label>
+      <input
+        {...register("message")}
+        placeholder="Thank you for your work"
+        className={inputClassName}
+      />
     </form>
   );
 }

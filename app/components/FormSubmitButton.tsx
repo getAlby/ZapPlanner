@@ -6,6 +6,8 @@ export function FormSubmitButton() {
 
   const title =
     pathname === "/"
+      ? "New Periodic Payment"
+      : pathname === "/create"
       ? "Continue"
       : pathname === "/confirm"
       ? "Create Periodic Payment"
@@ -24,7 +26,7 @@ export function FormSubmitButton() {
         background: "linear-gradient(180deg, #FFDE6E 63.72%, #F8C455 95.24%)",
       }}
     >
-      Continue
+      {title}
     </button>
   );
 }

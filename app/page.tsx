@@ -1,27 +1,95 @@
-import { CreateSubscriptionForm } from "app/components/CreateSubscriptionForm";
+import { HomePageForm } from "app/components/HomePageForm";
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
     <>
+      <div className="w-full h-48 relative">
+        <Image
+          className="object-cover"
+          src="/nwc-periodic-payments.png"
+          alt="Periodic Payments Logo"
+          fill
+          priority
+        />
+      </div>
       <h2 className="font-heading font-bold text-2xl">
         What are periodic payments?
       </h2>
-      <p className="font-body">
-        Periodic payments are transfers from your wallet to a lightning address
-        with defined intervals.{" "}
-      </p>
-      <p className="font-body">
-        You can use them to provide continual support to your favourite
-        value4value creators. Example: <span className="font-mono">100</span>{" "}
-        sats every 1h or <span className="font-mono">1,000</span> sats everyday.
-      </p>
       <div className="flex flex-col gap-4">
-        <h2 className="font-heading font-bold text-2xl">
-          New periodic payment
-        </h2>
-        <CreateSubscriptionForm />
+        <AboutItem
+          description="Periodic payments are lightning transfers sent within time intervals
+        defined by you."
+          icon="satoshi.svg"
+        />
+        <AboutItem
+          description={
+            <>
+              Example: <span className="font-mono">100</span> sats every hour or{" "}
+              <span className="font-mono">1,000</span> sats per day.
+            </>
+          }
+          icon="info.svg"
+        />
+
+        <AboutItem
+          description={
+            <>
+              They are possible thanks to{" "}
+              <Link
+                className="link"
+                href="https://nwc.getalby.com"
+                target="_blank"
+              >
+                Nostr Wallet Connect
+              </Link>
+              .
+            </>
+          }
+          icon="nostr.svg"
+        />
+        <AboutItem
+          description={
+            <>
+              Use ZapPlanner to plan your periodic payments eg. to provide
+              continual support to your favourite{" "}
+              <Link
+                className="link"
+                href="https://value4value.info/"
+                target="_blank"
+              >
+                V4V
+              </Link>{" "}
+              creators.
+            </>
+          }
+          icon="clock.svg"
+        />
       </div>
+
+      <HomePageForm />
     </>
+  );
+}
+
+type AboutItemProps = {
+  description: React.ReactNode;
+  icon: string;
+};
+
+function AboutItem({ description, icon }: AboutItemProps) {
+  return (
+    <div className="flex gap-4">
+      <Image
+        src={`/icons/${icon}`}
+        alt={icon}
+        width={24}
+        height={24}
+        priority
+      />
+      <p className="font-body text-base">{description}</p>
+    </div>
   );
 }

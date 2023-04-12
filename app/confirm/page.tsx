@@ -48,11 +48,7 @@ export default function ConfirmSubscriptionPage() {
 
       <p className="font-body">
         Use{" "}
-        <Link
-          href="https://nostr-wallet-connect.getalby.com"
-          target="_blank"
-          className="link"
-        >
+        <Link href="https://nwc.getalby.com" target="_blank" className="link">
           Nostr Wallet Connect
         </Link>{" "}
         to create new app session and securely connect your lightning wallet to
