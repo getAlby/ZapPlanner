@@ -1,4 +1,6 @@
-# NWC Periodic Payments
+# ZapPlanner
+
+Periodic lightning payments powered by Nostr Wallet Connect (NWC)
 
 ## Installation
 
@@ -9,6 +11,8 @@ Run `cp .env.example .env.local && husky install`
 Run `yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_KEY>` in .env.local
 
 ## Development
+
+Run `yarn docker:start`
 
 Run `yarn inngest:local`
 

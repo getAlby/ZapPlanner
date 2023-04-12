@@ -7,7 +7,9 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      sans: ["Inter", "sans-serif"],
+      heading: ["Catamaran", "sans-serif"],
+      body: ["Inter", "sans-serif"],
+      mono: ["Roboto Mono", "monospace"],
     },
   },
   plugins: [require("daisyui")],

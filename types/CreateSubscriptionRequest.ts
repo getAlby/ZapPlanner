@@ -1,7 +1,10 @@
+import { Timeframe } from "types/Timeframe";
+
 export type CreateSubscriptionRequest = {
-  lightningAddress: string;
+  recipientLightningAddress: string;
   amount: string;
   message?: string;
   nostrWalletConnectUrl: string;
-  sleepDuration: string;
+  timeframe: Timeframe;
+  timeframeValue: string;
 };
