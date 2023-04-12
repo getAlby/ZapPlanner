@@ -11,6 +11,8 @@ export function FormSubmitButton() {
       ? "Continue"
       : pathname === "/confirm"
       ? "Create Periodic Payment"
+      : pathname?.startsWith("/subscriptions")
+      ? "New Periodic Payment"
       : null;
 
   if (!title) {

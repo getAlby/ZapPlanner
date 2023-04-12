@@ -1,9 +1,9 @@
 import { prismaClient } from "lib/server/prisma";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
 import { SaveSubscriptionAlert } from "app/subscriptions/[id]/components/SaveSubcriptionAlert";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
+import { StartNewSubscriptionForm } from "app/components/StartNewSubscriptionForm";
 
 export default async function SubscriptionPage({
   params,
@@ -36,6 +36,7 @@ export default async function SubscriptionPage({
 
       <SaveSubscriptionAlert />
       <CancelSubscriptionButton subscriptionId={subscription.id} />
+      <StartNewSubscriptionForm />
     </>
   );
 }

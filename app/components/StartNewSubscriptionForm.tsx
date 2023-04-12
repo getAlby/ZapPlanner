@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 
-export function HomePageForm() {
+export function StartNewSubscriptionForm() {
   const { push } = useRouter();
   const goToCreatePage = (event: FormEvent) => {
     push("/create");
