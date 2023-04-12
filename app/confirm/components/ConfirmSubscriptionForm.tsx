@@ -50,6 +50,7 @@ export function ConfirmSubscriptionForm({
         {...register("nostrWalletConnectUrl")}
         placeholder="nostrwalletconnect://..."
         className={inputClassName}
+        type="password"
       />
     </form>
   );
