@@ -1,10 +1,14 @@
 "use client";
 
 import React from "react";
-import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
 
 type SubscriptionSummaryProps = {
-  values: CreateSubscriptionFormData;
+  values: {
+    amount: string;
+    recipientLightningAddress: string;
+    sleepDuration: string;
+    message: string | undefined;
+  };
   showFirstPayment?: boolean;
 };
 

@@ -28,7 +28,19 @@ export default function ConfirmSubscriptionPage() {
   return (
     <>
       <h2 className="font-heading font-bold text-2xl">Summary</h2>
-      <SubscriptionSummary values={subscriptionValues} showFirstPayment />
+      <SubscriptionSummary
+        values={{
+          amount: subscriptionValues.amount,
+          recipientLightningAddress:
+            subscriptionValues.recipientLightningAddress,
+          sleepDuration:
+            subscriptionValues.timeframeValue +
+            " " +
+            subscriptionValues.timeframe,
+          message: subscriptionValues.message,
+        }}
+        showFirstPayment
+      />
       <div className="divider my-0" />
       <h2 className="font-heading font-bold text-2xl">
         Finalize with Nostr Wallet Connect

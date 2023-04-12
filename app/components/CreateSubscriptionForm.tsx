@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
+import { Timeframe, timeframes } from "types/Timeframe";
 
 const inputClassName = "input input-bordered w-full mb-4";
 const labelClassName = "font-body font-medium";
@@ -14,6 +15,8 @@ export function CreateSubscriptionForm() {
     handleSubmit,
     reset,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm<CreateSubscriptionFormData>({});
   React.useEffect(() => {
     const sessionValues = sessionStorage.getItem("fields");
@@ -26,8 +29,10 @@ export function CreateSubscriptionForm() {
               process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS ||
               "hello@getalby.com",
             message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
-            sleepDuration:
-              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_DURATION || "30d",
+            timeframeValue:
+              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
+            timeframe:
+              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME || "days",
           }
     );
   }, [reset]);
@@ -36,6 +41,11 @@ export function CreateSubscriptionForm() {
     sessionStorage.setItem("fields", JSON.stringify(data));
     push("/confirm");
   });
+  const watchedTimeframe = watch("timeframe");
+  const setSelectedTimeframe = React.useCallback(
+    (timeframe: Timeframe) => setValue("timeframe", timeframe),
+    [setValue]
+  );
 
   return (
     <form
@@ -58,11 +68,25 @@ export function CreateSubscriptionForm() {
       <label className={labelClassName}>Message</label>
       <input
         {...register("message")}
-        placeholder="Keep going, you're doing great!"
+        placeholder="Providing continual support ⚡"
         className={inputClassName}
       />
       <label className={labelClassName}>Repeat every</label>
-      <input {...register("sleepDuration")} className={inputClassName} />
+      <div className="flex justify-center gap-2 items-">
+        <input {...register("timeframeValue")} className={inputClassName} />
+        <select
+          className="select select-bordered w-full max-w-xs"
+          onChange={(event) =>
+            setSelectedTimeframe(event.target.value as Timeframe)
+          }
+        >
+          {timeframes.map((timeframe) => (
+            <option key={timeframe} value={timeframe}>
+              {timeframe}
+            </option>
+          ))}
+        </select>
+      </div>
     </form>
   );
 }

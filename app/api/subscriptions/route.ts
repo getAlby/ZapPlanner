@@ -14,7 +14,10 @@ export async function POST(request: Request) {
         createSubscriptionRequest.recipientLightningAddress,
       nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,
       message: createSubscriptionRequest.message,
-      sleepDuration: createSubscriptionRequest.sleepDuration,
+      sleepDuration:
+        createSubscriptionRequest.timeframeValue +
+        " " +
+        createSubscriptionRequest.timeframe,
     },
   });
 
