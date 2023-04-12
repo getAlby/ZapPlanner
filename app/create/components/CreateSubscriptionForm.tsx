@@ -6,8 +6,10 @@ import React from "react";
 import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
 import { Timeframe, timeframes } from "types/Timeframe";
 
-const inputClassNameWithoutPadding = "input input-bordered w-full";
-const inputClassName = inputClassNameWithoutPadding + "mb-4";
+const inputClassNameWithoutBottomMargin = "input input-bordered w-full";
+const inputBottomMargin = "mb-4";
+const inputClassName =
+  inputClassNameWithoutBottomMargin + " " + inputBottomMargin;
 const labelClassName = "font-body font-medium";
 
 export function CreateSubscriptionForm() {
@@ -67,11 +69,13 @@ export function CreateSubscriptionForm() {
         className={inputClassName}
       />
       <label className={labelClassName}>Frequency</label>
-      <div className="flex justify-center gap-2 items-center">
+      <div
+        className={`flex justify-center gap-2 items-center ${inputBottomMargin}`}
+      >
         <p className="lg:flex-shrink-0">Repeat payment every</p>
         <input
           {...register("timeframeValue")}
-          className={`${inputClassNameWithoutPadding} w-full`}
+          className={`${inputClassNameWithoutBottomMargin} w-full`}
         />
         <select
           className="select select-bordered"
