@@ -17,4 +17,10 @@ model Subscription {
   amount Int
   message String?
   sleepDuration String
+  createdDateTime DateTime @default(now())
+  lastSuccessfulPaymentDateTime DateTime?
+  lastFailedPaymentDateTime DateTime?
+  numSuccessfulPayments Int @default(0)
+  numFailedPayments Int @default(0)
+  retryCount Int @default(0)
 }

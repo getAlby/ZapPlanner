@@ -8,6 +8,7 @@ import { WebLNProvider } from "@webbtc/webln-types";
 import { Event, NostrProvider } from "alby-tools/dist/types";
 import { signEvent, getPublicKey, getEventHash } from "nostr-tools";
 import { prismaClient } from "lib/server/prisma";
+import { MAX_RETRIES } from "lib/constants";
 
 global.crypto = crypto;
 
@@ -66,6 +67,7 @@ const periodicZap = inngest.createFunction(
         subscription;
       const message = subscription.message ?? undefined;
 
+      let paymentSucceeded = false;
       try {
         const noswebln = new webln.NostrWebLNProvider({
           relayUrl: "wss://relay.getalby.com/v1",
@@ -83,10 +85,38 @@ const periodicZap = inngest.createFunction(
         } else {
           await sendStandardPayment(ln, amount, message, noswebln);
         }
+        paymentSucceeded = true;
+        noswebln.close();
+        console.log("Closed noswebln");
       } catch (error) {
         console.error("Failed to send periodic zap", error);
         //throw error;
       }
+      const updatedSubscription = await prismaClient.subscription.update({
+        where: {
+          id: subscriptionId,
+        },
+        data: {
+          retryCount: paymentSucceeded ? 0 : subscription.retryCount + 1,
+          lastSuccessfulPaymentDateTime: paymentSucceeded
+            ? new Date()
+            : undefined,
+          lastFailedPaymentDateTime: !paymentSucceeded ? new Date() : undefined,
+          numFailedPayments:
+            subscription.numFailedPayments + (paymentSucceeded ? 0 : 1),
+          numSuccessfulPayments:
+            subscription.numSuccessfulPayments + (paymentSucceeded ? 1 : 0),
+        },
+      });
+
+      if (updatedSubscription.retryCount > MAX_RETRIES) {
+        console.error(
+          "subscription " + subscriptionId + " payment failed too many times"
+        );
+        return undefined;
+      }
+
+      console.log(`Sleeping for ${subscription.sleepDuration}`);
       return subscription.sleepDuration;
     });
 
@@ -94,9 +124,7 @@ const periodicZap = inngest.createFunction(
       return;
     }
 
-    console.log(`Sleeping for ${sleepDuration}`);
     await step.sleep(sleepDuration);
-    console.log("Sleep end");
 
     if (ENABLE_REPEAT_EVENTS) {
       // create a new event object without inngest-added properties (id, ts)
