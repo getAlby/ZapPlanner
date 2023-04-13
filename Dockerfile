@@ -43,7 +43,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app ./
+# fix NextJS 13 cache errors
+COPY --chown=nextjs:nodejs --from=builder /app/ ./
+#COPY --from=builder /app ./
 
 USER nextjs
 

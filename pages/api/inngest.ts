@@ -83,10 +83,13 @@ const periodicZap = inngest.createFunction(
         } else {
           await sendStandardPayment(ln, amount, message, noswebln);
         }
+        noswebln.close();
+        console.log("Closed noswebln");
       } catch (error) {
         console.error("Failed to send periodic zap", error);
         //throw error;
       }
+      console.log(`Sleeping for ${subscription.sleepDuration}`);
       return subscription.sleepDuration;
     });
 
@@ -94,9 +97,7 @@ const periodicZap = inngest.createFunction(
       return;
     }
 
-    console.log(`Sleeping for ${sleepDuration}`);
     await step.sleep(sleepDuration);
-    console.log("Sleep end");
 
     if (ENABLE_REPEAT_EVENTS) {
       // create a new event object without inngest-added properties (id, ts)
