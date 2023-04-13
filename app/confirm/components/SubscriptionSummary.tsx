@@ -53,6 +53,14 @@ export function SubscriptionSummary({
       {showFirstPayment && (
         <SubscriptionSummaryItem left="First payment" right="Immediately" />
       )}
+      {values.createdDateTime && (
+        <SubscriptionSummaryItem
+          left="Created"
+          right={formatDistance(values.createdDateTime, new Date(), {
+            addSuffix: true,
+          })}
+        />
+      )}
       {values.lastSuccessfulPaymentDateTime && (
         <SubscriptionSummaryItem
           left="Last payment"
