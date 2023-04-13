@@ -83,6 +83,8 @@ const periodicZap = inngest.createFunction(
         } else {
           await sendStandardPayment(ln, amount, message, noswebln);
         }
+        noswebln.close();
+        console.log("Closed noswebln");
       } catch (error) {
         console.error("Failed to send periodic zap", error);
         //throw error;
