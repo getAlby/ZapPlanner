@@ -98,7 +98,7 @@ export function SubscriptionSummary({
           right={values.numSuccessfulPayments}
         />
       )}
-      {values.numSuccessfulPayments && (
+      {(values.numSuccessfulPayments || 0) > 0 && (
         <SubscriptionSummaryItem
           left="Total sats sent"
           right={`${
