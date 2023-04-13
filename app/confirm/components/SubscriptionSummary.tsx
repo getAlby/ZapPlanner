@@ -100,7 +100,7 @@ export function SubscriptionSummary({
       )}
       {values.numSuccessfulPayments && (
         <SubscriptionSummaryItem
-          left="Total sent"
+          left="Total sats sent"
           right={`${
             (values.numSuccessfulPayments || 0) * parseInt(values.amount)
           }⚡`}
