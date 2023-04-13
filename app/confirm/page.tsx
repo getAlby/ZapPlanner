@@ -52,7 +52,7 @@ export default function ConfirmSubscriptionPage() {
           Nostr Wallet Connect
         </Link>{" "}
         to create new app session and securely connect your lightning wallet to
-        Periodic Payments Creator.
+        ZapPlanner.
       </p>
       <ConfirmSubscriptionForm values={subscriptionValues} />
     </>
