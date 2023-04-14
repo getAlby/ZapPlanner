@@ -23,6 +23,13 @@ export default async function SubscriptionPage({
 
   return (
     <>
+      {Date.now() - subscription.createdDateTime.getTime() < 30000 && (
+        <div className="bg-green-50 p-3 rounded-md">
+          <p className="font-body text-green-700 text-sm font-medium">
+            ✅Your periodic payment has been successfully created!
+          </p>
+        </div>
+      )}
       <h2 className="font-heading font-bold text-2xl">Periodic payment</h2>
       <SubscriptionSummary
         values={{
