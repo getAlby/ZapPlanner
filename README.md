@@ -2,6 +2,8 @@
 
 Periodic lightning payments powered by Nostr Wallet Connect (NWC)
 
+Try it here: https://zapplanner.albylabs.com/
+
 ## Installation
 
 Run `yarn install`
