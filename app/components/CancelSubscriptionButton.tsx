@@ -18,6 +18,7 @@ export function CancelSubscriptionButton({
     if (!res.ok) {
       alert(res.status + " " + res.statusText);
     } else {
+      sessionStorage.setItem("flashAlert", "subscriptionDeleted");
       push("/");
     }
   }, [push, subscriptionId]);

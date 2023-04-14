@@ -4,6 +4,7 @@ import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButto
 import { SaveSubscriptionAlert } from "app/subscriptions/[id]/components/SaveSubcriptionAlert";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import { StartNewSubscriptionForm } from "app/components/StartNewSubscriptionForm";
+import { FlashAlert } from "app/components/FlashAlert";
 
 export default async function SubscriptionPage({
   params,
@@ -23,13 +24,7 @@ export default async function SubscriptionPage({
 
   return (
     <>
-      {Date.now() - subscription.createdDateTime.getTime() < 30000 && (
-        <div className="bg-green-50 p-3 rounded-md">
-          <p className="font-body text-green-700 text-sm font-medium">
-            ✅Your periodic payment has been successfully created!
-          </p>
-        </div>
-      )}
+      <FlashAlert />
       <h2 className="font-heading font-bold text-2xl">Periodic payment</h2>
       <SubscriptionSummary
         values={{

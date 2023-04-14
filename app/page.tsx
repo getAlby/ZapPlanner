@@ -2,10 +2,12 @@ import { StartNewSubscriptionForm } from "app/components/StartNewSubscriptionFor
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FlashAlert } from "app/components/FlashAlert";
 
 export default function HomePage() {
   return (
     <>
+      <FlashAlert />
       <div className="w-full h-48 relative">
         <Image
           className="object-cover"
