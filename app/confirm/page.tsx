@@ -42,17 +42,24 @@ export default function ConfirmSubscriptionPage() {
         showFirstPayment
       />
       <div className="divider my-0" />
-      <h2 className="font-heading font-bold text-2xl">
-        Finalize with Nostr Wallet Connect
-      </h2>
+      <h2 className="font-heading font-bold text-2xl">Link your wallet</h2>
 
       <p className="font-body">
-        Use{" "}
+        Use Nostr Wallet Connect to securely connect your bitcoin lightning
+        wallet to ZapPlanner. Nostr Wallet connect is available for{" "}
         <Link href="https://nwc.getalby.com" target="_blank" className="link">
-          Nostr Wallet Connect
-        </Link>{" "}
-        to create new app session and securely connect your lightning wallet to
-        Periodic Payments Creator.
+          Alby accounts
+        </Link>
+        ,{" "}
+        <Link
+          href="https://github.com/getAlby/umbrel-community-app-store"
+          target="_blank"
+          className="link"
+        >
+          {" "}
+          Umbrel wallets
+        </Link>
+        , etc.
       </p>
       <ConfirmSubscriptionForm values={subscriptionValues} />
     </>
