@@ -12,9 +12,17 @@ Run `cp .env.example .env.local && husky install`
 
 Run `yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_KEY>` in .env.local
 
-## Development
+## Development (Docker)
 
 Run `yarn docker:start`
+
+Run `yarn inngest:local`
+
+Run `yarn dev`
+
+## Development (local)
+
+Run `yarn db:migrate:deploy`
 
 Run `yarn inngest:local`
 
