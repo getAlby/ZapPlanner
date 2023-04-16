@@ -27,16 +27,15 @@ export function CreateSubscriptionForm() {
       sessionValues
         ? JSON.parse(sessionValues)
         : {
-            amount: "1",
-            recipientLightningAddress:
-              process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS ||
-              "hello@getalby.com",
-            message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
-            timeframeValue:
-              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
-            timeframe:
-              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME || "days",
-          }
+          amount: "1000",
+          recipientLightningAddress:
+            process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
+          message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
+          timeframeValue:
+            process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
+          timeframe:
+            process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME || "days",
+        }
     );
   }, [reset]);
   const { push } = useRouter();
@@ -56,7 +55,7 @@ export function CreateSubscriptionForm() {
       onSubmit={onSubmit}
       className="flex flex-col gap-2 w-full"
     >
-      <label className={labelClassName}>Recipient Lightning address</label>
+      <label className={labelClassName}>Recipient lightning address</label>
       <input
         {...register("recipientLightningAddress")}
         placeholder="hello@getalby.com"
@@ -78,7 +77,9 @@ export function CreateSubscriptionForm() {
           className={`${inputClassNameWithoutBottomMargin} w-full`}
         />
         <select
+          {...register("timeframe")}
           className="select select-bordered"
+          defaultValue={watchedTimeframe}
           onChange={(event) =>
             setSelectedTimeframe(event.target.value as Timeframe)
           }
@@ -87,7 +88,6 @@ export function CreateSubscriptionForm() {
             <option
               key={timeframe}
               value={timeframe}
-              selected={timeframe === watchedTimeframe}
             >
               {timeframe}
             </option>
