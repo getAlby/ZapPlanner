@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
 import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
+import { webln } from "alby-js-sdk"
 const inputClassName = "input input-bordered w-full mb-4";
 const labelClassName = "font-body font-medium";
 
@@ -32,6 +33,10 @@ export function ConfirmSubscriptionForm({
 
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
+    const nwc = webln.NostrWebLNProvider.withNewSecret();
+    await nwc.initNWC('alby', { name: `ZapPlanner (${data.recipientLightningAddress})` });
+
+    data.nostrWalletConnectUrl = nwc.nostrWalletConnectUrl;
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       sessionStorage.setItem("flashAlert", "subscriptionCreated");
