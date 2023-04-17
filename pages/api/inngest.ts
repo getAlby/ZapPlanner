@@ -70,7 +70,6 @@ const periodicZap = inngest.createFunction(
       let paymentSucceeded = false;
       try {
         const noswebln = new webln.NostrWebLNProvider({
-          relayUrl: "wss://relay.getalby.com/v1",
           nostrWalletConnectUrl,
         });
 

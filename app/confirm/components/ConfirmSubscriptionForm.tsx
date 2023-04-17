@@ -6,9 +6,7 @@ import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
 import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
-import { webln } from "alby-js-sdk"
-const inputClassName = "input input-bordered w-full mb-4";
-const labelClassName = "font-body font-medium";
+import { webln } from "alby-js-sdk";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -19,11 +17,7 @@ type ConfirmSubscriptionFormProps = {
 export function ConfirmSubscriptionForm({
   values,
 }: ConfirmSubscriptionFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: {
       ...values,
       nostrWalletConnectUrl:
@@ -32,11 +26,24 @@ export function ConfirmSubscriptionForm({
   });
 
   const { push } = useRouter();
-  const onSubmit = handleSubmit(async (data) => {
-    const nwc = webln.NostrWebLNProvider.withNewSecret();
-    await nwc.initNWC('alby', { name: `ZapPlanner (${data.recipientLightningAddress})` });
+  const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
 
-    data.nostrWalletConnectUrl = nwc.nostrWalletConnectUrl;
+  const linkWallet = async () => {
+    const nwc = webln.NostrWebLNProvider.withNewSecret({
+      walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
+    });
+    await nwc.initNWC(process.env.NEXT_PUBLIC_NWC_NEW_APP_URL || "alby", {
+      name: `ZapPlanner (${values.recipientLightningAddress})`,
+    });
+
+    setValue("nostrWalletConnectUrl", nwc.getNostrWalletConnectUrl(true));
+  };
+
+  const onSubmit = handleSubmit(async (data) => {
+    if (!data.nostrWalletConnectUrl) {
+      alert("Please link your wallet");
+      return;
+    }
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       sessionStorage.setItem("flashAlert", "subscriptionCreated");
@@ -45,20 +52,11 @@ export function ConfirmSubscriptionForm({
   });
 
   return (
-    <form
-      id="create-subscription"
-      onSubmit={onSubmit}
-      className="flex flex-col gap-2 w-full"
-    >
-      <label className={labelClassName}>Nostr Wallet Connect URL</label>
-
-      <input
-        {...register("nostrWalletConnectUrl")}
-        placeholder="nostrwalletconnect://..."
-        className={inputClassName}
-        type="password"
-      />
-    </form>
+    <>
+      <form id="create-subscription" onSubmit={onSubmit} className="hidden" />
+      <button onClick={linkWallet}>Link wallet</button>
+      {hasLinkedWallet && <p>Wallet linked!</p>}
+    </>
   );
 }
 

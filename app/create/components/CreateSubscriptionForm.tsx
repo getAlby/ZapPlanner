@@ -27,15 +27,15 @@ export function CreateSubscriptionForm() {
       sessionValues
         ? JSON.parse(sessionValues)
         : {
-          amount: "1000",
-          recipientLightningAddress:
-            process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
-          message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
-          timeframeValue:
-            process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
-          timeframe:
-            process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME || "days",
-        }
+            amount: process.env.NEXT_PUBLIC_DEFAULT_AMOUNT || "1000",
+            recipientLightningAddress:
+              process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
+            message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
+            timeframeValue:
+              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
+            timeframe:
+              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME || "days",
+          }
     );
   }, [reset]);
   const { push } = useRouter();
@@ -85,10 +85,7 @@ export function CreateSubscriptionForm() {
           }
         >
           {timeframes.map((timeframe) => (
-            <option
-              key={timeframe}
-              value={timeframe}
-            >
+            <option key={timeframe} value={timeframe}>
               {timeframe}
             </option>
           ))}
