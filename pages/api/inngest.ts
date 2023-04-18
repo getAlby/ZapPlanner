@@ -33,7 +33,6 @@ type Events = {
 export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
 
 const ENABLE_REPEAT_EVENTS = true;
-const SEND_ZAP = false;
 
 const periodicZap = inngest.createFunction(
   {
@@ -80,11 +79,17 @@ const periodicZap = inngest.createFunction(
         });
         await ln.fetch();
 
-        if (SEND_ZAP) {
-          await sendZap(ln, noswebln, amount, message);
-        } else {
-          await sendStandardPayment(ln, amount, message, noswebln);
-        }
+        console.log("Enabling noswebln");
+        await noswebln.enable();
+        console.log("Requesting invoice");
+        const invoice = await ln.requestInvoice({
+          satoshi: amount,
+          comment: message,
+        });
+        console.log("Sending payment");
+        const response = await noswebln.sendPayment(invoice.paymentRequest);
+        console.log("Done", response);
+
         paymentSucceeded = true;
         noswebln.close();
         console.log("Closed noswebln");
@@ -137,70 +142,3 @@ const periodicZap = inngest.createFunction(
 );
 
 export default serve(inngest, [periodicZap]);
-
-async function sendZap(
-  ln: LightningAddress,
-  noswebln: webln.NostrWebLNProvider,
-  amount: number,
-  message: string | undefined
-) {
-  const DEFAULT_ZAP_RELAYS = [
-    "wss://relay.damus.io",
-    "wss://nos.lol",
-    "wss://relay.nostr.bg",
-    "wss://brb.io",
-  ];
-
-  const privateKey = noswebln.secret;
-
-  if (!privateKey || privateKey.length !== 64) {
-    throw new Error("nostrWalletConnectUrl does not contain a valid secret");
-  }
-  const pubkey = getPublicKey(privateKey);
-  // TODO: use noswebln instead of creating a NostrProvider
-  const nostr: NostrProvider = {
-    getPublicKey: () => Promise.resolve(pubkey),
-    signEvent: ((event: Event) => {
-      const signedEvent = {
-        ...event,
-        pubkey,
-      };
-
-      signedEvent.id = getEventHash(signedEvent);
-      signedEvent.sig = signEvent(signedEvent, privateKey);
-      console.error("Signed event: " + event.kind);
-      return Promise.resolve(signedEvent);
-    }) as unknown as () => Promise<Event> /*FIXME: remove cast when alby-tools is updated*/,
-  };
-
-  console.log("Sending zap...");
-  const response = await ln.zap(
-    {
-      satoshi: amount,
-      comment: message,
-      relays: DEFAULT_ZAP_RELAYS,
-    },
-    {
-      nostr,
-    }
-  );
-  console.error("Zap done", response);
-}
-
-async function sendStandardPayment(
-  ln: LightningAddress,
-  amount: number,
-  message: string | undefined,
-  noswebln: webln.NostrWebLNProvider
-) {
-  console.log("Enabling noswebln");
-  await noswebln.enable();
-  console.log("Requesting invoice");
-  const invoice = await ln.requestInvoice({
-    satoshi: amount,
-    comment: message,
-  });
-  console.log("Sending payment");
-  const response = await noswebln.sendPayment(invoice.paymentRequest);
-  console.log("Done", response);
-}
