@@ -48,11 +48,20 @@ export function ConfirmSubscriptionForm({
       <label className={labelClassName}>Nostr Wallet Connect URL</label>
 
       <input
-        {...register("nostrWalletConnectUrl")}
+        {...register("nostrWalletConnectUrl", {
+          validate: (value) =>
+            value.startsWith("nostrwalletconnect://") &&
+            value.indexOf("&secret=") > 0
+              ? undefined
+              : "Invalid NWC url",
+        })}
         placeholder="nostrwalletconnect://..."
         className={inputClassName}
         type="password"
       />
+      {errors.nostrWalletConnectUrl && (
+        <p className="text-error">{errors.nostrWalletConnectUrl.message}</p>
+      )}
     </form>
   );
 }
