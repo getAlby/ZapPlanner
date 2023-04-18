@@ -54,8 +54,26 @@ export function ConfirmSubscriptionForm({
   return (
     <>
       <form id="create-subscription" onSubmit={onSubmit} className="hidden" />
-      <button onClick={linkWallet}>Link wallet</button>
-      {hasLinkedWallet && <p>Wallet linked!</p>}
+      <div className="flex justify-center">
+        {!hasLinkedWallet ? (
+          <button
+            onClick={linkWallet}
+            className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
+            style={{
+              background:
+                "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
+            }}
+          >
+            Link Wallet
+          </button>
+        ) : (
+          <div className="bg-green-50 p-3 rounded-md w-full">
+            <p className="font-body text-green-700 text-sm font-medium">
+              ✅ Wallet linked
+            </p>
+          </div>
+        )}
+      </div>
     </>
   );
 }
