@@ -85,6 +85,12 @@ const periodicZap = inngest.createFunction(
         const invoice = await ln.requestInvoice({
           satoshi: amount,
           comment: message,
+          payerdata: subscription.payerName
+            ? {
+                name: subscription.payerName,
+                // TODO: also sender nostr pubkey
+              }
+            : undefined,
         });
         console.log("Sending payment");
         const response = await noswebln.sendPayment(invoice.paymentRequest);

@@ -22,7 +22,10 @@ export function CreateSubscriptionForm() {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<CreateSubscriptionFormData>({});
+  } = useForm<CreateSubscriptionFormData>({
+    reValidateMode: "onBlur",
+    mode: "onBlur",
+  });
   React.useEffect(() => {
     const sessionValues = sessionStorage.getItem("fields");
     reset(
@@ -52,6 +55,9 @@ export function CreateSubscriptionForm() {
   );
   const [validatingLightningAddress, setValidatingLightningAddress] =
     React.useState(false);
+  const [lightningAddress, setLightningAddress] = React.useState<
+    LightningAddress | undefined
+  >(undefined);
 
   return (
     <form
@@ -76,9 +82,14 @@ export function CreateSubscriptionForm() {
                 }
                 if (!errorMessage) {
                   await ln.fetch();
+                  if (!ln.lnurlpData) {
+                    errorMessage = "This lightning address does not exist";
+                  }
                 }
-                if (!ln.lnurlpData) {
-                  errorMessage = "This lightning address does not exist";
+                if (!errorMessage) {
+                  setLightningAddress(ln);
+                } else {
+                  setLightningAddress(undefined);
                 }
               } catch (e) {
                 errorMessage = "This is not a valid lightning address";
@@ -130,13 +141,10 @@ export function CreateSubscriptionForm() {
           onChange={(event) =>
             setSelectedTimeframe(event.target.value as Timeframe)
           }
+          value={watchedTimeframe}
         >
           {timeframes.map((timeframe) => (
-            <option
-              key={timeframe}
-              value={timeframe}
-              selected={timeframe === watchedTimeframe}
-            >
+            <option key={timeframe} value={timeframe}>
               {timeframe}
             </option>
           ))}
@@ -145,11 +153,33 @@ export function CreateSubscriptionForm() {
       {errors.timeframeValue && (
         <p className="text-error">{errors.timeframeValue.message}</p>
       )}
-      <label className={labelClassName}>Message attached</label>
+      <label className={labelClassName}>
+        Message attached (max{" "}
+        {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
+      </label>
       <input
         {...register("message")}
-        placeholder="Thank you for your work"
+        placeholder={
+          lightningAddress?.lnurlpData?.commentAllowed
+            ? "Thank you for your work"
+            : "Comments not supported by this lightning address"
+        }
         className={inputClassName}
+        disabled={!lightningAddress?.lnurlpData?.commentAllowed}
+        maxLength={lightningAddress?.lnurlpData?.commentAllowed}
+      />
+      <label className={labelClassName}>Payer name</label>
+      <input
+        {...register("payerName")}
+        placeholder={
+          lightningAddress?.lnurlpData?.payerData?.name
+            ? "Satoshi"
+            : "Payer name not supported by this lightning address"
+        }
+        className={inputClassName}
+        disabled={
+          !lightningAddress || !lightningAddress.lnurlpData?.payerData?.name
+        }
       />
     </form>
   );

@@ -142,7 +142,7 @@ function SubscriptionSummaryItem({
   return (
     <div className="flex w-full justify-between">
       <div className="font-body text-gray-700">{left}</div>
-      <div className="font-body text-black font-bold">{right}</div>
+      <div className="font-body text-black font-bold text-end">{right}</div>
     </div>
   );
 }

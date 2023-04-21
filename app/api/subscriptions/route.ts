@@ -14,6 +14,7 @@ export async function POST(request: Request) {
         createSubscriptionRequest.recipientLightningAddress,
       nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,
       message: createSubscriptionRequest.message,
+      payerName: createSubscriptionRequest.payerName,
       sleepDuration:
         createSubscriptionRequest.timeframeValue +
         " " +

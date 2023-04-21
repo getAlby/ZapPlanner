@@ -16,6 +16,7 @@ model Subscription {
   recipientLightningAddress String
   amount Int
   message String?
+  payerName String?
   sleepDuration String
   createdDateTime DateTime @default(now())
   lastSuccessfulPaymentDateTime DateTime?
