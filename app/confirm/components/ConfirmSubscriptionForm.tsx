@@ -5,18 +5,19 @@ import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
-import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
+import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
+import { isValidNostrConnectUrl } from "lib/validation";
 const inputClassName = "input input-bordered w-full mb-4";
 const labelClassName = "font-body font-medium";
 
 type FormData = CreateSubscriptionRequest;
 
 type ConfirmSubscriptionFormProps = {
-  values: CreateSubscriptionFormData;
+  unconfirmedSubscription: UnconfirmedSubscription;
 };
 
 export function ConfirmSubscriptionForm({
-  values,
+  unconfirmedSubscription,
 }: ConfirmSubscriptionFormProps) {
   const {
     register,
@@ -24,7 +25,7 @@ export function ConfirmSubscriptionForm({
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      ...values,
+      ...unconfirmedSubscription,
       nostrWalletConnectUrl:
         process.env.NEXT_PUBLIC_DEFAULT_NOSTR_WALLET_CONNECT_URL,
     },
@@ -51,12 +52,9 @@ export function ConfirmSubscriptionForm({
       <input
         {...register("nostrWalletConnectUrl", {
           validate: (value) =>
-            value.startsWith("nostrwalletconnect://") &&
-            value.indexOf("&secret=") > 0
-              ? undefined
-              : "Invalid NWC url",
+            isValidNostrConnectUrl(value) ? undefined : "Invalid NWC url",
         })}
-        placeholder="nostrwalletconnect://..."
+        placeholder="nostr+walletconnect://..."
         className={inputClassName}
         type="password"
       />

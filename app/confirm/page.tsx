@@ -4,11 +4,11 @@ import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
+import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 
 export default function ConfirmSubscriptionPage() {
-  const [subscriptionValues, setSubscriptionValues] = React.useState<
-    CreateSubscriptionFormData | undefined
+  const [subscriptionValues, setUnconfirmedSubscription] = React.useState<
+    UnconfirmedSubscription | undefined
   >();
   const { replace } = useRouter();
 
@@ -17,7 +17,11 @@ export default function ConfirmSubscriptionPage() {
     if (!subscriptionFields) {
       replace("/");
     } else {
-      setSubscriptionValues(JSON.parse(subscriptionFields));
+      const unconfirmedSubscription = JSON.parse(
+        subscriptionFields
+      ) as UnconfirmedSubscription;
+
+      setUnconfirmedSubscription(unconfirmedSubscription);
     }
   }, [replace]);
 
@@ -33,10 +37,7 @@ export default function ConfirmSubscriptionPage() {
           amount: subscriptionValues.amount,
           recipientLightningAddress:
             subscriptionValues.recipientLightningAddress,
-          sleepDuration:
-            subscriptionValues.timeframeValue +
-            " " +
-            subscriptionValues.timeframe,
+          sleepDuration: subscriptionValues.sleepDuration,
           message: subscriptionValues.message,
         }}
         showFirstPayment
@@ -61,7 +62,7 @@ export default function ConfirmSubscriptionPage() {
         </Link>
         , etc.
       </p>
-      <ConfirmSubscriptionForm values={subscriptionValues} />
+      <ConfirmSubscriptionForm unconfirmedSubscription={subscriptionValues} />
     </>
   );
 }

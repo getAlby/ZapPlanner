@@ -3,16 +3,23 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
 import { Timeframe, timeframes } from "types/Timeframe";
-import { LightningAddress } from "alby-tools";
+import { LightningAddress, LUD18PayerData } from "alby-tools";
 import { Loading } from "app/components/Loading";
+import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
+import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
+import { isValidPositiveValue } from "lib/validation";
 
 const inputClassNameWithoutBottomMargin = "input input-bordered w-full";
 const inputBottomMargin = "mb-4";
 const inputClassName =
   inputClassNameWithoutBottomMargin + " " + inputBottomMargin;
 const labelClassName = "font-body font-medium";
+
+type CreateSubscriptionFormData = Omit<
+  CreateSubscriptionRequest,
+  "nostrWalletConnectUrl" | "payerData" | "sleepDuration"
+> & { payerName: string; timeframe: Timeframe; timeframeValue: string };
 
 export function CreateSubscriptionForm() {
   const {
@@ -45,7 +52,19 @@ export function CreateSubscriptionForm() {
   }, [reset]);
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
-    sessionStorage.setItem("fields", JSON.stringify(data));
+    const unconfirmedSubscription: UnconfirmedSubscription = {
+      amount: data.amount,
+      recipientLightningAddress: data.recipientLightningAddress,
+      message: data.message,
+      sleepDuration: data.timeframeValue + " " + data.timeframe,
+      payerData: data.payerName
+        ? JSON.stringify({
+            payerName: data.payerName,
+          } as LUD18PayerData)
+        : undefined,
+    };
+
+    sessionStorage.setItem("fields", JSON.stringify(unconfirmedSubscription));
     push("/confirm");
   });
   const watchedTimeframe = watch("timeframe");
@@ -114,7 +133,7 @@ export function CreateSubscriptionForm() {
       <input
         {...register("amount", {
           validate: (value) =>
-            parseInt(value) <= 0 || isNaN(parseInt(value))
+            !isValidPositiveValue(parseInt(value))
               ? "Please enter a positive value"
               : undefined,
         })}
@@ -130,7 +149,7 @@ export function CreateSubscriptionForm() {
         <input
           {...register("timeframeValue", {
             validate: (value) =>
-              parseInt(value) <= 0 || isNaN(parseInt(value))
+              !isValidPositiveValue(parseInt(value))
                 ? "Please enter a positive value"
                 : undefined,
           })}
@@ -174,7 +193,8 @@ export function CreateSubscriptionForm() {
         placeholder={
           lightningAddress?.lnurlpData?.payerData?.name
             ? "Satoshi"
-            : "Payer name not supported by this lightning address"
+            : "Payer name not supported by this lightning address - " +
+              JSON.stringify(lightningAddress?.lnurlpData)
         }
         className={inputClassName}
         disabled={

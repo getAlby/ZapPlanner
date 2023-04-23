@@ -5,8 +5,6 @@ import { LightningAddress } from "alby-tools";
 import { Inngest } from "inngest";
 import { serve } from "inngest/next";
 import { WebLNProvider } from "@webbtc/webln-types";
-import { Event, NostrProvider } from "alby-tools/dist/types";
-import { signEvent, getPublicKey, getEventHash } from "nostr-tools";
 import { prismaClient } from "lib/server/prisma";
 import { MAX_RETRIES } from "lib/constants";
 
@@ -79,18 +77,28 @@ const periodicZap = inngest.createFunction(
         });
         await ln.fetch();
 
+        if (!ln.lnurlpData) {
+          throw new Error(
+            "Failed to retrieve LNURLp data for " + recipientLightningAddress
+          );
+        }
+
         console.log("Enabling noswebln");
         await noswebln.enable();
         console.log("Requesting invoice");
         const invoice = await ln.requestInvoice({
           satoshi: amount,
-          comment: message,
-          payerdata: subscription.payerName
-            ? {
-                name: subscription.payerName,
-                // TODO: also sender nostr pubkey
-              }
-            : undefined,
+          comment:
+            message &&
+            ln.lnurlpData.commentAllowed &&
+            ln.lnurlpData.commentAllowed >= message.length
+              ? message
+              : undefined,
+          // TODO: only send supported payerData?
+          payerdata:
+            ln.lnurlpData.payerData && subscription.payerData
+              ? JSON.parse(subscription.payerData)
+              : undefined,
         });
         console.log("Sending payment");
         const response = await noswebln.sendPayment(invoice.paymentRequest);

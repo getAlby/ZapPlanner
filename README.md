@@ -4,6 +4,15 @@ Periodic lightning payments powered by Nostr Wallet Connect (NWC)
 
 Try it here: https://zapplanner.albylabs.com/
 
+## Programmatically filling the fields
+
+As a service you can programmatically create a URL with all the subscription properties that your users will only need to confirm:
+http://zapplanner.com/confirm?recipient=hello@getalby.com&timeframe=30d&message=baz
+
+&payerdata={"foo"="bar"}
+
+The timeframe field
+
 ## Installation
 
 Run `yarn install`
