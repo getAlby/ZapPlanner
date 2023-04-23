@@ -9,7 +9,7 @@ Try it here: https://zapplanner.albylabs.com/
 As a service you can programmatically create a URL with all the subscription properties that your users will only need to confirm:
 
 ```
-http://zapplanner.com/confirm?amount=21&recipient=hello@getalby.com&timeframe=30d&comment=baz&payerdata=%7B%22name%22%3A%22Bob%22%7D
+https://zapplanner.com/confirm?amount=21&recipient=hello@getalby.com&timeframe=30d&comment=baz&payerdata=%7B%22name%22%3A%22Bob%22%7D
 ```
 
 - `amount`, `recipient`, `timeframe` are required
