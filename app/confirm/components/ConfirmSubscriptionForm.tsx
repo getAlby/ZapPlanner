@@ -14,10 +14,12 @@ type FormData = CreateSubscriptionRequest;
 
 type ConfirmSubscriptionFormProps = {
   unconfirmedSubscription: UnconfirmedSubscription;
+  returnUrl?: string;
 };
 
 export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
+  returnUrl,
 }: ConfirmSubscriptionFormProps) {
   const {
     register,
@@ -37,7 +39,11 @@ export function ConfirmSubscriptionForm({
     if (subscriptionId) {
       sessionStorage.removeItem("fields");
       sessionStorage.setItem("flashAlert", "subscriptionCreated");
-      push(`/subscriptions/${subscriptionId}`);
+      push(
+        `/subscriptions/${subscriptionId}${
+          returnUrl ? `?returnUrl=${returnUrl}` : ""
+        }`
+      );
     }
   });
 

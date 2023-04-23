@@ -5,11 +5,14 @@ import { SaveSubscriptionAlert } from "app/subscriptions/[id]/components/SaveSub
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import { StartNewSubscriptionForm } from "app/components/StartNewSubscriptionForm";
 import { FlashAlert } from "app/components/FlashAlert";
+import Link from "next/link";
 
 export default async function SubscriptionPage({
   params,
+  searchParams,
 }: {
   params: { id: string };
+  searchParams?: { returnUrl?: string };
 }) {
   const subscriptionId = params.id;
 
@@ -46,6 +49,14 @@ export default async function SubscriptionPage({
       <div className="divider my-0" />
 
       <SaveSubscriptionAlert />
+      {searchParams?.returnUrl && (
+        <Link href={searchParams.returnUrl}>
+          <button className="btn btn-primary btn-block normal-case">
+            Return to {searchParams.returnUrl}
+          </button>
+        </Link>
+      )}
+
       <CancelSubscriptionButton subscriptionId={subscription.id} />
       <StartNewSubscriptionForm />
     </>

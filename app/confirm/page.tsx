@@ -11,17 +11,19 @@ type ConfirmSubscriptionPageProps = {
     amount: string;
     recipient: string;
     timeframe: string;
-    comment: string;
-    payerdata: string;
+    comment?: string;
+    payerdata?: string;
+    returnUrl?: string;
   };
 };
 
 export default function ConfirmSubscriptionPage({
   searchParams,
 }: ConfirmSubscriptionPageProps) {
-  const [subscriptionValues, setUnconfirmedSubscription] = React.useState<
+  const [unconfirmedSubscription, setUnconfirmedSubscription] = React.useState<
     UnconfirmedSubscription | undefined
   >();
+  const [returnUrl, setReturnUrl] = React.useState<string | undefined>();
   const { replace } = useRouter();
 
   React.useEffect(() => {
@@ -41,6 +43,7 @@ export default function ConfirmSubscriptionPage({
           ? decodeURIComponent(searchParams.payerdata)
           : undefined,
       });
+      setReturnUrl(searchParams.returnUrl);
     } else if (subscriptionFields) {
       const unconfirmedSubscription = JSON.parse(
         subscriptionFields
@@ -52,7 +55,7 @@ export default function ConfirmSubscriptionPage({
     }
   }, [replace, searchParams]);
 
-  if (!subscriptionValues) {
+  if (!unconfirmedSubscription) {
     return null;
   }
 
@@ -61,12 +64,12 @@ export default function ConfirmSubscriptionPage({
       <h2 className="font-heading font-bold text-2xl">Summary</h2>
       <SubscriptionSummary
         values={{
-          amount: subscriptionValues.amount,
+          amount: unconfirmedSubscription.amount,
           recipientLightningAddress:
-            subscriptionValues.recipientLightningAddress,
-          sleepDuration: subscriptionValues.sleepDuration,
-          message: subscriptionValues.message,
-          payerData: subscriptionValues.payerData,
+            unconfirmedSubscription.recipientLightningAddress,
+          sleepDuration: unconfirmedSubscription.sleepDuration,
+          message: unconfirmedSubscription.message,
+          payerData: unconfirmedSubscription.payerData,
         }}
         showFirstPayment
       />
@@ -90,7 +93,10 @@ export default function ConfirmSubscriptionPage({
         </Link>
         , etc.
       </p>
-      <ConfirmSubscriptionForm unconfirmedSubscription={subscriptionValues} />
+      <ConfirmSubscriptionForm
+        unconfirmedSubscription={unconfirmedSubscription}
+        returnUrl={returnUrl}
+      />
     </>
   );
 }
