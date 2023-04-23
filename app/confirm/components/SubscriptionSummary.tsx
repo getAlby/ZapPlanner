@@ -15,6 +15,7 @@ type SubscriptionSummaryProps = {
     numSuccessfulPayments?: number;
     numFailedPayments?: number;
     retryCount?: number;
+    payerData?: string;
   };
   showFirstPayment?: boolean;
 };
@@ -50,6 +51,9 @@ export function SubscriptionSummary({
         left="Message"
         right={values.message || "(no message provided)"}
       />
+      {values.payerData && (
+        <SubscriptionSummaryItem left="Payer Data" right={values.payerData} />
+      )}
       {showFirstPayment && (
         <SubscriptionSummaryItem left="First payment" right="Immediately" />
       )}

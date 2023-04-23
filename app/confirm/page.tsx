@@ -6,7 +6,19 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 
-export default function ConfirmSubscriptionPage() {
+type ConfirmSubscriptionPageProps = {
+  searchParams?: {
+    amount: string;
+    recipient: string;
+    timeframe: string;
+    comment: string;
+    payerdata: string;
+  };
+};
+
+export default function ConfirmSubscriptionPage({
+  searchParams,
+}: ConfirmSubscriptionPageProps) {
   const [subscriptionValues, setUnconfirmedSubscription] = React.useState<
     UnconfirmedSubscription | undefined
   >();
@@ -14,16 +26,31 @@ export default function ConfirmSubscriptionPage() {
 
   React.useEffect(() => {
     const subscriptionFields = sessionStorage.getItem("fields");
-    if (!subscriptionFields) {
-      replace("/");
-    } else {
+
+    if (
+      searchParams?.amount &&
+      searchParams.recipient &&
+      searchParams.timeframe
+    ) {
+      setUnconfirmedSubscription({
+        amount: searchParams.amount,
+        recipientLightningAddress: searchParams.recipient,
+        sleepDuration: decodeURIComponent(searchParams.timeframe),
+        message: searchParams.comment,
+        payerData: searchParams.payerdata
+          ? decodeURIComponent(searchParams.payerdata)
+          : undefined,
+      });
+    } else if (subscriptionFields) {
       const unconfirmedSubscription = JSON.parse(
         subscriptionFields
       ) as UnconfirmedSubscription;
 
       setUnconfirmedSubscription(unconfirmedSubscription);
+    } else {
+      replace("/");
     }
-  }, [replace]);
+  }, [replace, searchParams]);
 
   if (!subscriptionValues) {
     return null;
@@ -39,6 +66,7 @@ export default function ConfirmSubscriptionPage() {
             subscriptionValues.recipientLightningAddress,
           sleepDuration: subscriptionValues.sleepDuration,
           message: subscriptionValues.message,
+          payerData: subscriptionValues.payerData,
         }}
         showFirstPayment
       />

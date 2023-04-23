@@ -40,6 +40,7 @@ export default async function SubscriptionPage({
           numFailedPayments: subscription.numFailedPayments,
           numSuccessfulPayments: subscription.numSuccessfulPayments,
           retryCount: subscription.retryCount,
+          payerData: subscription.payerData ?? undefined,
         }}
       />
       <div className="divider my-0" />
