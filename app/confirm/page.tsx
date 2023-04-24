@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
+import { useSearchParams } from "next/navigation";
 
 type ConfirmSubscriptionPageProps = {
   searchParams?: {
@@ -17,33 +18,37 @@ type ConfirmSubscriptionPageProps = {
   };
 };
 
-export default function ConfirmSubscriptionPage({
-  searchParams,
-}: ConfirmSubscriptionPageProps) {
+export default function ConfirmSubscriptionPage({}: ConfirmSubscriptionPageProps) {
   const [unconfirmedSubscription, setUnconfirmedSubscription] = React.useState<
     UnconfirmedSubscription | undefined
   >();
   const [returnUrl, setReturnUrl] = React.useState<string | undefined>();
   const { replace } = useRouter();
+  const searchParams = useSearchParams();
 
   React.useEffect(() => {
+    if (!searchParams) {
+      // router not ready
+      return;
+    }
     const subscriptionFields = sessionStorage.getItem("fields");
 
+    const searchParamsObj = Object.fromEntries(searchParams.entries());
     if (
-      searchParams?.amount &&
-      searchParams.recipient &&
-      searchParams.timeframe
+      searchParamsObj?.amount &&
+      searchParamsObj.recipient &&
+      searchParamsObj.timeframe
     ) {
       setUnconfirmedSubscription({
-        amount: searchParams.amount,
-        recipientLightningAddress: searchParams.recipient,
-        sleepDuration: decodeURIComponent(searchParams.timeframe),
-        message: searchParams.comment,
-        payerData: searchParams.payerdata
-          ? decodeURIComponent(searchParams.payerdata)
+        amount: searchParamsObj.amount,
+        recipientLightningAddress: searchParamsObj.recipient,
+        sleepDuration: decodeURIComponent(searchParamsObj.timeframe),
+        message: searchParamsObj.comment,
+        payerData: searchParamsObj.payerdata
+          ? decodeURIComponent(searchParamsObj.payerdata)
           : undefined,
       });
-      setReturnUrl(searchParams.returnUrl);
+      setReturnUrl(searchParamsObj.returnUrl);
     } else if (subscriptionFields) {
       const unconfirmedSubscription = JSON.parse(
         subscriptionFields
