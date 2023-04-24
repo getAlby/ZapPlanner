@@ -26,50 +26,53 @@ type CreateSubscriptionFormData = Omit<
 > & { payerName: string; timeframe: Timeframe; timeframeValue: string };
 
 export function CreateSubscriptionForm() {
+  const params = new URLSearchParams(
+    global.window ? window.location.search : undefined
+  );
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
     watch,
     setValue,
   } = useForm<CreateSubscriptionFormData>({
     reValidateMode: "onBlur",
     mode: "onBlur",
+    defaultValues: {
+      amount: params.get("amount") || "1",
+      recipientLightningAddress:
+        process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
+      message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
+      timeframeValue:
+        process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
+      timeframe:
+        (process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME as Timeframe) ||
+        "days",
+    },
   });
-  React.useEffect(() => {
-    const sessionValues = sessionStorage.getItem("fields");
-    reset(
-      sessionValues
-        ? JSON.parse(sessionValues)
-        : {
-            amount: "1",
-            recipientLightningAddress:
-              process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
-            message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
-            timeframeValue:
-              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
-            timeframe:
-              process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME || "days",
-          }
-    );
-  }, [reset]);
+
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
-    const unconfirmedSubscription: UnconfirmedSubscription = {
-      amount: data.amount,
-      recipientLightningAddress: data.recipientLightningAddress,
-      message: data.message,
-      sleepDuration: data.timeframeValue + " " + data.timeframe,
-      payerData: data.payerName
-        ? JSON.stringify({
-            payerName: data.payerName,
-          } as LUD18PayerData)
-        : undefined,
-    };
+    const payerData = data.payerName
+      ? JSON.stringify({
+          payerName: data.payerName,
+        } as LUD18PayerData)
+      : undefined;
 
-    sessionStorage.setItem("fields", JSON.stringify(unconfirmedSubscription));
-    push("/confirm");
+    const searchParams = new URLSearchParams();
+    searchParams.append("amount", data.amount);
+    searchParams.append("recipient", data.recipientLightningAddress);
+    searchParams.append(
+      "timeframe",
+      data.timeframeValue + " " + data.timeframe
+    );
+    if (data.message) {
+      searchParams.append("comment", encodeURIComponent(data.message));
+    }
+    if (payerData) {
+      searchParams.append("payerdata", encodeURIComponent(payerData));
+    }
+    push(`/confirm?${searchParams.toString()}`);
   });
   const watchedTimeframe = watch("timeframe");
   const setSelectedTimeframe = React.useCallback(
@@ -157,6 +160,7 @@ export function CreateSubscriptionForm() {
                 ? "Please enter a positive value"
                 : undefined,
           })}
+          placeholder="30"
           className={`${inputClassNameWithoutBottomMargin} w-full`}
         />
         <select

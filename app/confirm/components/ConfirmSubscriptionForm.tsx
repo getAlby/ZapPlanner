@@ -37,7 +37,6 @@ export function ConfirmSubscriptionForm({
   const onSubmit = handleSubmit(async (data) => {
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
-      sessionStorage.removeItem("fields");
       sessionStorage.setItem("flashAlert", "subscriptionCreated");
       push(
         `/subscriptions/${subscriptionId}${

@@ -1,12 +1,9 @@
-"use client";
 import { ConfirmSubscriptionForm } from "app/confirm/components/ConfirmSubscriptionForm";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import React from "react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
-import { useSearchParams } from "next/navigation";
-import { Loading } from "app/components/Loading";
 
 type ConfirmSubscriptionPageProps = {
   searchParams?: {
@@ -19,55 +16,30 @@ type ConfirmSubscriptionPageProps = {
   };
 };
 
-export default function ConfirmSubscriptionPage({}: ConfirmSubscriptionPageProps) {
-  const [unconfirmedSubscription, setUnconfirmedSubscription] = React.useState<
-    UnconfirmedSubscription | undefined
-  >();
-  const [returnUrl, setReturnUrl] = React.useState<string | undefined>();
-  const { replace } = useRouter();
-  const searchParams = useSearchParams();
+export const dynamic = "force-dynamic";
 
-  React.useEffect(() => {
-    if (!searchParams) {
-      // router not ready
-      return;
-    }
-    const subscriptionFields = sessionStorage.getItem("fields");
-
-    const searchParamsObj = Object.fromEntries(searchParams.entries());
-    if (
-      searchParamsObj?.amount &&
-      searchParamsObj.recipient &&
-      searchParamsObj.timeframe
-    ) {
-      setUnconfirmedSubscription({
-        amount: searchParamsObj.amount,
-        recipientLightningAddress: searchParamsObj.recipient,
-        sleepDuration: decodeURIComponent(searchParamsObj.timeframe),
-        message: searchParamsObj.comment,
-        payerData: searchParamsObj.payerdata
-          ? decodeURIComponent(searchParamsObj.payerdata)
-          : undefined,
-      });
-      setReturnUrl(searchParamsObj.returnUrl);
-    } else if (subscriptionFields) {
-      const unconfirmedSubscription = JSON.parse(
-        subscriptionFields
-      ) as UnconfirmedSubscription;
-
-      setUnconfirmedSubscription(unconfirmedSubscription);
-    } else {
-      replace("/");
-    }
-  }, [replace, searchParams]);
-
-  if (!unconfirmedSubscription) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loading />
-      </div>
-    );
+export default function ConfirmSubscriptionPage({
+  searchParams,
+}: ConfirmSubscriptionPageProps) {
+  if (
+    !searchParams?.amount ||
+    !searchParams?.recipient ||
+    !searchParams?.timeframe
+  ) {
+    redirect("/");
   }
+
+  const unconfirmedSubscription: UnconfirmedSubscription = {
+    amount: searchParams.amount,
+    recipientLightningAddress: searchParams.recipient,
+    sleepDuration: decodeURIComponent(searchParams.timeframe),
+    message: searchParams.comment
+      ? decodeURIComponent(searchParams.comment)
+      : undefined,
+    payerData: searchParams.payerdata
+      ? decodeURIComponent(searchParams.payerdata)
+      : undefined,
+  };
 
   return (
     <>
@@ -105,7 +77,7 @@ export default function ConfirmSubscriptionPage({}: ConfirmSubscriptionPageProps
       </p>
       <ConfirmSubscriptionForm
         unconfirmedSubscription={unconfirmedSubscription}
-        returnUrl={returnUrl}
+        returnUrl={searchParams.returnUrl}
       />
     </>
   );
