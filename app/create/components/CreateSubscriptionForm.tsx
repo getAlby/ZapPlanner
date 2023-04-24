@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { Timeframe, timeframes } from "types/Timeframe";
-import { LightningAddress, LUD18PayerData } from "alby-tools";
+import { LightningAddress } from "alby-tools";
+import { LnUrlPayResponse } from "alby-tools/dist/types";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
@@ -15,6 +16,9 @@ const inputBottomMargin = "mb-4";
 const inputClassName =
   inputClassNameWithoutBottomMargin + " " + inputBottomMargin;
 const labelClassName = "font-body font-medium";
+
+// TODO: remove when alby-tools exposes LUD18PayerData
+type LUD18PayerData = LnUrlPayResponse["payerData"];
 
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,
