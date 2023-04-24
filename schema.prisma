@@ -16,6 +16,7 @@ model Subscription {
   recipientLightningAddress String
   amount Int
   message String?
+  payerData String? // LUD-18 encoded JSON payer data
   sleepDuration String
   createdDateTime DateTime @default(now())
   lastSuccessfulPaymentDateTime DateTime?
