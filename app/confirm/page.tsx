@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { useSearchParams } from "next/navigation";
+import { Loading } from "app/components/Loading";
 
 type ConfirmSubscriptionPageProps = {
   searchParams?: {
@@ -61,7 +62,11 @@ export default function ConfirmSubscriptionPage({}: ConfirmSubscriptionPageProps
   }, [replace, searchParams]);
 
   if (!unconfirmedSubscription) {
-    return null;
+    return (
+      <div className="flex justify-center items-center h-96">
+        <Loading />
+      </div>
+    );
   }
 
   return (
