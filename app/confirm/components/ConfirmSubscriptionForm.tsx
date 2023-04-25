@@ -33,7 +33,7 @@ export function ConfirmSubscriptionForm({
   const linkWallet = async () => {
     const nwc = webln.NostrWebLNProvider.withNewSecret({
       walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
-      connectUrl: process.env.NEXT_PUBLIC_NWC_CONNECT_URL,
+      authorizationUrl: process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL,
     });
     await nwc.initNWC({
       name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
