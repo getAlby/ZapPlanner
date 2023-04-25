@@ -39,7 +39,7 @@ export function CreateSubscriptionForm() {
     reValidateMode: "onBlur",
     mode: "onBlur",
     defaultValues: {
-      amount: params.get("amount") || "1",
+      amount: params.get("amount"),
       recipientLightningAddress:
         process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
       message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
@@ -144,11 +144,10 @@ export function CreateSubscriptionForm() {
               ? "Please enter a positive value"
               : undefined,
         })}
-        placeholder="21"
+        placeholder="2100"
         className={inputClassName}
       />
       {errors.amount && <p className="text-error">{errors.amount.message}</p>}
-      <label className={labelClassName}>Frequency</label>
       <div
         className={`flex justify-center gap-2 items-center ${inputBottomMargin}`}
       >
@@ -182,35 +181,32 @@ export function CreateSubscriptionForm() {
       {errors.timeframeValue && (
         <p className="text-error">{errors.timeframeValue.message}</p>
       )}
-      <label className={labelClassName}>
-        Message attached (max{" "}
-        {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
-      </label>
-      <input
-        {...register("message")}
-        placeholder={
-          lightningAddress?.lnurlpData?.commentAllowed
-            ? "Thank you for your work"
-            : "Comments not supported by this lightning address"
-        }
-        className={inputClassName}
-        disabled={!lightningAddress?.lnurlpData?.commentAllowed}
-        maxLength={lightningAddress?.lnurlpData?.commentAllowed}
-      />
-      <label className={labelClassName}>Payer name</label>
-      <input
-        {...register("payerName")}
-        placeholder={
-          lightningAddress?.lnurlpData?.payerData?.name
-            ? "Satoshi"
-            : "Payer name not supported by this lightning address - " +
-              JSON.stringify(lightningAddress?.lnurlpData)
-        }
-        className={inputClassName}
-        disabled={
-          !lightningAddress || !lightningAddress.lnurlpData?.payerData?.name
-        }
-      />
+
+      {lightningAddress && lightningAddress?.lnurlpData?.commentAllowed && (
+        <>
+          <label className={labelClassName}>
+            Your message (max{" "}
+            {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
+          </label>
+
+          <input
+            {...register("message")}
+            className={inputClassName}
+            maxLength={lightningAddress?.lnurlpData?.commentAllowed}
+          />
+        </>
+      )}
+
+      {lightningAddress && lightningAddress?.lnurlpData?.payerData?.name && (
+        <>
+          <label className={labelClassName}>Your name</label>
+          <input
+            {...register("payerName")}
+            className={inputClassName}
+          />
+        </>
+      )}
+
     </form>
   );
 }
