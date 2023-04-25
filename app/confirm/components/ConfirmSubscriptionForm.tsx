@@ -31,10 +31,15 @@ export function ConfirmSubscriptionForm({
   const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
 
   const linkWallet = async () => {
-    const nwc = webln.NostrWebLNProvider.withNewSecret({
-      walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
-      authorizationUrl: process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL,
-    });
+    const nwc = webln.NostrWebLNProvider.withNewSecret(
+      process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY &&
+        process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL
+        ? {
+            walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
+            authorizationUrl: process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL,
+          }
+        : undefined
+    );
     await nwc.initNWC({
       name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
     });
