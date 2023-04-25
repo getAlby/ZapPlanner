@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8080",
+    "dev": "next dev -p 8081",
     "build": "next build",
     "start": "next start",
     "lint": "tsc -noEmit && next lint && yarn format:check",
@@ -28,7 +28,7 @@
     "@types/node": "18.15.11",
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
-    "alby-js-sdk": "^1.4.3",
+    "alby-js-sdk": "^1.5.1",
     "alby-tools": "^2.2.0",
     "autoprefixer": "^10.4.14",
     "daisyui": "^2.51.5",

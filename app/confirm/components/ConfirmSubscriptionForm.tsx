@@ -5,10 +5,8 @@ import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
+import { webln } from "alby-js-sdk";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
-import { isValidNostrConnectUrl } from "lib/validation";
-const inputClassName = "input input-bordered w-full mb-4";
-const labelClassName = "font-body font-medium";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -21,11 +19,7 @@ export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
   returnUrl,
 }: ConfirmSubscriptionFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
+  const { handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: {
       ...unconfirmedSubscription,
       nostrWalletConnectUrl:
@@ -34,7 +28,25 @@ export function ConfirmSubscriptionForm({
   });
 
   const { push } = useRouter();
+  const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
+
+  const linkWallet = async () => {
+    const nwc = webln.NostrWebLNProvider.withNewSecret({
+      walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
+      authorizationUrl: process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL,
+    });
+    await nwc.initNWC({
+      name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
+    });
+
+    setValue("nostrWalletConnectUrl", nwc.getNostrWalletConnectUrl(true));
+  };
+
   const onSubmit = handleSubmit(async (data) => {
+    if (!data.nostrWalletConnectUrl) {
+      alert("Please link your wallet");
+      return;
+    }
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       sessionStorage.setItem("flashAlert", "subscriptionCreated");
@@ -47,26 +59,29 @@ export function ConfirmSubscriptionForm({
   });
 
   return (
-    <form
-      id="create-subscription"
-      onSubmit={onSubmit}
-      className="flex flex-col gap-2 w-full"
-    >
-      <label className={labelClassName}>Nostr Wallet Connect URL</label>
-
-      <input
-        {...register("nostrWalletConnectUrl", {
-          validate: (value) =>
-            isValidNostrConnectUrl(value) ? undefined : "Invalid NWC url",
-        })}
-        placeholder="nostr+walletconnect://..."
-        className={inputClassName}
-        type="password"
-      />
-      {errors.nostrWalletConnectUrl && (
-        <p className="text-error">{errors.nostrWalletConnectUrl.message}</p>
-      )}
-    </form>
+    <>
+      <form id="create-subscription" onSubmit={onSubmit} className="hidden" />
+      <div className="flex justify-center">
+        {!hasLinkedWallet ? (
+          <button
+            onClick={linkWallet}
+            className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
+            style={{
+              background:
+                "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
+            }}
+          >
+            Link Wallet
+          </button>
+        ) : (
+          <div className="bg-green-50 p-3 rounded-md w-full">
+            <p className="font-body text-green-700 text-sm font-medium">
+              ✅ Wallet linked
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
