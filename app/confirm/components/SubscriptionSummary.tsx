@@ -15,6 +15,7 @@ type SubscriptionSummaryProps = {
     numSuccessfulPayments?: number;
     numFailedPayments?: number;
     retryCount?: number;
+    payerData?: string;
   };
   showFirstPayment?: boolean;
 };
@@ -50,6 +51,9 @@ export function SubscriptionSummary({
         left="Message"
         right={values.message || "(no message provided)"}
       />
+      {values.payerData && (
+        <SubscriptionSummaryItem left="Payer Data" right={values.payerData} />
+      )}
       {showFirstPayment && (
         <SubscriptionSummaryItem left="First payment" right="Immediately" />
       )}
@@ -142,7 +146,7 @@ function SubscriptionSummaryItem({
   return (
     <div className="flex w-full justify-between">
       <div className="font-body text-gray-700">{left}</div>
-      <div className="font-body text-black font-bold">{right}</div>
+      <div className="font-body text-black font-bold text-end">{right}</div>
     </div>
   );
 }

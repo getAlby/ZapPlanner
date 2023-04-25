@@ -1,6 +1,6 @@
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 
-export type CreateSubscriptionFormData = Omit<
+export type UnconfirmedSubscription = Omit<
   CreateSubscriptionRequest,
   "nostrWalletConnectUrl"
 >;

@@ -432,10 +432,10 @@ alby-js-sdk@^1.4.3:
     crypto-js "^4.1.1"
     nostr-tools "^1.7.5"
 
-alby-tools@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/alby-tools/-/alby-tools-2.1.0.tgz#34369a0275deb02d6b61ff7e3a9d845e35e874ed"
-  integrity sha512-MRFc9T0UiIS22veJ2/UCB+nyfP1cFOhaOMdj1A5cooUOskZcUdEYT4LCQxk/4DumLHjZXhnFbrPOe2gfsNtBQw==
+alby-tools@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/alby-tools/-/alby-tools-2.2.0.tgz#44c2ccde41922e1e603043d14bef957f78db586b"
+  integrity sha512-E5UHrd5QnHDuipKw01YGsYlbhTkJ/YhC1EfiOCrSGPb2Yz6VNbmdrnIMY+MsKT/8JybLAU/6tFzCxTdFT1Pp1A==
   dependencies:
     "@webbtc/webln-types" "^1.0.10"
     cross-fetch "^3.1.5"

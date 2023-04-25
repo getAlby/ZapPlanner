@@ -1,43 +1,57 @@
-"use client";
 import { ConfirmSubscriptionForm } from "app/confirm/components/ConfirmSubscriptionForm";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import React from "react";
-import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
+import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 
-export default function ConfirmSubscriptionPage() {
-  const [subscriptionValues, setSubscriptionValues] = React.useState<
-    CreateSubscriptionFormData | undefined
-  >();
-  const { replace } = useRouter();
+type ConfirmSubscriptionPageProps = {
+  searchParams?: {
+    amount: string;
+    recipient: string;
+    timeframe: string;
+    comment?: string;
+    payerdata?: string;
+    returnUrl?: string;
+  };
+};
 
-  React.useEffect(() => {
-    const subscriptionFields = sessionStorage.getItem("fields");
-    if (!subscriptionFields) {
-      replace("/");
-    } else {
-      setSubscriptionValues(JSON.parse(subscriptionFields));
-    }
-  }, [replace]);
+export const dynamic = "force-dynamic";
 
-  if (!subscriptionValues) {
-    return null;
+export default function ConfirmSubscriptionPage({
+  searchParams,
+}: ConfirmSubscriptionPageProps) {
+  if (
+    !searchParams?.amount ||
+    !searchParams?.recipient ||
+    !searchParams?.timeframe
+  ) {
+    redirect("/");
   }
+
+  const unconfirmedSubscription: UnconfirmedSubscription = {
+    amount: searchParams.amount,
+    recipientLightningAddress: searchParams.recipient,
+    sleepDuration: decodeURIComponent(searchParams.timeframe),
+    message: searchParams.comment
+      ? decodeURIComponent(searchParams.comment)
+      : undefined,
+    payerData: searchParams.payerdata
+      ? decodeURIComponent(searchParams.payerdata)
+      : undefined,
+  };
 
   return (
     <>
       <h2 className="font-heading font-bold text-2xl">Summary</h2>
       <SubscriptionSummary
         values={{
-          amount: subscriptionValues.amount,
+          amount: unconfirmedSubscription.amount,
           recipientLightningAddress:
-            subscriptionValues.recipientLightningAddress,
-          sleepDuration:
-            subscriptionValues.timeframeValue +
-            " " +
-            subscriptionValues.timeframe,
-          message: subscriptionValues.message,
+            unconfirmedSubscription.recipientLightningAddress,
+          sleepDuration: unconfirmedSubscription.sleepDuration,
+          message: unconfirmedSubscription.message,
+          payerData: unconfirmedSubscription.payerData,
         }}
         showFirstPayment
       />
@@ -61,7 +75,10 @@ export default function ConfirmSubscriptionPage() {
         </Link>
         , etc.
       </p>
-      <ConfirmSubscriptionForm values={subscriptionValues} />
+      <ConfirmSubscriptionForm
+        unconfirmedSubscription={unconfirmedSubscription}
+        returnUrl={searchParams.returnUrl}
+      />
     </>
   );
 }

@@ -1,11 +1,31 @@
+import { LightningAddress } from "alby-tools";
 import { StatusCodes } from "http-status-codes";
 import { prismaClient } from "lib/server/prisma";
+import {
+  isValidLightningAddress,
+  isValidNostrConnectUrl,
+  isValidPositiveValue,
+} from "lib/validation";
+import ms from "ms";
 import { inngest } from "pages/api/inngest";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 export async function POST(request: Request) {
   const createSubscriptionRequest: CreateSubscriptionRequest =
     await request.json();
+
+  if (
+    !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
+    ms(createSubscriptionRequest.sleepDuration) < 1000 ||
+    !isValidLightningAddress(
+      createSubscriptionRequest.recipientLightningAddress
+    ) ||
+    !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
+  ) {
+    return new Response("One or more invalid subscription fields", {
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
 
   const subscription = await prismaClient.subscription.create({
     data: {
@@ -14,10 +34,8 @@ export async function POST(request: Request) {
         createSubscriptionRequest.recipientLightningAddress,
       nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,
       message: createSubscriptionRequest.message,
-      sleepDuration:
-        createSubscriptionRequest.timeframeValue +
-        " " +
-        createSubscriptionRequest.timeframe,
+      payerData: createSubscriptionRequest.payerData,
+      sleepDuration: createSubscriptionRequest.sleepDuration,
     },
   });
 

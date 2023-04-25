@@ -5,21 +5,23 @@ import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
-import { CreateSubscriptionFormData } from "types/CreateSubscriptionFormData";
 import { webln } from "alby-js-sdk";
+import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 
 type FormData = CreateSubscriptionRequest;
 
 type ConfirmSubscriptionFormProps = {
-  values: CreateSubscriptionFormData;
+  unconfirmedSubscription: UnconfirmedSubscription;
+  returnUrl?: string;
 };
 
 export function ConfirmSubscriptionForm({
-  values,
+  unconfirmedSubscription,
+  returnUrl,
 }: ConfirmSubscriptionFormProps) {
   const { handleSubmit, setValue, watch } = useForm<FormData>({
     defaultValues: {
-      ...values,
+      ...unconfirmedSubscription,
       nostrWalletConnectUrl:
         process.env.NEXT_PUBLIC_DEFAULT_NOSTR_WALLET_CONNECT_URL,
     },
@@ -33,7 +35,7 @@ export function ConfirmSubscriptionForm({
       walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
     });
     await nwc.initNWC(process.env.NEXT_PUBLIC_NWC_NEW_APP_URL || "alby", {
-      name: `ZapPlanner (${values.recipientLightningAddress})`,
+      name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
     });
 
     setValue("nostrWalletConnectUrl", nwc.getNostrWalletConnectUrl(true));
@@ -47,7 +49,11 @@ export function ConfirmSubscriptionForm({
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       sessionStorage.setItem("flashAlert", "subscriptionCreated");
-      push(`/subscriptions/${subscriptionId}`);
+      push(
+        `/subscriptions/${subscriptionId}${
+          returnUrl ? `?returnUrl=${returnUrl}` : ""
+        }`
+      );
     }
   });
 
