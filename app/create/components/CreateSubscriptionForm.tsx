@@ -26,9 +26,6 @@ type CreateSubscriptionFormData = Omit<
 > & { payerName: string; timeframe: Timeframe; timeframeValue: string };
 
 export function CreateSubscriptionForm() {
-  const params = new URLSearchParams(
-    global.window ? window.location.search : undefined
-  );
   const {
     register,
     handleSubmit,
@@ -39,7 +36,7 @@ export function CreateSubscriptionForm() {
     reValidateMode: "onBlur",
     mode: "onBlur",
     defaultValues: {
-      amount: params.get("amount"),
+      amount: process.env.NEXT_PUBLIC_DEFAULT_AMOUNT,
       recipientLightningAddress:
         process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
       message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
@@ -193,6 +190,7 @@ export function CreateSubscriptionForm() {
             {...register("message")}
             className={inputClassName}
             maxLength={lightningAddress?.lnurlpData?.commentAllowed}
+            placeholder="Thank you for your work"
           />
         </>
       )}
@@ -203,10 +201,10 @@ export function CreateSubscriptionForm() {
           <input
             {...register("payerName")}
             className={inputClassName}
+            placeholder="John Smith"
           />
         </>
       )}
-
     </form>
   );
 }
