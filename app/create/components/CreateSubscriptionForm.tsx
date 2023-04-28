@@ -10,6 +10,8 @@ import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { isValidPositiveValue } from "lib/validation";
+import { Box } from "app/components/Box";
+import { Button } from "app/components/Button";
 
 const inputClassNameWithoutBottomMargin = "input input-bordered w-full";
 const inputBottomMargin = "mb-4";
@@ -29,7 +31,7 @@ export function CreateSubscriptionForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     watch,
     setValue,
   } = useForm<CreateSubscriptionFormData>({
@@ -83,128 +85,143 @@ export function CreateSubscriptionForm() {
   >(undefined);
 
   return (
-    <form
-      id="create-subscription"
-      onSubmit={onSubmit}
-      className="flex flex-col gap-2 w-full"
-    >
-      <label className={labelClassName}>Recipient Lightning address</label>
-      <div className="relative flex flex-col justify-center">
-        <input
-          {...register("recipientLightningAddress", {
-            validate: async (address) => {
-              setValidatingLightningAddress(true);
-              let errorMessage: string | undefined;
-              try {
-                if (!address.length) {
-                  errorMessage = "please provide a lightning address";
-                }
-                const ln = new LightningAddress(address);
-                if (!ln.username) {
-                  errorMessage = "This is not a valid lightning address";
-                }
-                if (!errorMessage) {
-                  await ln.fetch();
-                  if (!ln.lnurlpData) {
-                    errorMessage = "This lightning address does not exist";
+    <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
+      <Box>
+        <div className="flex flex-col gap-4">
+          <h2 className="font-heading font-bold text-2xl">
+            New periodic payment
+          </h2>
+
+          <label className={labelClassName}>Recipient Lightning address</label>
+          <div className="relative flex flex-col justify-center">
+            <input
+              {...register("recipientLightningAddress", {
+                validate: async (address) => {
+                  setValidatingLightningAddress(true);
+                  let errorMessage: string | undefined;
+                  try {
+                    if (!address.length) {
+                      errorMessage = "please provide a lightning address";
+                    }
+                    const ln = new LightningAddress(address);
+                    if (!ln.username) {
+                      errorMessage = "This is not a valid lightning address";
+                    }
+                    if (!errorMessage) {
+                      await ln.fetch();
+                      if (!ln.lnurlpData) {
+                        errorMessage = "This lightning address does not exist";
+                      }
+                    }
+                    if (!errorMessage) {
+                      setLightningAddress(ln);
+                    } else {
+                      setLightningAddress(undefined);
+                    }
+                  } catch (e) {
+                    errorMessage = "This is not a valid lightning address";
                   }
-                }
-                if (!errorMessage) {
-                  setLightningAddress(ln);
-                } else {
-                  setLightningAddress(undefined);
-                }
-              } catch (e) {
-                errorMessage = "This is not a valid lightning address";
-              }
-              setValidatingLightningAddress(false);
-              return errorMessage;
-            },
-          })}
-          placeholder="hello@getalby.com"
-          className={inputClassName}
-        />
-        {validatingLightningAddress && (
-          <div className="absolute right-3">
-            <Loading />
+                  setValidatingLightningAddress(false);
+                  return errorMessage;
+                },
+              })}
+              placeholder="hello@getalby.com"
+              className={inputClassName}
+            />
+            {validatingLightningAddress && (
+              <div className="absolute right-3">
+                <Loading className="w-5 -mt-3" />
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      {errors.recipientLightningAddress && (
-        <p className="text-error">{errors.recipientLightningAddress.message}</p>
-      )}
-      <label className={labelClassName}>Amount in sats</label>
-      <input
-        {...register("amount", {
-          validate: (value) =>
-            !isValidPositiveValue(parseInt(value))
-              ? "Please enter a positive value"
-              : undefined,
-        })}
-        placeholder="2100"
-        className={inputClassName}
-      />
-      {errors.amount && <p className="text-error">{errors.amount.message}</p>}
-      <div
-        className={`flex justify-center gap-2 items-center ${inputBottomMargin}`}
-      >
-        <p className="lg:flex-shrink-0">Repeat payment every</p>
-        <input
-          {...register("timeframeValue", {
-            validate: (value) =>
-              !isValidPositiveValue(parseInt(value))
-                ? "Please enter a positive value"
-                : undefined,
-          })}
-          placeholder="30"
-          className={`${inputClassNameWithoutBottomMargin} w-full`}
-        />
-        <select
-          {...register("timeframe")}
-          className="select select-bordered"
-          defaultValue={watchedTimeframe}
-          onChange={(event) =>
-            setSelectedTimeframe(event.target.value as Timeframe)
-          }
-          value={watchedTimeframe}
-        >
-          {timeframes.map((timeframe) => (
-            <option key={timeframe} value={timeframe}>
-              {timeframe}
-            </option>
-          ))}
-        </select>
-      </div>
-      {errors.timeframeValue && (
-        <p className="text-error">{errors.timeframeValue.message}</p>
-      )}
-
-      {lightningAddress && lightningAddress?.lnurlpData?.commentAllowed && (
-        <>
-          <label className={labelClassName}>
-            Your message (max{" "}
-            {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
-          </label>
-
+          {errors.recipientLightningAddress && (
+            <p className="text-error">
+              {errors.recipientLightningAddress.message}
+            </p>
+          )}
+          <label className={labelClassName}>Amount in sats</label>
           <input
-            {...register("message")}
+            {...register("amount", {
+              validate: (value) =>
+                !isValidPositiveValue(parseInt(value))
+                  ? "Please enter a positive value"
+                  : undefined,
+            })}
+            placeholder="2100"
             className={inputClassName}
-            maxLength={lightningAddress?.lnurlpData?.commentAllowed}
-            placeholder="Thank you for your work"
           />
-        </>
-      )}
+          {errors.amount && (
+            <p className="text-error">{errors.amount.message}</p>
+          )}
+          <div
+            className={`flex justify-center gap-2 items-center ${inputBottomMargin}`}
+          >
+            <p className="lg:flex-shrink-0">Repeat payment every</p>
+            <input
+              {...register("timeframeValue", {
+                validate: (value) =>
+                  !isValidPositiveValue(parseInt(value))
+                    ? "Please enter a positive value"
+                    : undefined,
+              })}
+              placeholder="30"
+              className={`${inputClassNameWithoutBottomMargin} w-full`}
+            />
+            <select
+              {...register("timeframe")}
+              className="select select-bordered"
+              defaultValue={watchedTimeframe}
+              onChange={(event) =>
+                setSelectedTimeframe(event.target.value as Timeframe)
+              }
+              value={watchedTimeframe}
+            >
+              {timeframes.map((timeframe) => (
+                <option key={timeframe} value={timeframe}>
+                  {timeframe}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.timeframeValue && (
+            <p className="text-error">{errors.timeframeValue.message}</p>
+          )}
 
-      {lightningAddress && lightningAddress?.lnurlpData?.payerData?.name && (
-        <>
-          <label className={labelClassName}>Your name</label>
-          <input
-            {...register("payerName")}
-            className={inputClassName}
-            placeholder="John Smith"
-          />
-        </>
-      )}
+          {lightningAddress && lightningAddress?.lnurlpData?.commentAllowed && (
+            <>
+              <label className={labelClassName}>
+                Your message (max{" "}
+                {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
+              </label>
+
+              <input
+                {...register("message")}
+                className={inputClassName}
+                maxLength={lightningAddress?.lnurlpData?.commentAllowed}
+                placeholder="Thank you for your work"
+              />
+            </>
+          )}
+
+          {lightningAddress &&
+            lightningAddress?.lnurlpData?.payerData?.name && (
+              <>
+                <label className={labelClassName}>Your name</label>
+                <input
+                  {...register("payerName")}
+                  className={inputClassName}
+                  placeholder="John Smith"
+                />
+              </>
+            )}
+        </div>
+      </Box>
+      <Button type="submit" className="mt-8" disabled={isSubmitting}>
+        <div className="flex justify-center items-center gap-2">
+          <span>Continue</span>
+          {isSubmitting && <Loading />}
+        </div>
+      </Button>
     </form>
   );
 }

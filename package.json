@@ -31,6 +31,7 @@
     "alby-js-sdk": "^1.5.1",
     "alby-tools": "^2.2.0",
     "autoprefixer": "^10.4.14",
+    "clsx": "^1.2.1",
     "daisyui": "^2.51.5",
     "date-fns": "^2.29.3",
     "encoding": "^0.1.13",
