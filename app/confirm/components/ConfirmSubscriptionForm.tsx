@@ -7,6 +7,7 @@ import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
 import { webln } from "alby-js-sdk";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
+import { isValidNostrConnectUrl } from "lib/validation";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -68,16 +69,30 @@ export function ConfirmSubscriptionForm({
       <form id="create-subscription" onSubmit={onSubmit} className="hidden" />
       <div className="flex justify-center">
         {!hasLinkedWallet ? (
-          <button
-            onClick={linkWallet}
-            className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
-            style={{
-              background:
-                "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
-            }}
-          >
-            Link Wallet
-          </button>
+          <div className="flex flex-col items-center">
+            <button
+              onClick={linkWallet}
+              className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
+              style={{
+                background:
+                  "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
+              }}
+            >
+              Link Wallet
+            </button>
+            <span className="text-xs mt-4 mb-1">or paste a NWC url below:</span>
+            <input
+              className="input input-bordered w-64 input-sm"
+              placeholder="nostr+walletconnect://..."
+              onChange={(e) =>
+                isValidNostrConnectUrl(e.target.value)
+                  ? setValue("nostrWalletConnectUrl", e.target.value)
+                  : alert("invalid NWC url")
+              }
+              value=""
+              type="password"
+            />
+          </div>
         ) : (
           <div className="bg-green-50 p-3 rounded-md w-full">
             <p className="font-body text-green-700 text-sm font-medium">
