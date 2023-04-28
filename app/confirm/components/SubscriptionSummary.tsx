@@ -75,27 +75,37 @@ export function SubscriptionSummary({
           )}
         />
       )}
-      {(values.lastSuccessfulPaymentDateTime || values.createdDateTime) &&
-        isActive && (
-          <SubscriptionSummaryItem
-            left="Next payment"
-            right={formatDistance(
-              add(
-                values.lastSuccessfulPaymentDateTime ||
-                  values.createdDateTime ||
-                  Date.now(),
-                {
-                  seconds:
-                    (ms(values.sleepDuration) *
-                      (1 + (values.retryCount || 0))) /
-                    1000,
-                }
-              ),
-              new Date(),
-              { addSuffix: true }
-            )}
-          />
-        )}
+      {values.createdDateTime && isActive && (
+        <SubscriptionSummaryItem
+          left="Next payment"
+          right={
+            values.lastSuccessfulPaymentDateTime ||
+            values.lastFailedPaymentDateTime
+              ? formatDistance(
+                  add(
+                    Math.max(
+                      (
+                        values.lastSuccessfulPaymentDateTime ||
+                        values.lastFailedPaymentDateTime ||
+                        values.createdDateTime
+                      ).getTime(),
+                      (
+                        values.lastFailedPaymentDateTime ||
+                        values.lastSuccessfulPaymentDateTime ||
+                        values.createdDateTime
+                      ).getTime()
+                    ),
+                    {
+                      seconds: ms(values.sleepDuration) / 1000,
+                    }
+                  ),
+                  new Date(),
+                  { addSuffix: true }
+                )
+              : "Now"
+          }
+        />
+      )}
       {values.lastFailedPaymentDateTime && (
         <SubscriptionSummaryItem
           left="Last failure"
