@@ -119,6 +119,7 @@ export function ConfirmSubscriptionForm({
             {!hasLinkedWallet ? (
               <div className="flex flex-col items-center">
                 <button
+                  type="button"
                   onClick={linkWallet}
                   className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
                   style={{
