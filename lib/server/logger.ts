@@ -11,15 +11,5 @@ export const logger = winston.createLogger({
     new winston.transports.Console({
       format,
     }),
-    ...(process.env.DATADOG_API_KEY
-      ? [
-          new winston.transports.Http({
-            host: "http-intake.logs.datadoghq.eu",
-            path: `/api/v2/logs?dd-api-key=${process.env.DATADOG_API_KEY}&ddsource=zapplanner&service=zapplanner`,
-            ssl: true,
-            format,
-          }),
-        ]
-      : []),
   ],
 });
