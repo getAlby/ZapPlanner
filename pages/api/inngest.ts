@@ -7,6 +7,7 @@ import { serve } from "inngest/next";
 import { WebLNProvider } from "@webbtc/webln-types";
 import { prismaClient } from "lib/server/prisma";
 import { MAX_RETRIES } from "lib/constants";
+import { logger } from "lib/server/logger";
 
 global.crypto = crypto;
 
@@ -52,11 +53,9 @@ const periodicZap = inngest.createFunction(
         },
       });
       if (!subscription) {
-        console.log(
-          "No subscription found matching " +
-            subscriptionId +
-            ". Cancelling zap"
-        );
+        logger.info("No subscription found. Cancelling zap", {
+          subscriptionId,
+        });
         return undefined;
       }
 
@@ -82,9 +81,9 @@ const periodicZap = inngest.createFunction(
           );
         }
 
-        console.log("Enabling noswebln");
+        logger.info("Enabling noswebln", { subscriptionId });
         await noswebln.enable();
-        console.log("Requesting invoice");
+        logger.info("Requesting invoice", { subscriptionId });
         const invoice = await ln.requestInvoice({
           satoshi: amount,
           comment:
@@ -99,15 +98,15 @@ const periodicZap = inngest.createFunction(
               ? JSON.parse(subscription.payerData)
               : undefined,
         });
-        console.log("Sending payment");
+        logger.info("Sending payment", { subscriptionId });
         const response = await noswebln.sendPayment(invoice.paymentRequest);
-        console.log("Done", response);
+        logger.info("Done", { response, subscriptionId });
 
         paymentSucceeded = true;
         noswebln.close();
-        console.log("Closed noswebln");
+        logger.info("Closed noswebln", { subscriptionId });
       } catch (error) {
-        console.error("Failed to send periodic zap", error);
+        logger.error("Failed to send periodic zap", { subscriptionId, error });
         //throw error;
       }
       const updatedSubscription = await prismaClient.subscription.update({
@@ -128,13 +127,15 @@ const periodicZap = inngest.createFunction(
       });
 
       if (updatedSubscription.retryCount > MAX_RETRIES) {
-        console.error(
-          "subscription " + subscriptionId + " payment failed too many times"
-        );
+        logger.error("subscription payment failed too many times", {
+          subscriptionId,
+        });
         return undefined;
       }
 
-      console.log(`Sleeping for ${subscription.sleepDuration}`);
+      logger.info(`Sleeping for ${subscription.sleepDuration}`, {
+        subscriptionId,
+      });
       return subscription.sleepDuration;
     });
 

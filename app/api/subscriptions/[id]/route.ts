@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { logger } from "lib/server/logger";
 import { prismaClient } from "lib/server/prisma";
 import { inngest } from "pages/api/inngest";
 export async function DELETE(
@@ -24,6 +25,8 @@ export async function DELETE(
     });
   }
 
+  logger.info("Cancelling subscription", { subscriptionId });
+
   try {
     await inngest.send({
       name: "cancel",
@@ -32,7 +35,7 @@ export async function DELETE(
       },
     });
   } catch (error) {
-    console.warn("Failed to cancel inngest event", error);
+    logger.warn("Failed to cancel inngest event", { subscriptionId, error });
   }
 
   await prismaClient.subscription.delete({

@@ -1,5 +1,5 @@
-import { LightningAddress } from "alby-tools";
 import { StatusCodes } from "http-status-codes";
+import { logger } from "lib/server/logger";
 import { prismaClient } from "lib/server/prisma";
 import {
   isValidLightningAddress,
@@ -49,6 +49,8 @@ export async function POST(request: Request) {
   const createSubscriptionResponse: CreateSubscriptionResponse = {
     subscriptionId: subscription.id,
   };
+
+  logger.info("Created subscription", { subscriptionId: subscription.id });
 
   return new Response(JSON.stringify(createSubscriptionResponse), {
     status: StatusCodes.CREATED,
