@@ -1,4 +1,3 @@
-import { FormSubmitButton } from "app/components/FormSubmitButton";
 import "./globals.css";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,21 +15,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="bg-gray-50">
-        <div className="flex flex-col gap-8 px-4 py-14 lg:px-14 items-center justify-start">
-          <div className="flex flex-col-reverse lg:flex-row justify-center items-center gap-4">
-            <Link href="/">
-              <h1
-                className="font-heading font-bold text-3xl text-black text-center
-"
-              >
-                ZapPlanner
-              </h1>
-            </Link>
-          </div>
-          <div className="flex flex-col p-10 gap-8 bg-white shadow rounded-lg w-full max-w-xl">
-            {children}
-          </div>
-          <FormSubmitButton />
+        <div className="flex flex-col gap-8 px-4 py-4 lg:py-14 lg:px-14 items-center justify-start">
+          {children}
         </div>
         <div className="flex gap-2 items-center justify-center mt-6 mb-10">
           <span className="font-body text-xs">Powered by</span>

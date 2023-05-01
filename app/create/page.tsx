@@ -1,15 +1,13 @@
+import { Box } from "app/components/Box";
+import { Header } from "app/components/Header";
 import { CreateSubscriptionForm } from "app/create/components/CreateSubscriptionForm";
 import React from "react";
 
-export default function HomePage() {
+export default function CreatePage() {
   return (
     <>
-      <div className="flex flex-col gap-4">
-        <h2 className="font-heading font-bold text-2xl">
-          New periodic payment
-        </h2>
-        <CreateSubscriptionForm />
-      </div>
+      <Header />
+      <CreateSubscriptionForm />
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { Header } from "app/components/Header";
 import { ConfirmSubscriptionForm } from "app/confirm/components/ConfirmSubscriptionForm";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import Link from "next/link";
@@ -43,38 +44,8 @@ export default function ConfirmSubscriptionPage({
 
   return (
     <>
-      <h2 className="font-heading font-bold text-2xl">Summary</h2>
-      <SubscriptionSummary
-        values={{
-          amount: unconfirmedSubscription.amount,
-          recipientLightningAddress:
-            unconfirmedSubscription.recipientLightningAddress,
-          sleepDuration: unconfirmedSubscription.sleepDuration,
-          message: unconfirmedSubscription.message,
-          payerData: unconfirmedSubscription.payerData,
-        }}
-        showFirstPayment
-      />
-      <div className="divider my-0" />
-      <h2 className="font-heading font-bold text-2xl">Link your wallet</h2>
+      <Header />
 
-      <p className="font-body">
-        Use Nostr Wallet Connect to securely connect your bitcoin lightning
-        wallet to ZapPlanner. Nostr Wallet connect is available for{" "}
-        <Link href="https://nwc.getalby.com" target="_blank" className="link">
-          Alby accounts
-        </Link>
-        ,{" "}
-        <Link
-          href="https://github.com/getAlby/umbrel-community-app-store"
-          target="_blank"
-          className="link"
-        >
-          {" "}
-          Umbrel wallets
-        </Link>
-        , etc.
-      </p>
       <ConfirmSubscriptionForm
         unconfirmedSubscription={unconfirmedSubscription}
         returnUrl={searchParams.returnUrl}

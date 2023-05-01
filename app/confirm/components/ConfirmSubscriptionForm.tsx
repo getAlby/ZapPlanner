@@ -8,6 +8,11 @@ import React from "react";
 import { webln } from "alby-js-sdk";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { isValidNostrConnectUrl } from "lib/validation";
+import { Box } from "app/components/Box";
+import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
+import Link from "next/link";
+import { Button } from "app/components/Button";
+import { Loading } from "app/components/Loading";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -20,7 +25,12 @@ export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
   returnUrl,
 }: ConfirmSubscriptionFormProps) {
-  const { handleSubmit, setValue, watch } = useForm<FormData>({
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<FormData>({
     defaultValues: {
       ...unconfirmedSubscription,
       nostrWalletConnectUrl:
@@ -66,41 +76,90 @@ export function ConfirmSubscriptionForm({
 
   return (
     <>
-      <form id="create-subscription" onSubmit={onSubmit} className="hidden" />
-      <div className="flex justify-center">
-        {!hasLinkedWallet ? (
-          <div className="flex flex-col items-center">
-            <button
-              onClick={linkWallet}
-              className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
-              style={{
-                background:
-                  "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
-              }}
+      <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
+        <Box>
+          <h2 className="font-heading font-bold text-2xl">Summary</h2>
+          <SubscriptionSummary
+            values={{
+              amount: unconfirmedSubscription.amount,
+              recipientLightningAddress:
+                unconfirmedSubscription.recipientLightningAddress,
+              sleepDuration: unconfirmedSubscription.sleepDuration,
+              message: unconfirmedSubscription.message,
+              payerData: unconfirmedSubscription.payerData,
+            }}
+            showFirstPayment
+          />
+          <div className="divider my-0" />
+          <h2 className="font-heading font-bold text-2xl">Link your wallet</h2>
+
+          <p className="font-body">
+            Use Nostr Wallet Connect to securely connect your bitcoin lightning
+            wallet to ZapPlanner. Nostr Wallet connect is available for{" "}
+            <Link
+              href="https://nwc.getalby.com"
+              target="_blank"
+              className="link"
             >
-              Link Wallet
-            </button>
-            <span className="text-xs mt-4 mb-1">or paste a NWC url below:</span>
-            <input
-              className="input input-bordered w-64 input-sm"
-              placeholder="nostr+walletconnect://..."
-              onChange={(e) =>
-                isValidNostrConnectUrl(e.target.value)
-                  ? setValue("nostrWalletConnectUrl", e.target.value)
-                  : alert("invalid NWC url")
-              }
-              value=""
-              type="password"
-            />
+              Alby accounts
+            </Link>
+            ,{" "}
+            <Link
+              href="https://github.com/getAlby/umbrel-community-app-store"
+              target="_blank"
+              className="link"
+            >
+              {" "}
+              Umbrel wallets
+            </Link>
+            , etc.
+          </p>
+
+          <div className="flex justify-center">
+            {!hasLinkedWallet ? (
+              <div className="flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={linkWallet}
+                  className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
+                  }}
+                >
+                  Link Wallet
+                </button>
+                <span className="text-xs mt-4 mb-1">
+                  or paste a NWC url below:
+                </span>
+                <input
+                  className="input input-bordered w-64 input-sm"
+                  placeholder="nostr+walletconnect://..."
+                  onChange={(e) =>
+                    isValidNostrConnectUrl(e.target.value)
+                      ? setValue("nostrWalletConnectUrl", e.target.value)
+                      : alert("invalid NWC url")
+                  }
+                  value=""
+                  type="password"
+                />
+              </div>
+            ) : (
+              <div className="bg-green-50 p-3 rounded-md w-full">
+                <p className="font-body text-green-700 text-sm font-medium">
+                  ✅ Wallet linked
+                </p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="bg-green-50 p-3 rounded-md w-full">
-            <p className="font-body text-green-700 text-sm font-medium">
-              ✅ Wallet linked
-            </p>
+        </Box>
+        <Button type="submit" className="mt-8" disabled={isSubmitting}>
+          <div className="flex justify-center items-center gap-2">
+            <span>Create Periodic Payment</span>
+            {isSubmitting && <Loading />}
           </div>
-        )}
-      </div>
+        </Button>
+      </form>
     </>
   );
 }
