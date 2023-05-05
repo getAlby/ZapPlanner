@@ -24,4 +24,6 @@ model Subscription {
   numSuccessfulPayments Int @default(0)
   numFailedPayments Int @default(0)
   retryCount Int @default(0)
+  email String?
+  sendPaymentNotifications Boolean @default(true)
 }

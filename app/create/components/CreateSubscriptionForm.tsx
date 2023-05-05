@@ -13,12 +13,6 @@ import { isValidPositiveValue } from "lib/validation";
 import { Box } from "app/components/Box";
 import { Button } from "app/components/Button";
 
-const inputClassNameWithoutBottomMargin = "input input-bordered w-full";
-const inputBottomMargin = "mb-4";
-const inputClassName =
-  inputClassNameWithoutBottomMargin + " " + inputBottomMargin;
-const labelClassName = "font-body font-medium";
-
 // TODO: remove when alby-tools exposes LUD18PayerData
 type LUD18PayerData = LnUrlPayResponse["payerData"];
 
@@ -87,12 +81,12 @@ export function CreateSubscriptionForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
       <Box>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           <h2 className="font-heading font-bold text-2xl">
             New periodic payment
           </h2>
 
-          <label className={labelClassName}>Recipient Lightning address</label>
+          <label className="zp-label">Recipient Lightning address</label>
           <div className="relative flex flex-col justify-center">
             <input
               {...register("recipientLightningAddress", {
@@ -125,8 +119,7 @@ export function CreateSubscriptionForm() {
                   return errorMessage;
                 },
               })}
-              placeholder="hello@getalby.com"
-              className={inputClassName}
+              className="zp-input"
             />
             {validatingLightningAddress && (
               <div className="absolute right-3">
@@ -135,11 +128,11 @@ export function CreateSubscriptionForm() {
             )}
           </div>
           {errors.recipientLightningAddress && (
-            <p className="text-error">
+            <p className="zp-form-error">
               {errors.recipientLightningAddress.message}
             </p>
           )}
-          <label className={labelClassName}>Amount in sats</label>
+          <label className="zp-label">Amount in sats</label>
           <input
             {...register("amount", {
               validate: (value) =>
@@ -148,14 +141,13 @@ export function CreateSubscriptionForm() {
                   : undefined,
             })}
             placeholder="2100"
-            className={inputClassName}
+            className="zp-input"
           />
           {errors.amount && (
-            <p className="text-error">{errors.amount.message}</p>
+            <p className="zp-form-error">{errors.amount.message}</p>
           )}
-          <div
-            className={`flex justify-center gap-2 items-center ${inputBottomMargin}`}
-          >
+          <label className="zp-label">Frequency</label>
+          <div className={`flex justify-center gap-2 items-center`}>
             <p className="lg:flex-shrink-0">Repeat payment every</p>
             <input
               {...register("timeframeValue", {
@@ -165,7 +157,7 @@ export function CreateSubscriptionForm() {
                     : undefined,
               })}
               placeholder="30"
-              className={`${inputClassNameWithoutBottomMargin} w-full`}
+              className={`zp-input w-full`}
             />
             <select
               {...register("timeframe")}
@@ -184,19 +176,19 @@ export function CreateSubscriptionForm() {
             </select>
           </div>
           {errors.timeframeValue && (
-            <p className="text-error">{errors.timeframeValue.message}</p>
+            <p className="zp-form-error">{errors.timeframeValue.message}</p>
           )}
 
           {lightningAddress && lightningAddress?.lnurlpData?.commentAllowed && (
             <>
-              <label className={labelClassName}>
+              <label className="zp-label">
                 Your message (max{" "}
                 {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
               </label>
 
               <input
                 {...register("message")}
-                className={inputClassName}
+                className="zp-input"
                 maxLength={lightningAddress?.lnurlpData?.commentAllowed}
                 placeholder="Thank you for your work"
               />
@@ -206,10 +198,10 @@ export function CreateSubscriptionForm() {
           {lightningAddress &&
             lightningAddress?.lnurlpData?.payerData?.name && (
               <>
-                <label className={labelClassName}>Your name</label>
+                <label className="zp-label">Your name</label>
                 <input
                   {...register("payerName")}
-                  className={inputClassName}
+                  className="zp-input"
                   placeholder="John Smith"
                 />
               </>

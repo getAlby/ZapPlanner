@@ -16,3 +16,15 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
+
+.zp-input {
+  @apply input input-bordered w-full;
+}
+
+.zp-label {
+  @apply font-body font-medium mt-8 mb-1;
+}
+
+.zp-form-error {
+  @apply text-error mt-2;
+}

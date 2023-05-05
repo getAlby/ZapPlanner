@@ -8,6 +8,9 @@ import { WebLNProvider } from "@webbtc/webln-types";
 import { prismaClient } from "lib/server/prisma";
 import { MAX_RETRIES } from "lib/constants";
 import { logger } from "lib/server/logger";
+import { areNotificationsSupported } from "lib/server/areNotificationsSupported";
+import { sendEmail } from "lib/server/sendEmail";
+import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
 
 global.crypto = crypto;
 
@@ -126,10 +129,27 @@ const periodicZap = inngest.createFunction(
         },
       });
 
+      if (
+        areNotificationsSupported(subscription.sleepDuration) &&
+        subscription.email &&
+        subscription.sendPaymentNotifications
+      ) {
+        await sendEmail(subscription.email, {
+          type: paymentSucceeded ? "payment-success" : "payment-failed",
+          subscriptionUrl: getSubscriptionUrl(subscription.id),
+        });
+      }
+
       if (updatedSubscription.retryCount > MAX_RETRIES) {
         logger.error("subscription payment failed too many times", {
           subscriptionId,
         });
+        if (subscription.email) {
+          await sendEmail(subscription.email, {
+            type: "subscription-deactivated",
+            subscriptionUrl: getSubscriptionUrl(subscription.id),
+          });
+        }
         return undefined;
       }
 

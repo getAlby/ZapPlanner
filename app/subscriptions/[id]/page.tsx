@@ -1,13 +1,12 @@
 import { prismaClient } from "lib/server/prisma";
 import { notFound } from "next/navigation";
-import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
-import { SaveSubscriptionAlert } from "app/subscriptions/[id]/components/SaveSubcriptionAlert";
-import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
-import { FlashAlert } from "app/components/FlashAlert";
-import Link from "next/link";
 import { Header } from "app/components/Header";
-import { Box } from "app/components/Box";
-import { Button } from "app/components/Button";
+import { SubscriptionPageForm } from "app/subscriptions/[id]/components/SubscriptionPageForm";
+import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
+import { FlashAlert } from "app/components/FlashAlert";
+import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
+import { areNotificationsSupported } from "lib/server/areNotificationsSupported";
+import Link from "next/link";
 
 export default async function SubscriptionPage({
   params,
@@ -30,42 +29,60 @@ export default async function SubscriptionPage({
   return (
     <>
       <Header />
-      <Box>
-        <FlashAlert />
-        <h2 className="font-heading font-bold text-2xl">Periodic payment</h2>
-        <SubscriptionSummary
-          values={{
-            amount: subscription.amount.toString(),
-            recipientLightningAddress: subscription.recipientLightningAddress,
-            sleepDuration: subscription.sleepDuration,
-            message: subscription.message || undefined,
-            createdDateTime: subscription.createdDateTime,
-            lastFailedPaymentDateTime:
-              subscription.lastFailedPaymentDateTime ?? undefined,
-            lastSuccessfulPaymentDateTime:
-              subscription.lastSuccessfulPaymentDateTime ?? undefined,
-            numFailedPayments: subscription.numFailedPayments,
-            numSuccessfulPayments: subscription.numSuccessfulPayments,
-            retryCount: subscription.retryCount,
-            payerData: subscription.payerData ?? undefined,
-          }}
-        />
-        <div className="divider my-0" />
+      <SubscriptionPageForm
+        formFields={{
+          sendPaymentNotifications: subscription.sendPaymentNotifications,
+          email: subscription.email || "",
+        }}
+        subscriptionId={subscription.id}
+        notificationsSupported={areNotificationsSupported(
+          subscription.sleepDuration
+        )}
+        beforeFormContent={
+          <>
+            <FlashAlert />
+            <h2 className="font-heading font-bold text-2xl">
+              Periodic payment
+            </h2>
+            <SubscriptionSummary
+              values={{
+                amount: subscription.amount.toString(),
+                recipientLightningAddress:
+                  subscription.recipientLightningAddress,
+                sleepDuration: subscription.sleepDuration,
+                message: subscription.message || undefined,
+                createdDateTime: subscription.createdDateTime,
+                lastFailedPaymentDateTime:
+                  subscription.lastFailedPaymentDateTime ?? undefined,
+                lastSuccessfulPaymentDateTime:
+                  subscription.lastSuccessfulPaymentDateTime ?? undefined,
+                numFailedPayments: subscription.numFailedPayments,
+                numSuccessfulPayments: subscription.numSuccessfulPayments,
+                retryCount: subscription.retryCount,
+                payerData: subscription.payerData ?? undefined,
+              }}
+            />
+            <CancelSubscriptionButton subscriptionId={subscription.id} />
+            <div className="divider my-0" />
 
-        <SaveSubscriptionAlert />
-        {searchParams?.returnUrl && (
-          <Link href={searchParams.returnUrl}>
-            <button className="btn btn-primary btn-block normal-case">
-              Return to {searchParams.returnUrl}
+            <p className="font-body">
+              Bookmark this page or provide your email so you can access this
+              periodic payment If you wish to cancel it. You can also delete the
+              NWC connection to cancel this periodic payment.
+            </p>
+          </>
+        }
+      />
+      {searchParams?.returnUrl && (
+        <div className="w-full max-w-xs flex flex-col justify-center items-center">
+          <div className="divider mb-8" />
+          <Link href={searchParams?.returnUrl}>
+            <button className="btn btn-primary btn-sm normal-case">
+              Return to {searchParams?.returnUrl}
             </button>
           </Link>
-        )}
-
-        <CancelSubscriptionButton subscriptionId={subscription.id} />
-      </Box>
-      <Link href="/create">
-        <Button>New Periodic Payment</Button>
-      </Link>
+        </div>
+      )}
     </>
   );
 }
