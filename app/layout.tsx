@@ -71,21 +71,20 @@ export default async function RootLayout({
                   </Link>
                 </div>
                 <ul className="list-disc list-inside">
-                  <li>
+                  <li className="list-item">
                     <span className="font-bold">amount</span>,{" "}
                     <span className="font-bold">recipient</span>, and{" "}
                     <span className="font-bold">timeframe</span> are required
                   </li>
-                  <li>
+                  <li className="list-item">
                     <span className="font-bold">amount</span> is in sats
                   </li>
-                  <li>
+                  <li className="list-item">
                     <span className="font-bold">recipient</span> must be a
                     lightning address
                   </li>
-                  <li>
-                    <span className="font-bold">timeframe</span> must be in
-                    milliseconds, or a valid{" "}
+                  <li className="list-item">
+                    <span className="font-bold">timeframe</span> must be a valid{" "}
                     <Link
                       href="https://www.npmjs.com/package/ms"
                       target="_blank"
@@ -93,10 +92,10 @@ export default async function RootLayout({
                     >
                       ms
                     </Link>{" "}
-                    string e.g. <span className="font-bold">1%20day</span> or{" "}
-                    <span className="font-bold">30%20minutes</span>
+                    string e.g. <span className="font-bold">1 day</span> or{" "}
+                    <span className="font-bold">30 minutes</span>
                   </li>
-                  <li>
+                  <li className="list-item">
                     <span className="font-bold">payerdata</span> should be a
                     URL-encoded JSON object as per{" "}
                     <Link
@@ -107,12 +106,12 @@ export default async function RootLayout({
                       LUD-18
                     </Link>
                   </li>
-                  <li>
+                  <li className="list-item">
                     <span className="font-bold">comment</span> and{" "}
                     <span className="font-bold">payerdata</span> will only be
                     sent if the recipient lightning address supports it
                   </li>
-                  <li>
+                  <li className="list-item">
                     <span className="font-bold">returnUrl</span> encoded URL to
                     show on the confirmation page to link users back to your
                     site
