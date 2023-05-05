@@ -22,27 +22,31 @@ https://zapplanner.albylabs.com/confirm?amount=21&recipient=hello@getalby.com&ti
 
 ## Installation
 
-Run `yarn install`
+Run `$ yarn install`
 
-Run `cp .env.example .env.local && husky install`
+Run `$ cp .env.example .env && husky install`
 
-Run `yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_KEY>` in .env.local
+Run `$ yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_KEY>` in `.env`
 
-Run `yarn db:migrate:deploy` (if developing with Docker make sure to run Run `yarn docker:start` first)
+Unless you already have it, create the database with: `$ createdb boostagram-viewer`
+
+Make sure to set your Postgres username and password in `.env`. To list Postgres users, open `$ psql` followed by `> \du`. To set no password, leave it empty like this: `postgres://username:@localhost...`.
+
+Run `$ yarn db:migrate:deploy` (if developing with Docker make sure to run Run `$ yarn docker:start` first)
 
 ## Development (Docker)
 
-Run `yarn docker:start`
+Run `$ yarn docker:start`
 
-Run `yarn inngest:local`
+Run `$ yarn inngest:local`
 
-Run `yarn dev`
+Run `$ yarn dev`
 
 ## Development (local)
 
-Run `yarn inngest:local`
+Run `$ yarn inngest:local`
 
-Run `yarn dev`
+Run `$ yarn dev`
 
 ## NextJS
 
