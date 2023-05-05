@@ -41,7 +41,7 @@ export async function PUT(
     });
   }
 
-  await prismaClient.subscription.update({
+  const updatedSubscription = await prismaClient.subscription.update({
     where: {
       id: subscription.id,
     },
@@ -54,7 +54,7 @@ export async function PUT(
   if (updateSubscriptionRequest.email) {
     await sendEmail(updateSubscriptionRequest.email, {
       type: "subscription-updated",
-      subscriptionUrl: getSubscriptionUrl(subscription.id),
+      subscription: updatedSubscription,
     });
   }
   return new Response(undefined, {

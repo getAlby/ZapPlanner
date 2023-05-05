@@ -136,7 +136,7 @@ const periodicZap = inngest.createFunction(
       ) {
         await sendEmail(subscription.email, {
           type: paymentSucceeded ? "payment-success" : "payment-failed",
-          subscriptionUrl: getSubscriptionUrl(subscription.id),
+          subscription,
         });
       }
 
@@ -147,7 +147,7 @@ const periodicZap = inngest.createFunction(
         if (subscription.email) {
           await sendEmail(subscription.email, {
             type: "subscription-deactivated",
-            subscriptionUrl: getSubscriptionUrl(subscription.id),
+            subscription,
           });
         }
         return undefined;

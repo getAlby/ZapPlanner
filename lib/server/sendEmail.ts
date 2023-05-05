@@ -1,3 +1,5 @@
+import { Subscription } from "@prisma/client";
+import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
 import { logger } from "lib/server/logger";
 import * as nodemailer from "nodemailer";
 
@@ -36,14 +38,17 @@ type EmailTemplate = (
       type: "subscription-deactivated";
     }
 ) & {
-  subscriptionUrl: string;
+  subscription: Subscription;
 };
 
 export const sendEmail = (to: string, template: EmailTemplate) => {
+  const subscriptionUrl = getSubscriptionUrl(template.subscription.id);
   if (transport) {
     // TODO: templates
-    const subject = template.type;
-    const html = `Manage your periodic payment: <a href="${template.subscriptionUrl}">${template.subscriptionUrl}</a> `;
+    const subject = getEmailSubject(template);
+    const html =
+      getEmailHtml(template) +
+      `<br/><br/>Manage your periodic payment: <a href="${subscriptionUrl}">${subscriptionUrl}</a>`;
     transport.sendMail({
       to,
       subject,
@@ -54,3 +59,35 @@ export const sendEmail = (to: string, template: EmailTemplate) => {
     logger.warn("Email config not setup. Skipped sending email");
   }
 };
+function getEmailHtml(template: EmailTemplate) {
+  switch (template.type) {
+    case "subscription-updated":
+      return (
+        `Your notification settings have been updated for your periodic payment to ${template.subscription.recipientLightningAddress}.` +
+        `<br/><br/>Payments of ${template.subscription.amount} sats will be made every ${template.subscription.sleepDuration}.` +
+        `<br/><br/>${
+          template.subscription.sendPaymentNotifications
+            ? "You'll receive a confirmation email for each payment."
+            : "You won't receive email confirmation for future payments."
+        }`
+      );
+    case "payment-success":
+      return `Your lightning payment to ${template.subscription.recipientLightningAddress} was successful.<br/><br/>Your next payment is scheduled for ${template.subscription.sleepDuration} from now.`;
+    case "payment-failed":
+      return `Your last periodic payment failed. Retry count: `;
+    case "subscription-deactivated":
+      return `Periodic Payment deactivated`;
+  }
+}
+function getEmailSubject(template: EmailTemplate) {
+  switch (template.type) {
+    case "subscription-updated":
+      return `Your Periodic Payment to ${template.subscription.recipientLightningAddress}`;
+    case "payment-success":
+      return `Successful Payment of ${template.subscription.amount} sats to ${template.subscription.recipientLightningAddress}`;
+    case "payment-failed":
+      return `Failed Payment to ${template.subscription.recipientLightningAddress}`;
+    case "subscription-deactivated":
+      return `Periodic Payment deactivated`;
+  }
+}
