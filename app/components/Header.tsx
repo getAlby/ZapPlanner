@@ -24,7 +24,7 @@ export function Header({ minimal = true }) {
       <Link href="/">
         <h1
           className={clsx(
-            "font-heading font-bold text-black text-center",
+            "font-heading font-bold text-center text-primary",
             minimal ? "text-3xl" : "text-4xl"
           )}
         >
@@ -32,7 +32,7 @@ export function Header({ minimal = true }) {
         </h1>
       </Link>
       {!minimal && (
-        <h2 className="max-lg:text-center text-2xl">
+        <h2 className="max-lg:text-center text-2xl text-primary-content">
           Schedule automatic periodic lightning payments
         </h2>
       )}

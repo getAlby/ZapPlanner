@@ -3,6 +3,7 @@ import "./globals.css";
 import Image from "next/image";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
+import { AlbyLogo } from "app/components/icons/AlbyLogo";
 
 export const metadata = {
   title: "ZapPlanner",
@@ -19,7 +20,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50">
+      <body className="bg-base-200">
         <div className="flex flex-col gap-8 px-4 py-4 lg:py-14 lg:px-14 items-center justify-start">
           <Toaster position="bottom-center" />
           {children}
@@ -28,13 +29,7 @@ export default async function RootLayout({
           <Link href="https://getalby.com" target="_blank">
             <div className="flex gap-2 items-center justify-center">
               <span className="font-body text-xs">Powered by</span>
-              <Image
-                src="/alby.svg"
-                alt="Alby Logo"
-                width={63}
-                height={30}
-                priority
-              />
+              <AlbyLogo className="text-primary" />
             </div>
           </Link>
           <span>•</span>
@@ -49,7 +44,7 @@ export default async function RootLayout({
               }
             >
               <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-bold">
+                <h3 className="text-lg font-bold text-primary">
                   Programmatically create confirmation links
                 </h3>
                 <p>

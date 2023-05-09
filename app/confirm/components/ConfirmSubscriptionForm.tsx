@@ -85,7 +85,7 @@ export function ConfirmSubscriptionForm({
     <>
       <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
         <Box>
-          <h2 className="font-heading font-bold text-2xl">
+          <h2 className="font-heading font-bold text-2xl text-primary">
             Connect wallet to confirm periodic payment
           </h2>
           <SubscriptionSummary
@@ -110,7 +110,7 @@ export function ConfirmSubscriptionForm({
                   height={32}
                   priority
                 />
-                <h2 className="font-heading font-bold text-2xl">
+                <h2 className="font-heading font-bold text-2xl text-primary">
                   Nostr Wallet Connect
                 </h2>
               </div>
@@ -153,8 +153,8 @@ export function ConfirmSubscriptionForm({
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-green-50 p-3 rounded-md w-full">
-                    <p className="font-body text-green-700 text-sm font-medium">
+                  <div className="bg-green-50 p-3 rounded-md w-full dark:bg-green-900">
+                    <p className="font-body text-green-700 dark:text-green-400 text-sm font-medium">
                       ✅ Wallet linked
                     </p>
                   </div>
@@ -185,7 +185,7 @@ export function ConfirmSubscriptionForm({
                     height={32}
                     priority
                   />
-                  <h2 className="font-heading font-bold text-2xl">
+                  <h2 className="font-heading font-bold text-2xl text-primary">
                     Nostr Wallet Connect
                   </h2>
                 </div>

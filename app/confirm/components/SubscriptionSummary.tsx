@@ -155,8 +155,8 @@ function SubscriptionSummaryItem({
 }: SubscriptionSummaryItemProps) {
   return (
     <div className="flex w-full justify-between">
-      <div className="font-body text-gray-700">{left}</div>
-      <div className="font-body text-black font-bold text-end">{right}</div>
+      <div className="font-body text-primary-content">{left}</div>
+      <div className="font-body text-primary font-bold text-end">{right}</div>
     </div>
   );
 }

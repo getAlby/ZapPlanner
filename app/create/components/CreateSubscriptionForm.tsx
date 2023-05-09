@@ -86,7 +86,7 @@ export function CreateSubscriptionForm() {
     <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
       <Box>
         <div className="flex flex-col">
-          <h2 className="font-heading font-bold text-2xl">
+          <h2 className="font-heading font-bold text-2xl text-primary">
             New periodic payment
           </h2>
 
@@ -127,7 +127,7 @@ export function CreateSubscriptionForm() {
             />
             {validatingLightningAddress && (
               <div className="absolute right-3">
-                <Loading className="w-5 -mt-3" />
+                <Loading className="w-5" />
               </div>
             )}
           </div>

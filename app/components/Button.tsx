@@ -20,7 +20,8 @@ export function Button({
         "shadow h-10 rounded-md font-body font-bold hover:opacity-80",
         block ? "w-full" : "w-64",
         (props.disabled || variant === "disabled") && "text-gray-400",
-        props.className
+        props.className,
+        variant === "primary" ? "text-black" : "text-primary-content"
       )}
       style={
         props.disabled || variant === "disabled"

@@ -39,7 +39,7 @@ export default async function SubscriptionPage({
         )}
         beforeFormContent={
           <>
-            <h2 className="font-heading font-bold text-2xl">
+            <h2 className="font-heading font-bold text-2xl text-primary">
               Periodic payment
             </h2>
             <SubscriptionSummary
