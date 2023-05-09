@@ -197,12 +197,16 @@ export function ConfirmSubscriptionForm({
                     </Button>
                     <div className="divider">or</div>
                     <div>
-                      <span className="zp-label">
-                        Paste a Nostr Wallet Connect url:
-                      </span>
+                      <div className="flex justify-between flex-col">
+                        <label className="zp-label" style={{ marginTop: 0 }}>
+                          Paste a Nostr Wallet Connect url:
+                        </label>
+                        <label className="zp-label-ex">
+                          Example: <samp>nostrwalletconnect://...</samp>
+                        </label>
+                      </div>
                       <input
                         className="zp-input-sm"
-                        placeholder="nostrwalletconnect://..."
                         onChange={(e) =>
                           isValidNostrConnectUrl(e.target.value)
                             ? setValue("nostrWalletConnectUrl", e.target.value)

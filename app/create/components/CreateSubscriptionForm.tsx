@@ -90,7 +90,14 @@ export function CreateSubscriptionForm() {
             New periodic payment
           </h2>
 
-          <label className="zp-label">Recipient Lightning address</label>
+          <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
+            <label className="zp-label">
+              Recipient Lightning address<span className="text-red-500">*</span>{" "}
+            </label>
+            <label className="zp-label-ex">
+              Example: <samp>hello@getalby.com</samp>
+            </label>
+          </div>
           <div className="relative flex flex-col justify-center">
             <input
               {...register("recipientLightningAddress", {
@@ -136,7 +143,9 @@ export function CreateSubscriptionForm() {
               {errors.recipientLightningAddress.message}
             </p>
           )}
-          <label className="zp-label">Amount in sats</label>
+          <label className="zp-label">
+            Amount in sats<span className="text-red-500">*</span>
+          </label>
           <input
             {...register("amount", {
               validate: (value) =>
@@ -144,13 +153,14 @@ export function CreateSubscriptionForm() {
                   ? "Please enter a positive value"
                   : undefined,
             })}
-            placeholder="2100"
             className="zp-input"
           />
           {errors.amount && (
             <p className="zp-form-error">{errors.amount.message}</p>
           )}
-          <label className="zp-label">Frequency</label>
+          <label className="zp-label">
+            Frequency<span className="text-red-500">*</span>
+          </label>
           <div className={`flex justify-center gap-2 items-center`}>
             <p className="lg:flex-shrink-0">Repeat payment every</p>
             <input
@@ -160,7 +170,6 @@ export function CreateSubscriptionForm() {
                     ? "Please enter a positive value"
                     : undefined,
               })}
-              placeholder="30"
               className={`zp-input w-full`}
             />
             <select
@@ -185,16 +194,17 @@ export function CreateSubscriptionForm() {
 
           {lightningAddress && lightningAddress?.lnurlpData?.commentAllowed && (
             <>
-              <label className="zp-label">
-                Your message (max{" "}
-                {lightningAddress?.lnurlpData?.commentAllowed ?? 0} characters)
-              </label>
+              <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
+                <label className="zp-label">Your message</label>
+                <label className="zp-label-ex">
+                  Example: <samp>Thank you for your work</samp>
+                </label>
+              </div>
 
               <input
                 {...register("message")}
                 className="zp-input"
                 maxLength={lightningAddress?.lnurlpData?.commentAllowed}
-                placeholder="Thank you for your work"
               />
             </>
           )}
@@ -202,12 +212,13 @@ export function CreateSubscriptionForm() {
           {lightningAddress &&
             lightningAddress?.lnurlpData?.payerData?.name && (
               <>
-                <label className="zp-label">Your name</label>
-                <input
-                  {...register("payerName")}
-                  className="zp-input"
-                  placeholder="John Smith"
-                />
+                <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
+                  <label className="zp-label">Your name</label>
+                  <label className="zp-label-ex">
+                    Example: <samp>John Smith</samp>
+                  </label>
+                </div>
+                <input {...register("payerName")} className="zp-input" />
               </>
             )}
         </div>

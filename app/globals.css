@@ -29,6 +29,13 @@ body {
 .zp-label {
   @apply font-body font-medium mt-8 mb-1;
 }
+.zp-label-ex {
+  @apply font-body text-xs font-medium mb-1;
+}
+
+.zp-label-ex samp {
+  @apply bg-gray-300;
+}
 
 .zp-form-error {
   @apply text-error mt-2;
