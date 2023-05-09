@@ -4,7 +4,7 @@ import { Header } from "app/components/Header";
 import { SubscriptionPageForm } from "app/subscriptions/[id]/components/SubscriptionPageForm";
 import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
-import { areNotificationsSupported } from "lib/server/areNotificationsSupported";
+import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import Link from "next/link";
 
 export default async function SubscriptionPage({
@@ -34,7 +34,7 @@ export default async function SubscriptionPage({
           email: subscription.email || "",
         }}
         subscriptionId={subscription.id}
-        notificationsSupported={areNotificationsSupported(
+        emailNotificationsSupported={areEmailNotificationsSupported(
           subscription.sleepDuration
         )}
         beforeFormContent={

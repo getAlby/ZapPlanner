@@ -8,7 +8,7 @@ import { WebLNProvider } from "@webbtc/webln-types";
 import { prismaClient } from "lib/server/prisma";
 import { MAX_RETRIES } from "lib/constants";
 import { logger } from "lib/server/logger";
-import { areNotificationsSupported } from "lib/server/areNotificationsSupported";
+import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import { sendEmail } from "lib/server/sendEmail";
 import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
 
@@ -130,7 +130,7 @@ const periodicZap = inngest.createFunction(
       });
 
       if (
-        areNotificationsSupported(subscription.sleepDuration) &&
+        areEmailNotificationsSupported(subscription.sleepDuration) &&
         subscription.email &&
         subscription.sendPaymentNotifications
       ) {

@@ -14,7 +14,7 @@ type SubscriptionPageFormProps = {
   beforeFormContent: React.ReactNode;
   formFields: SubscriptionFormData;
   subscriptionId: string;
-  notificationsSupported: boolean;
+  emailNotificationsSupported: boolean;
 };
 
 type SubscriptionFormData = UpdateSubscriptionRequest;
@@ -23,7 +23,7 @@ export function SubscriptionPageForm({
   beforeFormContent,
   formFields,
   subscriptionId,
-  notificationsSupported,
+  emailNotificationsSupported,
 }: SubscriptionPageFormProps) {
   const {
     register,
@@ -64,7 +64,7 @@ export function SubscriptionPageForm({
           {errors.email && (
             <p className="zp-form-error">{errors.email.message}</p>
           )}
-          {notificationsSupported && (
+          {emailNotificationsSupported ? (
             <label className="label cursor-pointer mt-6 p-0 flex gap-2 items-center justify-start">
               <input
                 {...register("sendPaymentNotifications")}
@@ -81,6 +81,11 @@ export function SubscriptionPageForm({
                 I want to receive email confirmation for every payment
               </span>
             </label>
+          ) : (
+            <span className={clsx("font-body text-xs text-gray-300 mt-2")}>
+              Email confirmations for individual payments are only supported for
+              timeframes of 1 hour or more.
+            </span>
           )}
         </div>
       </Box>
