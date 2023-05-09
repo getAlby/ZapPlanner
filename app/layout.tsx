@@ -35,7 +35,6 @@ export default async function RootLayout({
           <span>•</span>
           <div className="flex gap-2 items-center justify-center">
             <Modal
-              modalId="for-developers"
               className="w-[700px] max-w-full"
               launcher={
                 <label className="font-body text-xs cursor-pointer">

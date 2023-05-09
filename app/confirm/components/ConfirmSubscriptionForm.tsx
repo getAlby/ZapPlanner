@@ -103,7 +103,6 @@ export function ConfirmSubscriptionForm({
           <div className="flex justify-center items-start lg:px-8">
             <div className="border-[1px] border-[#7E22CD] rounded-2xl flex flex-col gap-8 p-4 w-full relative">
               <Modal
-                modalId="about-nwc"
                 className="w-[480px] max-w-full"
                 launcher={
                   <label className="cursor-pointer flex-shrink-0 absolute top-2 right-2">
@@ -126,7 +125,7 @@ export function ConfirmSubscriptionForm({
                       height={32}
                       priority
                     />
-                    <h2 className="font-heading font-bold text-2xl text-primary">
+                    <h2 className="font-heading font-bold text-lg lg:text-2xl text-primary">
                       Nostr Wallet Connect
                     </h2>
                   </div>
@@ -171,7 +170,7 @@ export function ConfirmSubscriptionForm({
                   height={32}
                   priority
                 />
-                <h2 className="font-heading font-bold text-2xl text-primary">
+                <h2 className="font-heading font-bold text-lg lg:text-2xl text-primary">
                   Nostr Wallet Connect
                 </h2>
               </div>

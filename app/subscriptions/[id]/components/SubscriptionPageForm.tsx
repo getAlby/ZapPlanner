@@ -69,7 +69,10 @@ export function SubscriptionPageForm({
               <input
                 {...register("sendPaymentNotifications")}
                 type="checkbox"
-                className="checkbox checkbox-sm"
+                className={clsx(
+                  "checkbox checkbox-sm",
+                  isValidEmail(watchedEmail) && "checkbox-warning"
+                )}
                 disabled={!isValidEmail(watchedEmail)}
               />
               <span
