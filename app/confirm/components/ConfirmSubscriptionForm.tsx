@@ -105,7 +105,7 @@ export function ConfirmSubscriptionForm({
               <Modal
                 className="w-[480px] max-w-full"
                 launcher={
-                  <label className="cursor-pointer flex-shrink-0 absolute top-2 right-2">
+                  <div className="flex-shrink-0 absolute top-2 right-2">
                     <Image
                       src={`/icons/info-outline.svg`}
                       alt={"Info icon"}
@@ -113,7 +113,7 @@ export function ConfirmSubscriptionForm({
                       height={16}
                       priority
                     />
-                  </label>
+                  </div>
                 }
               >
                 <div className="flex flex-col gap-4 justify-center items-center">

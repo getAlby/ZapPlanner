@@ -15,11 +15,17 @@ export function Modal({
   const [isOpen, setOpen] = React.useState(false);
   return (
     <>
-      {React.cloneElement(launcher, { onClick: () => setOpen(true) })}
+      <div
+        className="cursor-pointer flex"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        {launcher}
+      </div>
 
-      <input type="checkbox" className="modal-toggle" />
       {isOpen && (
-        <div className="modal">
+        <div className="modal modal-open">
           <div className={clsx("modal-box relative", className)}>
             <label
               onClick={() => setOpen(false)}
