@@ -44,6 +44,7 @@ export function CreateSubscriptionForm() {
     },
   });
 
+  const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
     const payerData = data.payerName
@@ -65,6 +66,7 @@ export function CreateSubscriptionForm() {
     if (payerData) {
       searchParams.append("payerdata", encodeURIComponent(payerData));
     }
+    setNavigating(true);
     push(`/confirm?${searchParams.toString()}`);
   });
   const watchedTimeframe = watch("timeframe");
@@ -77,6 +79,8 @@ export function CreateSubscriptionForm() {
   const [lightningAddress, setLightningAddress] = React.useState<
     LightningAddress | undefined
   >(undefined);
+
+  const isLoading = isSubmitting || isNavigating;
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
@@ -208,10 +212,10 @@ export function CreateSubscriptionForm() {
             )}
         </div>
       </Box>
-      <Button type="submit" className="mt-8" disabled={isSubmitting}>
+      <Button type="submit" className="mt-8" disabled={isLoading}>
         <div className="flex justify-center items-center gap-2">
           <span>Continue</span>
-          {isSubmitting && <Loading />}
+          {isLoading && <Loading />}
         </div>
       </Button>
     </form>

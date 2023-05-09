@@ -41,6 +41,7 @@ export function ConfirmSubscriptionForm({
     },
   });
 
+  const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
   const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
 
@@ -69,6 +70,7 @@ export function ConfirmSubscriptionForm({
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       toast.success("Periodic payment created");
+      setNavigating(true);
       push(
         `/subscriptions/${subscriptionId}${
           returnUrl ? `?returnUrl=${returnUrl}` : ""
@@ -76,6 +78,8 @@ export function ConfirmSubscriptionForm({
       );
     }
   });
+
+  const isLoading = isSubmitting || isNavigating;
 
   return (
     <>
@@ -223,12 +227,12 @@ export function ConfirmSubscriptionForm({
         <Button
           type="submit"
           className="mt-8"
-          disabled={isSubmitting}
+          disabled={isLoading}
           variant={hasLinkedWallet ? "primary" : "disabled"}
         >
           <div className="flex justify-center items-center gap-2">
             <span>Create Periodic Payment</span>
-            {isSubmitting && <Loading />}
+            {isLoading && <Loading />}
           </div>
         </Button>
       </form>
