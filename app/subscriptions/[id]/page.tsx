@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Header } from "app/components/Header";
 import { SubscriptionPageForm } from "app/subscriptions/[id]/components/SubscriptionPageForm";
 import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButton";
-import { FlashAlert } from "app/components/FlashAlert";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import { areNotificationsSupported } from "lib/server/areNotificationsSupported";
 import Link from "next/link";
@@ -40,7 +39,6 @@ export default async function SubscriptionPage({
         )}
         beforeFormContent={
           <>
-            <FlashAlert />
             <h2 className="font-heading font-bold text-2xl">
               Periodic payment
             </h2>

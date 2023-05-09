@@ -13,6 +13,7 @@ import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary"
 import Link from "next/link";
 import { Button } from "app/components/Button";
 import { Loading } from "app/components/Loading";
+import { toast } from "react-hot-toast";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -60,12 +61,12 @@ export function ConfirmSubscriptionForm({
 
   const onSubmit = handleSubmit(async (data) => {
     if (!data.nostrWalletConnectUrl) {
-      alert("Please link your wallet");
+      toast.error("Please link your wallet");
       return;
     }
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
-      sessionStorage.setItem("flashAlert", "subscriptionCreated");
+      toast.success("Periodic payment created");
       push(
         `/subscriptions/${subscriptionId}${
           returnUrl ? `?returnUrl=${returnUrl}` : ""
@@ -134,11 +135,11 @@ export function ConfirmSubscriptionForm({
                 </span>
                 <input
                   className="input input-bordered w-64 input-sm"
-                  placeholder="nostr+walletconnect://..."
+                  placeholder="nostrwalletconnect://..."
                   onChange={(e) =>
                     isValidNostrConnectUrl(e.target.value)
                       ? setValue("nostrWalletConnectUrl", e.target.value)
-                      : alert("invalid NWC url")
+                      : toast.error("invalid NWC url")
                   }
                   value=""
                   type="password"
@@ -173,7 +174,7 @@ async function createSubscription(
     body: JSON.stringify(createSubscriptionRequest),
   });
   if (!res.ok) {
-    alert(res.status + " " + res.statusText);
+    toast.error(res.status + " " + res.statusText);
     return undefined;
   }
   const createSubscriptionResponse =

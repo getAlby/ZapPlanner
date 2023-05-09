@@ -2,6 +2,7 @@ import { Modal } from "app/components/Modal";
 import "./globals.css";
 import Image from "next/image";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "ZapPlanner",
@@ -20,6 +21,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className="bg-gray-50">
         <div className="flex flex-col gap-8 px-4 py-4 lg:py-14 lg:px-14 items-center justify-start">
+          <Toaster position="bottom-center" />
           {children}
         </div>
         <div className="flex gap-2 items-center justify-center mt-6 mb-10">

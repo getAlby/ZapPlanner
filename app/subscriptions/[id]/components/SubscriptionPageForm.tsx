@@ -8,6 +8,7 @@ import { Loading } from "app/components/Loading";
 import clsx from "clsx";
 import { emailRegex, isValidEmail } from "lib/validation";
 import { UpdateSubscriptionRequest } from "types/UpdateSubscriptionRequest";
+import toast from "react-hot-toast";
 
 type SubscriptionPageFormProps = {
   beforeFormContent: React.ReactNode;
@@ -109,9 +110,9 @@ async function updateSubscription(
     body: JSON.stringify(data),
   });
   if (!res.ok) {
-    alert(res.status + " " + res.statusText);
+    toast.error(res.status + " " + res.statusText);
     return false;
   } else {
-    alert("Email settings updated");
+    toast.success("Email settings updated");
   }
 }
