@@ -22,3 +22,7 @@ export const isValidNostrConnectUrl = (url: string) => {
     url.indexOf("&secret=") > 0
   );
 };
+
+export const emailRegex = /\S+@\S+\.\S+/;
+
+export const isValidEmail = (email: string) => emailRegex.test(email);

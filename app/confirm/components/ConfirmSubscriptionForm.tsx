@@ -13,6 +13,9 @@ import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary"
 import Link from "next/link";
 import { Button } from "app/components/Button";
 import { Loading } from "app/components/Loading";
+import { toast } from "react-hot-toast";
+import Image from "next/image";
+import { Modal } from "app/components/Modal";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -38,6 +41,7 @@ export function ConfirmSubscriptionForm({
     },
   });
 
+  const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
   const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
 
@@ -60,12 +64,13 @@ export function ConfirmSubscriptionForm({
 
   const onSubmit = handleSubmit(async (data) => {
     if (!data.nostrWalletConnectUrl) {
-      alert("Please link your wallet");
+      toast.error("Please link your wallet");
       return;
     }
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
-      sessionStorage.setItem("flashAlert", "subscriptionCreated");
+      toast.success("Periodic payment created");
+      setNavigating(true);
       push(
         `/subscriptions/${subscriptionId}${
           returnUrl ? `?returnUrl=${returnUrl}` : ""
@@ -74,11 +79,15 @@ export function ConfirmSubscriptionForm({
     }
   });
 
+  const isLoading = isSubmitting || isNavigating;
+
   return (
     <>
       <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
         <Box>
-          <h2 className="font-heading font-bold text-2xl">Summary</h2>
+          <h2 className="font-heading font-bold text-2xl">
+            Connect wallet to confirm periodic payment
+          </h2>
           <SubscriptionSummary
             values={{
               amount: unconfirmedSubscription.amount,
@@ -91,72 +100,139 @@ export function ConfirmSubscriptionForm({
             showFirstPayment
           />
           <div className="divider my-0" />
-          <h2 className="font-heading font-bold text-2xl">Link your wallet</h2>
-
-          <p className="font-body">
-            Use Nostr Wallet Connect to securely connect your bitcoin lightning
-            wallet to ZapPlanner. Nostr Wallet connect is available for{" "}
-            <Link
-              href="https://nwc.getalby.com"
-              target="_blank"
-              className="link"
-            >
-              Alby accounts
-            </Link>
-            ,{" "}
-            <Link
-              href="https://github.com/getAlby/umbrel-community-app-store"
-              target="_blank"
-              className="link"
-            >
-              {" "}
-              Umbrel wallets
-            </Link>
-            , etc.
-          </p>
-
-          <div className="flex justify-center">
-            {!hasLinkedWallet ? (
-              <div className="flex flex-col items-center">
-                <button
-                  type="button"
-                  onClick={linkWallet}
-                  className="shadow w-80 h-14 rounded-md font-body font-bold hover:opacity-80 text-white text-lg"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #A939C2 63.72%, #9A34B1 95.24%)",
-                  }}
-                >
-                  Link Wallet
-                </button>
-                <span className="text-xs mt-4 mb-1">
-                  or paste a NWC url below:
-                </span>
-                <input
-                  className="input input-bordered w-64 input-sm"
-                  placeholder="nostr+walletconnect://..."
-                  onChange={(e) =>
-                    isValidNostrConnectUrl(e.target.value)
-                      ? setValue("nostrWalletConnectUrl", e.target.value)
-                      : alert("invalid NWC url")
-                  }
-                  value=""
-                  type="password"
+          <div className="flex justify-center items-start gap-2 px-8">
+            <div className="border-[1px] border-[#7E22CD] rounded-2xl flex flex-col gap-8 py-4 px-8 w-full">
+              <div className="flex justify-center items-center gap-2">
+                <Image
+                  src={`/icons/nwc.svg`}
+                  alt={"NWC icon"}
+                  width={32}
+                  height={32}
+                  priority
                 />
+                <h2 className="font-heading font-bold text-2xl">
+                  Nostr Wallet Connect
+                </h2>
               </div>
-            ) : (
-              <div className="bg-green-50 p-3 rounded-md w-full">
-                <p className="font-body text-green-700 text-sm font-medium">
-                  ✅ Wallet linked
+
+              <div className="flex justify-center">
+                {!hasLinkedWallet ? (
+                  <div className="flex flex-col items-center">
+                    <Button
+                      block
+                      variant="primary"
+                      type="button"
+                      onClick={linkWallet}
+                    >
+                      <div className="flex justify-center items-center gap-2">
+                        <Image
+                          src={`/icons/alby.svg`}
+                          alt={"Alby icon"}
+                          width={24}
+                          height={24}
+                        />
+                        Connect with Alby
+                      </div>
+                    </Button>
+                    <div className="divider">or</div>
+                    <div>
+                      <span className="zp-label">
+                        Paste a Nostr Wallet Connect url:
+                      </span>
+                      <input
+                        className="zp-input-sm"
+                        placeholder="nostrwalletconnect://..."
+                        onChange={(e) =>
+                          isValidNostrConnectUrl(e.target.value)
+                            ? setValue("nostrWalletConnectUrl", e.target.value)
+                            : toast.error("invalid NWC url")
+                        }
+                        value=""
+                        type="password"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-green-50 p-3 rounded-md w-full">
+                    <p className="font-body text-green-700 text-sm font-medium">
+                      ✅ Wallet linked
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <Modal
+              modalId="about-nwc"
+              className="w-[480px] max-w-full"
+              launcher={
+                <label className="cursor-pointer flex-shrink-0">
+                  <Image
+                    src={`/icons/info-outline.svg`}
+                    alt={"Info icon"}
+                    width={16}
+                    height={16}
+                    priority
+                  />
+                </label>
+              }
+            >
+              <div className="flex flex-col gap-4 justify-center items-center">
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src={`/icons/nwc.svg`}
+                    alt={"NWC icon"}
+                    width={32}
+                    height={32}
+                    priority
+                  />
+                  <h2 className="font-heading font-bold text-2xl">
+                    Nostr Wallet Connect
+                  </h2>
+                </div>
+                <p className="font-body">
+                  Nostr Wallet Connect allows you to securely authorise
+                  ZapPlanner to perform transactions from your lightning wallet
+                  on your behalf.
                 </p>
+                <p className="font-body">
+                  It is currently available for{" "}
+                  <Link
+                    href="https://nwc.getalby.com"
+                    target="_blank"
+                    className="link"
+                  >
+                    Alby accounts
+                  </Link>{" "}
+                  and as an{" "}
+                  <Link
+                    href="https://github.com/getAlby/umbrel-community-app-store"
+                    target="_blank"
+                    className="link"
+                  >
+                    Umbrel app
+                  </Link>
+                  .
+                </p>
+                <Link
+                  href="https://blog.getalby.com/introducing-nostr-wallet-connect"
+                  className="link"
+                  target="_blank"
+                >
+                  Read more
+                </Link>
               </div>
-            )}
+            </Modal>
           </div>
         </Box>
-        <Button type="submit" className="mt-8" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="mt-8"
+          disabled={isLoading}
+          variant={hasLinkedWallet ? "primary" : "disabled"}
+        >
           <div className="flex justify-center items-center gap-2">
             <span>Create Periodic Payment</span>
-            {isSubmitting && <Loading />}
+            {isLoading && <Loading />}
           </div>
         </Button>
       </form>
@@ -173,7 +249,7 @@ async function createSubscription(
     body: JSON.stringify(createSubscriptionRequest),
   });
   if (!res.ok) {
-    alert(res.status + " " + res.statusText);
+    toast.error(res.status + " " + res.statusText);
     return undefined;
   }
   const createSubscriptionResponse =

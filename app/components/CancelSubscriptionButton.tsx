@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import clsx from "clsx";
+import { toast } from "react-hot-toast";
 
 type CancelSubscriptionButtonProps = {
   subscriptionId: string;
@@ -19,9 +20,9 @@ export function CancelSubscriptionButton({
       method: "DELETE",
     });
     if (!res.ok) {
-      alert(res.status + " " + res.statusText);
+      toast.error(res.status + " " + res.statusText);
     } else {
-      sessionStorage.setItem("flashAlert", "subscriptionDeleted");
+      toast.success("Periodic payment deleted");
       push("/");
     }
     setIsLoading(false);

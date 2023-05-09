@@ -12,3 +12,8 @@ services:
       POSTGRES_DB: nwc-periodic-payments
     volumes:
       - ./.db/:/var/lib/postgresql/data/
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
