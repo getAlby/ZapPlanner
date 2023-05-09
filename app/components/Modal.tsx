@@ -1,14 +1,17 @@
+import clsx from "clsx";
 import React from "react";
 
 type ModalProps = {
   launcher: React.ReactElement;
+  className?: string;
+  modalId?: string;
 };
-
-const modalId = "zp-modal";
 
 export function Modal({
   children,
   launcher,
+  className,
+  modalId,
 }: React.PropsWithChildren<ModalProps>) {
   return (
     <>
@@ -16,7 +19,7 @@ export function Modal({
 
       <input type="checkbox" id={modalId} className="modal-toggle" />
       <div className="modal">
-        <div className="modal-box relative">
+        <div className={clsx("modal-box relative", className)}>
           <label
             htmlFor={modalId}
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"

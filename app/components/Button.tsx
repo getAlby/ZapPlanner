@@ -3,24 +3,27 @@ import React from "react";
 import clsx from "clsx";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "disabled";
+  block?: boolean;
 };
 
 export function Button({
   children,
   variant = "primary",
+  block,
   ...props
 }: React.PropsWithChildren<ButtonProps>) {
   return (
     <button
       {...props}
       className={clsx(
-        "shadow w-64 h-10 rounded-md font-body font-bold hover:opacity-80",
-        props.disabled && "text-gray-400",
+        "shadow h-10 rounded-md font-body font-bold hover:opacity-80",
+        block ? "w-full" : "w-64",
+        (props.disabled || variant === "disabled") && "text-gray-400",
         props.className
       )}
       style={
-        props.disabled
+        props.disabled || variant === "disabled"
           ? {}
           : variant === "primary"
           ? {

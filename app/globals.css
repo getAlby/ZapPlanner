@@ -17,8 +17,13 @@ body {
   justify-content: space-between;
 }
 
-.zp-input {
+.zp-input,
+.zp-input-sm {
   @apply input input-bordered w-full;
+}
+
+.zp-input-sm {
+  @apply input-sm;
 }
 
 .zp-label {
