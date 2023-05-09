@@ -100,8 +100,69 @@ export function ConfirmSubscriptionForm({
             showFirstPayment
           />
           <div className="divider my-0" />
-          <div className="flex justify-center items-start gap-2 px-8">
-            <div className="border-[1px] border-[#7E22CD] rounded-2xl flex flex-col gap-8 py-4 px-8 w-full">
+          <div className="flex justify-center items-start lg:px-8">
+            <div className="border-[1px] border-[#7E22CD] rounded-2xl flex flex-col gap-8 p-4 w-full relative">
+              <Modal
+                modalId="about-nwc"
+                className="w-[480px] max-w-full"
+                launcher={
+                  <label className="cursor-pointer flex-shrink-0 absolute top-2 right-2">
+                    <Image
+                      src={`/icons/info-outline.svg`}
+                      alt={"Info icon"}
+                      width={16}
+                      height={16}
+                      priority
+                    />
+                  </label>
+                }
+              >
+                <div className="flex flex-col gap-4 justify-center items-center">
+                  <div className="flex justify-center items-center gap-2">
+                    <Image
+                      src={`/icons/nwc.svg`}
+                      alt={"NWC icon"}
+                      width={32}
+                      height={32}
+                      priority
+                    />
+                    <h2 className="font-heading font-bold text-2xl text-primary">
+                      Nostr Wallet Connect
+                    </h2>
+                  </div>
+                  <p className="font-body">
+                    Nostr Wallet Connect allows you to securely authorise
+                    ZapPlanner to perform transactions from your lightning
+                    wallet on your behalf.
+                  </p>
+                  <p className="font-body">
+                    It is currently available for{" "}
+                    <Link
+                      href="https://nwc.getalby.com"
+                      target="_blank"
+                      className="link"
+                    >
+                      Alby accounts
+                    </Link>{" "}
+                    and as an{" "}
+                    <Link
+                      href="https://github.com/getAlby/umbrel-community-app-store"
+                      target="_blank"
+                      className="link"
+                    >
+                      Umbrel app
+                    </Link>
+                    .
+                  </p>
+                  <Link
+                    href="https://blog.getalby.com/introducing-nostr-wallet-connect"
+                    className="link"
+                    target="_blank"
+                  >
+                    Read more
+                  </Link>
+                </div>
+              </Modal>
               <div className="flex justify-center items-center gap-2">
                 <Image
                   src={`/icons/nwc.svg`}
@@ -161,67 +222,6 @@ export function ConfirmSubscriptionForm({
                 )}
               </div>
             </div>
-            <Modal
-              modalId="about-nwc"
-              className="w-[480px] max-w-full"
-              launcher={
-                <label className="cursor-pointer flex-shrink-0">
-                  <Image
-                    src={`/icons/info-outline.svg`}
-                    alt={"Info icon"}
-                    width={16}
-                    height={16}
-                    priority
-                  />
-                </label>
-              }
-            >
-              <div className="flex flex-col gap-4 justify-center items-center">
-                <div className="flex justify-center items-center gap-2">
-                  <Image
-                    src={`/icons/nwc.svg`}
-                    alt={"NWC icon"}
-                    width={32}
-                    height={32}
-                    priority
-                  />
-                  <h2 className="font-heading font-bold text-2xl text-primary">
-                    Nostr Wallet Connect
-                  </h2>
-                </div>
-                <p className="font-body">
-                  Nostr Wallet Connect allows you to securely authorise
-                  ZapPlanner to perform transactions from your lightning wallet
-                  on your behalf.
-                </p>
-                <p className="font-body">
-                  It is currently available for{" "}
-                  <Link
-                    href="https://nwc.getalby.com"
-                    target="_blank"
-                    className="link"
-                  >
-                    Alby accounts
-                  </Link>{" "}
-                  and as an{" "}
-                  <Link
-                    href="https://github.com/getAlby/umbrel-community-app-store"
-                    target="_blank"
-                    className="link"
-                  >
-                    Umbrel app
-                  </Link>
-                  .
-                </p>
-                <Link
-                  href="https://blog.getalby.com/introducing-nostr-wallet-connect"
-                  className="link"
-                  target="_blank"
-                >
-                  Read more
-                </Link>
-              </div>
-            </Modal>
           </div>
         </Box>
         <Button
