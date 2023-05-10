@@ -15,7 +15,7 @@
     "docker:remove": "docker-compose down",
     "db:migrate:local": "dotenv -e .env.local -- prisma migrate dev",
     "db:migrate:local:createonly": "dotenv -e .env.local -- prisma migrate dev --create-only",
-    "db:connect:local": "psql postgres://user:password@localhost:5432/boostagram-viewer",
+    "db:connect:local": "psql postgres://user:password@localhost:5432/nwc-periodic-payments",
     "db:studio:local": "dotenv -e .env.local -- prisma studio",
     "db:reset:local": "dotenv -e .env.local -- prisma migrate reset",
     "deploy": "fly deploy --remote-only --build-secret DATABASE_URL=$DATABASE_URL --build-secret PRISMA_FIELD_ENCRYPTION_KEY=$PRISMA_FIELD_ENCRYPTION_KEY",
