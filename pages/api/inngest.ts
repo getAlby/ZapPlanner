@@ -102,15 +102,29 @@ const periodicZap = inngest.createFunction(
               : undefined,
         });
         logger.info("Sending payment", { subscriptionId });
-        const response = await noswebln.sendPayment(invoice.paymentRequest);
-        logger.info("Done", { response, subscriptionId });
+        const response = (await noswebln.sendPayment(
+          invoice.paymentRequest
+        )) as { preimage: string };
+        if (response.preimage) {
+          logger.info("Payment sent successfully", {
+            response,
+            subscriptionId,
+          });
+        } else {
+          logger.error("Payment sent but no preimage in response", {
+            response,
+            subscriptionId,
+          });
+        }
 
         paymentSucceeded = true;
-        noswebln.close();
-        logger.info("Closed noswebln", { subscriptionId });
+        try {
+          noswebln.close();
+        } catch (error) {
+          logger.error("Failed to close noswebln", { subscriptionId });
+        }
       } catch (error) {
         logger.error("Failed to send periodic zap", { subscriptionId, error });
-        //throw error;
       }
       const updatedSubscription = await prismaClient.subscription.update({
         where: {
