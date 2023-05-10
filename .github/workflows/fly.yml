@@ -5,18 +5,8 @@ on:
       - main
       - chore/sentry
 jobs:
-  sentry-cli:
-    name: Setup Sentry CLI
-    uses: mathieu-bour/setup-sentry-cli@v1
-    with:
-      version: latest # optional if 'latest'
-      # url: https://sentry.yourcompany.com # optional if you are using https://sentry.io
-      token: ${{ SECRETS.SENTRY_TOKEN }} # from GitHub secrets
-      organization: getalby
-      project: zapplanner
   deploy:
     name: Deploy app
-    needs: sentry-cli
     runs-on: ubuntu-latest
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
