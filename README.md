@@ -24,15 +24,25 @@ https://zapplanner.albylabs.com/confirm?amount=21&recipient=hello@getalby.com&ti
 
 Run `$ yarn install`
 
-Run `$ cp .env.example .env && husky install`
+Run `$ cp .env.example .env.local && husky install`
 
-Run `$ yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_KEY>` in `.env`
+_note: if .env.local does not work for you, as a temporary solution try renaming it to .env_
+
+Run `$ yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_KEY>` in `.env.local`
+
+### Database Setup (Docker)
+
+Run `$ yarn docker:start`
+
+Run `$ yarn db:migrate:deploy`
+
+### Database Setup (Non-Docker)
 
 Unless you already have it, create the database with: `$ createdb boostagram-viewer`
 
-Make sure to set your Postgres username and password in `.env`. To list Postgres users, open `$ psql` followed by `> \du`. To set no password, leave it empty like this: `postgres://username:@localhost...`.
+Make sure to set your Postgres username and password in `.env.local`. To list Postgres users, open `$ psql` followed by `> \du`. To set no password, leave it empty like this: `postgres://username:@localhost...`.
 
-Run `$ yarn db:migrate:deploy` (if developing with Docker make sure to run Run `$ yarn docker:start` first)
+Run `$ yarn db:migrate:deploy`
 
 ## Development (Docker)
 
@@ -42,7 +52,7 @@ Run `$ yarn inngest:local`
 
 Run `$ yarn dev`
 
-## Development (local)
+## Development (Non-Docker)
 
 Run `$ yarn inngest:local`
 
