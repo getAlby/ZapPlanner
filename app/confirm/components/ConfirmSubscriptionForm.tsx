@@ -55,11 +55,21 @@ export function ConfirmSubscriptionForm({
           }
         : undefined
     );
-    await nwc.initNWC({
-      name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
-    });
-
-    setValue("nostrWalletConnectUrl", nwc.getNostrWalletConnectUrl(true));
+    try {
+      await nwc.initNWC({
+        name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
+      });
+      const url = nwc.getNostrWalletConnectUrl(true);
+      if (isValidNostrConnectUrl(url)) {
+        setValue("nostrWalletConnectUrl", url);
+      } else {
+        throw new Error("Received invalid NWC URL");
+      }
+    } catch (error) {
+      if (error) {
+        console.error("Init NWC failed", error);
+      }
+    }
   };
 
   const onSubmit = handleSubmit(async (data) => {
