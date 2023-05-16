@@ -8,7 +8,6 @@ import { LightningAddress } from "alby-tools";
 import { LnUrlPayResponse } from "alby-tools/dist/types";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
-import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { isValidPositiveValue } from "lib/validation";
 import { Box } from "app/components/Box";
 import { Button } from "app/components/Button";
@@ -192,22 +191,23 @@ export function CreateSubscriptionForm() {
             <p className="zp-form-error">{errors.timeframeValue.message}</p>
           )}
 
-          {lightningAddress && lightningAddress?.lnurlpData?.commentAllowed && (
-            <>
-              <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
-                <label className="zp-label">Your message</label>
-                <label className="zp-label-ex">
-                  Example: <samp>Thank you for your work</samp>
-                </label>
-              </div>
+          {lightningAddress &&
+            !!lightningAddress?.lnurlpData?.commentAllowed && (
+              <>
+                <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
+                  <label className="zp-label">Your message</label>
+                  <label className="zp-label-ex">
+                    Example: <samp>Thank you for your work</samp>
+                  </label>
+                </div>
 
-              <input
-                {...register("message")}
-                className="zp-input"
-                maxLength={lightningAddress?.lnurlpData?.commentAllowed}
-              />
-            </>
-          )}
+                <input
+                  {...register("message")}
+                  className="zp-input"
+                  maxLength={lightningAddress?.lnurlpData?.commentAllowed}
+                />
+              </>
+            )}
 
           {lightningAddress &&
             lightningAddress?.lnurlpData?.payerData?.name && (
