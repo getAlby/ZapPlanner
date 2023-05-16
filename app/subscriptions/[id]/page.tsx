@@ -6,6 +6,8 @@ import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButto
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import Link from "next/link";
+import { MAX_RETRIES } from "lib/constants";
+import { ReactivateSubscriptionButton } from "app/components/ReactivateSubscriptionButton";
 
 export default async function SubscriptionPage({
   params,
@@ -60,6 +62,9 @@ export default async function SubscriptionPage({
                 payerData: subscription.payerData ?? undefined,
               }}
             />
+            {subscription.retryCount >= MAX_RETRIES && (
+              <ReactivateSubscriptionButton subscriptionId={subscription.id} />
+            )}
             <CancelSubscriptionButton subscriptionId={subscription.id} />
             <div className="divider my-0" />
 

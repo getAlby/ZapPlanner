@@ -1,4 +1,5 @@
 import { Subscription } from "@prisma/client";
+import { MAX_RETRIES } from "lib/constants";
 import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
 import { logger } from "lib/server/logger";
 import * as nodemailer from "nodemailer";
@@ -26,6 +27,9 @@ if (
 
 type EmailTemplate = (
   | {
+      type: "subscription-reactivated";
+    }
+  | {
       type: "subscription-updated";
     }
   | {
@@ -33,9 +37,14 @@ type EmailTemplate = (
     }
   | {
       type: "payment-failed";
+      errorMessage: string;
     }
   | {
       type: "subscription-deactivated";
+    }
+  | {
+      type: "payment-recovered";
+      numRetries: number;
     }
 ) & {
   subscription: Subscription;
@@ -73,21 +82,29 @@ function getEmailHtml(template: EmailTemplate) {
       );
     case "payment-success":
       return `Your lightning payment to ${template.subscription.recipientLightningAddress} was successful.<br/><br/>Your next payment is scheduled for ${template.subscription.sleepDuration} from now.`;
+    case "payment-recovered":
+      return `Your lightning payment to ${template.subscription.recipientLightningAddress} recovered after ${template.numRetries} failures.`;
     case "payment-failed":
-      return `Your last periodic payment failed. Retry count: `;
+      return `Your last periodic payment failed. Attempt: ${template.subscription.retryCount} / ${MAX_RETRIES}<br/><br/>After ${MAX_RETRIES} failed payments your subscription will be disabled. Please check your wallet balance, NWC connection and ensure your recipient's lightning address is still accessible.<br/><br/><b>Error: ${template.errorMessage}</b>`;
     case "subscription-deactivated":
-      return `Periodic Payment deactivated`;
+      return `Your Periodic Payment has been deactivated as it has failed ${MAX_RETRIES} times in a row. Please check your wallet balance, NWC connection and ensure your recipient's lightning address is still accessible.`;
+    case "subscription-reactivated":
+      return `Your Periodic Payment has been reactivated. Your next payment will be made instantly.`;
   }
 }
 function getEmailSubject(template: EmailTemplate) {
   switch (template.type) {
     case "subscription-updated":
-      return `Your Periodic Payment to ${template.subscription.recipientLightningAddress}`;
+      return `Details of your Periodic Payment to ${template.subscription.recipientLightningAddress}`;
     case "payment-success":
       return `Successful Payment of ${template.subscription.amount} sats to ${template.subscription.recipientLightningAddress}`;
+    case "payment-recovered":
+      return `Payment to ${template.subscription.recipientLightningAddress} recovered`;
     case "payment-failed":
-      return `Failed Payment to ${template.subscription.recipientLightningAddress}`;
+      return `Failed Payment to ${template.subscription.recipientLightningAddress} (Attempt ${template.subscription.retryCount} / ${MAX_RETRIES})`;
     case "subscription-deactivated":
-      return `Periodic Payment deactivated`;
+      return `Periodic Payment to ${template.subscription.recipientLightningAddress} deactivated`;
+    case "subscription-reactivated":
+      return `Periodic Payment to ${template.subscription.recipientLightningAddress} reactivated`;
   }
 }

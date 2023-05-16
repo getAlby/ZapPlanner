@@ -67,6 +67,8 @@ const periodicZap = inngest.createFunction(
       const message = subscription.message ?? undefined;
 
       let paymentSucceeded = false;
+      let paymentRecovered = false;
+      let errorMessage = "";
       try {
         const noswebln = new webln.NostrWebLNProvider({
           nostrWalletConnectUrl,
@@ -117,6 +119,9 @@ const periodicZap = inngest.createFunction(
           });
         }
 
+        if (subscription.retryCount > 0) {
+          paymentRecovered = true;
+        }
         paymentSucceeded = true;
         try {
           noswebln.close();
@@ -125,6 +130,7 @@ const periodicZap = inngest.createFunction(
         }
       } catch (error) {
         logger.error("Failed to send periodic zap", { subscriptionId, error });
+        errorMessage = (error as Error).message;
       }
       const updatedSubscription = await prismaClient.subscription.update({
         where: {
@@ -144,17 +150,26 @@ const periodicZap = inngest.createFunction(
       });
 
       if (
-        areEmailNotificationsSupported(subscription.sleepDuration) &&
-        subscription.email &&
-        subscription.sendPaymentNotifications
+        areEmailNotificationsSupported(updatedSubscription.sleepDuration) &&
+        updatedSubscription.email &&
+        updatedSubscription.sendPaymentNotifications
       ) {
-        await sendEmail(subscription.email, {
+        if (paymentRecovered) {
+          await sendEmail(updatedSubscription.email, {
+            type: "payment-recovered",
+            subscription: updatedSubscription,
+            numRetries: subscription.retryCount,
+          });
+        }
+
+        await sendEmail(updatedSubscription.email, {
           type: paymentSucceeded ? "payment-success" : "payment-failed",
-          subscription,
+          subscription: updatedSubscription,
+          errorMessage,
         });
       }
 
-      if (updatedSubscription.retryCount > MAX_RETRIES) {
+      if (updatedSubscription.retryCount >= MAX_RETRIES) {
         logger.error("subscription payment failed too many times", {
           subscriptionId,
         });

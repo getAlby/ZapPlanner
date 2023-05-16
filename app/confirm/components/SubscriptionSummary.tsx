@@ -134,6 +134,9 @@ export function SubscriptionSummary({
           right={values.numFailedPayments}
         />
       )}
+      {(values.retryCount || 0) > 0 && (
+        <SubscriptionSummaryItem left="Retry count" right={values.retryCount} />
+      )}
       {values.retryCount !== undefined && (
         <SubscriptionSummaryItem
           left="Status"
