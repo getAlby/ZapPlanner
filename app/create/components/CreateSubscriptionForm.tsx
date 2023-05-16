@@ -194,12 +194,7 @@ export function CreateSubscriptionForm() {
           {lightningAddress &&
             !!lightningAddress?.lnurlpData?.commentAllowed && (
               <>
-                <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
-                  <label className="zp-label">Your message</label>
-                  <label className="zp-label-ex">
-                    Example: <samp>Thank you for your work</samp>
-                  </label>
-                </div>
+                <label className="zp-label">Your message</label>
 
                 <input
                   {...register("message")}
@@ -212,12 +207,7 @@ export function CreateSubscriptionForm() {
           {lightningAddress &&
             lightningAddress?.lnurlpData?.payerData?.name && (
               <>
-                <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">
-                  <label className="zp-label">Your name</label>
-                  <label className="zp-label-ex">
-                    Example: <samp>John Smith</samp>
-                  </label>
-                </div>
+                <label className="zp-label">Your name</label>
                 <input {...register("payerName")} className="zp-input" />
               </>
             )}
