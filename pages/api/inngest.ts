@@ -32,6 +32,11 @@ type Events = {
   cancel: CancelSubscriptionEvent;
 };
 
+type NWCPaymentError = {
+  error: string;
+  code: string;
+};
+
 export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
 
 const ENABLE_REPEAT_EVENTS = true;
@@ -117,6 +122,7 @@ const periodicZap = inngest.createFunction(
             response,
             subscriptionId,
           });
+          throw new Error("Payment sent but no preimage in response");
         }
 
         if (subscription.retryCount > 0) {
@@ -130,7 +136,23 @@ const periodicZap = inngest.createFunction(
         }
       } catch (error) {
         logger.error("Failed to send periodic zap", { subscriptionId, error });
-        errorMessage = (error as Error).message;
+        if (typeof error === "string") {
+          errorMessage = error;
+        } else if (
+          (error as NWCPaymentError).error &&
+          typeof (error as NWCPaymentError).error === "string"
+        ) {
+          errorMessage = (
+            ((error as NWCPaymentError).code || "") +
+            " " +
+            (error as NWCPaymentError).error
+          ).trim();
+        } else if ((error as Error).message) {
+          errorMessage = (error as Error).message;
+        } else {
+          logger.error("Unparsable error", { error });
+          errorMessage = "Unknown";
+        }
       }
       const updatedSubscription = await prismaClient.subscription.update({
         where: {
