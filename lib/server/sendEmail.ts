@@ -58,12 +58,23 @@ export const sendEmail = (to: string, template: EmailTemplate) => {
     const html =
       getEmailHtml(template) +
       `<br/><br/>Manage your periodic payment: <a href="${subscriptionUrl}">${subscriptionUrl}</a>`;
-    transport.sendMail({
-      to,
-      subject,
-      html,
-      from: `ZapPlanner <${process.env.EMAIL_FROM}>`,
-    });
+    try {
+      transport.sendMail({
+        to,
+        subject,
+        html,
+        from: `ZapPlanner <${process.env.EMAIL_FROM}>`,
+      });
+    } catch (error) {
+      logger.error("Failed to send email", {
+        to,
+        template: {
+          templateType: template.type,
+          subscriptionId: template.subscription.id,
+        },
+        error,
+      });
+    }
   } else {
     logger.warn("Email config not setup. Skipped sending email");
   }
