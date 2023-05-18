@@ -22,7 +22,7 @@ export function CancelSubscriptionButton({
     if (!res.ok) {
       toast.error(res.status + " " + res.statusText);
     } else {
-      toast.success("Periodic payment deleted");
+      toast.success("Recrurring payment deleted");
       push("/");
     }
     setIsLoading(false);
@@ -37,7 +37,7 @@ export function CancelSubscriptionButton({
       onClick={cancelSubscription}
       disabled={isLoading}
     >
-      Cancel This Periodic Payment
+      Cancel This Recurring Payment
     </button>
   );
 }

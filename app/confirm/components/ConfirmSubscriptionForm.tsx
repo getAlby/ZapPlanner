@@ -79,7 +79,7 @@ export function ConfirmSubscriptionForm({
     }
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
-      toast.success("Periodic payment created");
+      toast.success("Recurring payment created");
       setNavigating(true);
       push(
         `/subscriptions/${subscriptionId}${
@@ -96,7 +96,7 @@ export function ConfirmSubscriptionForm({
       <form onSubmit={onSubmit} className="flex flex-col w-full items-center">
         <Box>
           <h2 className="font-heading font-bold text-2xl text-primary">
-            Connect wallet to confirm periodic payment
+            Connect wallet to confirm recurring payment
           </h2>
           <SubscriptionSummary
             values={{
@@ -244,7 +244,7 @@ export function ConfirmSubscriptionForm({
           variant={hasLinkedWallet ? "primary" : "disabled"}
         >
           <div className="flex justify-center items-center gap-2">
-            <span>Create Periodic Payment</span>
+            <span>Create Recurring Payment</span>
             {isLoading && <Loading />}
           </div>
         </Button>

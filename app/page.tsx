@@ -9,7 +9,7 @@ export default function HomePage() {
       <Header minimal={false} />
       <div className="flex gap-4 flex-wrap items-center justify-center">
         <Link href="/create">
-          <Button>New Periodic Payment</Button>
+          <Button>New Recurring Payment</Button>
         </Link>
         <Link href="/about">
           <Button variant="secondary">How does it work?</Button>

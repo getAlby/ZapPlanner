@@ -95,7 +95,7 @@ export function SubscriptionPageForm({
       <div className="mt-8 flex gap-4 flex-wrap items-center justify-center">
         <Link href="/create">
           <Button type="button" variant="secondary">
-            New Periodic Payment
+            New Recurring Payment
           </Button>
         </Link>
         <Button type="submit" disabled={isSubmitting}>

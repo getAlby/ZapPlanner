@@ -1,6 +1,6 @@
 # ZapPlanner
 
-Periodic lightning payments powered by Nostr Wallet Connect (NWC)
+Scheduled recurring lightning payments powered by Nostr Wallet Connect (NWC)
 
 Try it here: https://zapplanner.albylabs.com/
 

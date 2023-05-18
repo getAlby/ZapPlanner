@@ -15,7 +15,7 @@ export function Header({ minimal = true }) {
             className="object-cover"
             style={{ objectPosition: "50% 85%" }}
             src="/nwc-periodic-payments.png"
-            alt="Periodic Payments Logo"
+            alt="Recurring Payments Logo"
             fill
             priority
           />
@@ -33,7 +33,7 @@ export function Header({ minimal = true }) {
       </Link>
       {!minimal && (
         <h2 className="max-lg:text-center text-2xl text-primary-content">
-          Schedule automatic periodic lightning payments
+          Schedule automatic recurring lightning payments
         </h2>
       )}
     </div>

@@ -57,7 +57,7 @@ export const sendEmail = (to: string, template: EmailTemplate) => {
     const subject = getEmailSubject(template);
     const html =
       getEmailHtml(template) +
-      `<br/><br/>Manage your periodic payment: <a href="${subscriptionUrl}">${subscriptionUrl}</a>`;
+      `<br/><br/>Manage your recurring payment: <a href="${subscriptionUrl}">${subscriptionUrl}</a>`;
     try {
       transport.sendMail({
         to,
@@ -83,7 +83,7 @@ function getEmailHtml(template: EmailTemplate) {
   switch (template.type) {
     case "subscription-updated":
       return (
-        `Your notification settings have been updated for your periodic payment to ${template.subscription.recipientLightningAddress}.` +
+        `Your notification settings have been updated for your recurring payment to ${template.subscription.recipientLightningAddress}.` +
         `<br/><br/>Payments of ${template.subscription.amount} sats will be made every ${template.subscription.sleepDuration}.` +
         `<br/><br/>${
           template.subscription.sendPaymentNotifications
@@ -96,17 +96,17 @@ function getEmailHtml(template: EmailTemplate) {
     case "payment-recovered":
       return `Your lightning payment to ${template.subscription.recipientLightningAddress} recovered after ${template.numRetries} failures.`;
     case "payment-failed":
-      return `Your last periodic payment failed. Attempt: ${template.subscription.retryCount} / ${MAX_RETRIES}<br/><br/>After ${MAX_RETRIES} failed payments your subscription will be disabled. Please check your wallet balance, NWC connection and ensure your recipient's lightning address is still accessible.<br/><br/><b>Error: ${template.errorMessage}</b>`;
+      return `Your last recurring payment failed. Attempt: ${template.subscription.retryCount} / ${MAX_RETRIES}<br/><br/>After ${MAX_RETRIES} failed payments your subscription will be disabled. Please check your wallet balance, NWC connection and ensure your recipient's lightning address is still accessible.<br/><br/><b>Error: ${template.errorMessage}</b>`;
     case "subscription-deactivated":
-      return `Your Periodic Payment has been deactivated as it has failed ${MAX_RETRIES} times in a row. Please check your wallet balance, NWC connection and ensure your recipient's lightning address is still accessible.`;
+      return `Your Recurring Payment has been deactivated as it has failed ${MAX_RETRIES} times in a row. Please check your wallet balance, NWC connection and ensure your recipient's lightning address is still accessible.`;
     case "subscription-reactivated":
-      return `Your Periodic Payment has been reactivated. Your next payment will be made instantly.`;
+      return `Your Recurring Payment has been reactivated. Your next payment will be made instantly.`;
   }
 }
 function getEmailSubject(template: EmailTemplate) {
   switch (template.type) {
     case "subscription-updated":
-      return `Details of your Periodic Payment to ${template.subscription.recipientLightningAddress}`;
+      return `Details of your Recurring Payment to ${template.subscription.recipientLightningAddress}`;
     case "payment-success":
       return `Successful Payment of ${template.subscription.amount} sats to ${template.subscription.recipientLightningAddress}`;
     case "payment-recovered":
@@ -114,8 +114,8 @@ function getEmailSubject(template: EmailTemplate) {
     case "payment-failed":
       return `Failed Payment to ${template.subscription.recipientLightningAddress} (Attempt ${template.subscription.retryCount} / ${MAX_RETRIES})`;
     case "subscription-deactivated":
-      return `Periodic Payment to ${template.subscription.recipientLightningAddress} deactivated`;
+      return `Recurring Payment to ${template.subscription.recipientLightningAddress} deactivated`;
     case "subscription-reactivated":
-      return `Periodic Payment to ${template.subscription.recipientLightningAddress} reactivated`;
+      return `Recurring Payment to ${template.subscription.recipientLightningAddress} reactivated`;
   }
 }
