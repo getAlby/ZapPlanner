@@ -6,7 +6,7 @@ type HeaderProps = {
   minimal?: boolean;
 };
 
-export function Header({ minimal = true }) {
+export function Header({ minimal = true }: HeaderProps) {
   return (
     <div className="flex flex-col">
       {!minimal && (
