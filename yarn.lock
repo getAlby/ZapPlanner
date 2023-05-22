@@ -635,10 +635,10 @@ ajv@^6.10.0, ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-alby-js-sdk@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/alby-js-sdk/-/alby-js-sdk-1.5.1.tgz#e09827cbcf31fdb10473d674c35c3c95fb51ddab"
-  integrity sha512-aSZ4d0UWkBiVNh7h13460LnHzqJ9J4D1vpIaqvNwApGRsI2iZCG/gOqjo4RaaoAeuCXddQdnsRqF+1gfMjljCw==
+alby-js-sdk@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/alby-js-sdk/-/alby-js-sdk-1.7.1.tgz#0f60c2a32d821042123d14307c2b8f4aa3f9d6d3"
+  integrity sha512-L5q4U2lMtsLLYs5UREzCT+XgNWKV4CV1iWx3QYrUuvws6qSpoTUyk+j/RhUa8YkSJ/78rytOIYlIT9VuHxmftg==
   dependencies:
     cross-fetch "^3.1.5"
     crypto-js "^4.1.1"
