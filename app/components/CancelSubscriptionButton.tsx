@@ -22,7 +22,7 @@ export function CancelSubscriptionButton({
     if (!res.ok) {
       toast.error(res.status + " " + res.statusText);
     } else {
-      toast.success("Recrurring payment deleted");
+      toast.success("Recurring payment deleted");
       push("/");
     }
     setIsLoading(false);

@@ -70,8 +70,8 @@ export default async function SubscriptionPage({
 
             <p className="font-body">
               Bookmark this page or provide your email so you can access this
-              recurring payment If you wish to cancel it. You can also delete the
-              NWC connection to cancel this recurring payment.
+              recurring payment If you wish to cancel it. You can also delete
+              the NWC connection to cancel this recurring payment.
             </p>
           </>
         }
