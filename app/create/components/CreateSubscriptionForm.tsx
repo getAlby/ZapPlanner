@@ -46,11 +46,13 @@ export function CreateSubscriptionForm() {
   const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
-    const payerData = data.payerName
-      ? JSON.stringify({
-          name: data.payerName,
-        } as LUD18PayerData)
-      : undefined;
+    let encodedPayerData: string | undefined;
+    if (data.payerName) {
+      const payerData: LUD18PayerData = {
+        name: data.payerName,
+      };
+      encodedPayerData = JSON.stringify(payerData);
+    }
 
     const searchParams = new URLSearchParams();
     searchParams.append("amount", data.amount);
@@ -62,8 +64,8 @@ export function CreateSubscriptionForm() {
     if (data.message) {
       searchParams.append("comment", encodeURIComponent(data.message));
     }
-    if (payerData) {
-      searchParams.append("payerdata", encodeURIComponent(payerData));
+    if (encodedPayerData) {
+      searchParams.append("payerdata", encodeURIComponent(encodedPayerData));
     }
     setNavigating(true);
     push(`/confirm?${searchParams.toString()}`);
