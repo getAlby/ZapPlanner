@@ -42,7 +42,7 @@ export default async function SubscriptionPage({
         beforeFormContent={
           <>
             <h2 className="font-heading font-bold text-2xl text-primary">
-              Periodic payment
+              Recurring payment
             </h2>
             <SubscriptionSummary
               values={{
@@ -70,8 +70,8 @@ export default async function SubscriptionPage({
 
             <p className="font-body">
               Bookmark this page or provide your email so you can access this
-              periodic payment If you wish to cancel it. You can also delete the
-              NWC connection to cancel this periodic payment.
+              recurring payment If you wish to cancel it. You can also delete
+              the NWC connection to cancel this recurring payment.
             </p>
           </>
         }

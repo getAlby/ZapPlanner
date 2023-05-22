@@ -86,7 +86,7 @@ export function CreateSubscriptionForm() {
       <Box>
         <div className="flex flex-col">
           <h2 className="font-heading font-bold text-2xl text-primary">
-            New periodic payment
+            New recurring payment
           </h2>
 
           <div className="flex justify-between sm:items-end sm:gap-4 max-sm:flex-col">

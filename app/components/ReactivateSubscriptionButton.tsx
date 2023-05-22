@@ -22,7 +22,7 @@ export function ReactivateSubscriptionButton({
     if (!res.ok) {
       toast.error(res.status + " " + res.statusText);
     } else {
-      toast.success("Periodic payment reactivated");
+      toast.success("Recurring payment reactivated");
       refresh();
     }
     setIsLoading(false);
@@ -37,7 +37,7 @@ export function ReactivateSubscriptionButton({
       onClick={reactivateSubscription}
       disabled={isLoading}
     >
-      Reactivate This Periodic Payment
+      Reactivate This Recurring Payment
     </button>
   );
 }

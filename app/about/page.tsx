@@ -13,7 +13,7 @@ export default function AboutPage() {
         <h2 className="font-heading font-bold text-2xl">How does it work?</h2>
         <div className="flex flex-col gap-4">
           <AboutItem
-            description="Periodic payments are lightning transfers sent within time intervals
+            description="Recurring payments are lightning transfers sent within time intervals
         defined by you."
             icon="satoshi.svg"
           />
@@ -46,7 +46,7 @@ export default function AboutPage() {
           <AboutItem
             description={
               <>
-                Use ZapPlanner to plan your periodic payments eg. to provide
+                Use ZapPlanner to plan your recurring payments eg. to provide
                 continual support to your favourite{" "}
                 <Link
                   className="link"
@@ -63,7 +63,7 @@ export default function AboutPage() {
         </div>
       </Box>
       <Link href="/create">
-        <Button>New Periodic Payment</Button>
+        <Button>New Recurring Payment</Button>
       </Link>
     </>
   );
