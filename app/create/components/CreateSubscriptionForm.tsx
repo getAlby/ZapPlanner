@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { Timeframe, timeframes } from "types/Timeframe";
 import { LightningAddress } from "alby-tools";
-import { LnUrlPayResponse } from "alby-tools/dist/types";
+import { RequestInvoiceArgs } from "alby-tools/dist/types";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { isValidPositiveValue } from "lib/validation";
@@ -13,7 +13,7 @@ import { Box } from "app/components/Box";
 import { Button } from "app/components/Button";
 
 // TODO: remove when alby-tools exposes LUD18PayerData
-type LUD18PayerData = LnUrlPayResponse["payerData"];
+type LUD18PayerData = RequestInvoiceArgs["payerdata"];
 
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,
@@ -48,7 +48,7 @@ export function CreateSubscriptionForm() {
   const onSubmit = handleSubmit(async (data) => {
     const payerData = data.payerName
       ? JSON.stringify({
-          payerName: data.payerName,
+          name: data.payerName,
         } as LUD18PayerData)
       : undefined;
 
