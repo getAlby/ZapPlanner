@@ -30,7 +30,7 @@
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
     "alby-js-sdk": "^1.7.1",
-    "alby-tools": "^2.2.0",
+    "alby-tools": "^2.3.0",
     "autoprefixer": "^10.4.14",
     "clsx": "^1.2.1",
     "daisyui": "^2.51.5",
