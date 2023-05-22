@@ -16,6 +16,7 @@ import { Loading } from "app/components/Loading";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { Modal } from "app/components/Modal";
+import { captureException } from "@sentry/nextjs";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -262,6 +263,7 @@ async function createSubscription(
     body: JSON.stringify(createSubscriptionRequest),
   });
   if (!res.ok) {
+    captureException(new Error("Failed to create subscription: " + res.status));
     toast.error(res.status + " " + res.statusText);
     return undefined;
   }

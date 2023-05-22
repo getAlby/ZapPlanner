@@ -11,6 +11,7 @@ import { logger } from "lib/server/logger";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import { sendEmail } from "lib/server/sendEmail";
 import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
+import { captureException } from "@sentry/nextjs";
 
 global.crypto = crypto;
 
@@ -135,6 +136,7 @@ const periodicZap = inngest.createFunction(
           logger.error("Failed to close noswebln", { subscriptionId });
         }
       } catch (error) {
+        captureException(error);
         logger.error("Failed to send periodic zap", { subscriptionId, error });
         if (typeof error === "string") {
           errorMessage = error;
