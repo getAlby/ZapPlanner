@@ -3,9 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import { logger } from "lib/server/logger";
 import { prismaClient } from "lib/server/prisma";
 import {
-  isValidLightningAddress,
   isValidNostrConnectUrl,
   isValidPositiveValue,
+  validateLightningAddress,
 } from "lib/validation";
 import ms from "ms";
 import { inngest } from "pages/api/inngest";
@@ -19,12 +19,20 @@ export async function POST(request: Request) {
     if (
       !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
       ms(createSubscriptionRequest.sleepDuration) < 1000 ||
-      !isValidLightningAddress(
-        createSubscriptionRequest.recipientLightningAddress
-      ) ||
       !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
     ) {
       return new Response("One or more invalid subscription fields", {
+        status: StatusCodes.BAD_REQUEST,
+      });
+    }
+
+    const { errorMessage } = await validateLightningAddress(
+      createSubscriptionRequest.recipientLightningAddress,
+      parseInt(createSubscriptionRequest.amount)
+    );
+
+    if (errorMessage) {
+      return new Response(errorMessage, {
         status: StatusCodes.BAD_REQUEST,
       });
     }

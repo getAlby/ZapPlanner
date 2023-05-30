@@ -8,7 +8,7 @@ import { LightningAddress } from "alby-tools";
 import { RequestInvoiceArgs } from "alby-tools/dist/types";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
-import { isValidPositiveValue } from "lib/validation";
+import { isValidPositiveValue, validateLightningAddress } from "lib/validation";
 import { Box } from "app/components/Box";
 import { Button } from "app/components/Button";
 
@@ -70,6 +70,7 @@ export function CreateSubscriptionForm() {
     setNavigating(true);
     push(`/confirm?${searchParams.toString()}`);
   });
+  const watchedAmount = watch("amount");
   const watchedTimeframe = watch("timeframe");
   const setSelectedTimeframe = React.useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
@@ -104,29 +105,17 @@ export function CreateSubscriptionForm() {
               {...register("recipientLightningAddress", {
                 validate: async (address) => {
                   setValidatingLightningAddress(true);
-                  let errorMessage: string | undefined;
-                  try {
-                    if (!address.length) {
-                      errorMessage = "please provide a lightning address";
-                    }
-                    const ln = new LightningAddress(address);
-                    if (!ln.username) {
-                      errorMessage = "This is not a valid lightning address";
-                    }
-                    if (!errorMessage) {
-                      await ln.fetch();
-                      if (!ln.lnurlpData) {
-                        errorMessage = "This lightning address does not exist";
-                      }
-                    }
-                    if (!errorMessage) {
-                      setLightningAddress(ln);
-                    } else {
-                      setLightningAddress(undefined);
-                    }
-                  } catch (e) {
-                    errorMessage = "This is not a valid lightning address";
+                  const { ln, errorMessage } = await validateLightningAddress(
+                    address,
+                    parseInt(watchedAmount)
+                  );
+
+                  if (!errorMessage) {
+                    setLightningAddress(ln);
+                  } else {
+                    setLightningAddress(undefined);
                   }
+
                   setValidatingLightningAddress(false);
                   return errorMessage;
                 },
