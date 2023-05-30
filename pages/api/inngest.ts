@@ -146,8 +146,11 @@ const periodicZap = inngest.createFunction(
         } catch (error) {
           console.error("Failed to capture error", error);
         }
-        FIXME:;
-        logger.error("Failed to send periodic zap", { subscriptionId, error });
+        logger.error("Failed to send periodic zap", {
+          subscriptionId,
+          error,
+          noSuccessfulPayments: subscription.numSuccessfulPayments === 0,
+        });
         if (typeof error === "string") {
           errorMessage = error;
         } else if (
