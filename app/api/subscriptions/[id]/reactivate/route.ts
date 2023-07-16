@@ -35,6 +35,7 @@ export async function POST(
       },
       data: {
         retryCount: 0,
+        lastEventDateTime: null,
       },
     });
 

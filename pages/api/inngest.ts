@@ -4,15 +4,15 @@ import { webln } from "alby-js-sdk";
 import { LightningAddress } from "alby-tools";
 import { Inngest } from "inngest";
 import { serve } from "inngest/next";
-import { WebLNProvider } from "@webbtc/webln-types";
 import { prismaClient } from "lib/server/prisma";
 import { MAX_RETRIES } from "lib/constants";
 import { logger } from "lib/server/logger";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import { sendEmail } from "lib/server/sendEmail";
-import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
 import { captureException } from "@sentry/nextjs";
 import { isError } from "lib/utils";
+import { add } from "date-fns";
+import ms from "ms";
 
 global.crypto = crypto;
 
@@ -68,6 +68,39 @@ const periodicZap = inngest.createFunction(
         });
         return undefined;
       }
+      // safety check in case inngest fires unexpected event
+      if (subscription.retryCount >= MAX_RETRIES) {
+        logger.error("Subscription retry count exceeded. Skipping", {
+          subscriptionId,
+        });
+        return undefined;
+      }
+      // safety check in case inngest fires unexpected event
+      if (subscription.lastEventDateTime) {
+        const expectedNextEvent = add(subscription.lastEventDateTime, {
+          seconds: ms(subscription.sleepDuration) / 1000,
+        });
+
+        if (Date.now() < expectedNextEvent.getTime()) {
+          logger.error("Subscription event requested too early. Skipping", {
+            subscriptionId,
+            expectedDateTime: expectedNextEvent.toISOString(),
+            currentDateTime: new Date().toISOString(),
+            diffSeconds: Math.floor(
+              (expectedNextEvent.getTime() - Date.now()) / 1000
+            ),
+          });
+          return undefined;
+        }
+      }
+      await prismaClient.subscription.update({
+        where: {
+          id: subscription.id,
+        },
+        data: {
+          lastEventDateTime: new Date(),
+        },
+      });
 
       const { nostrWalletConnectUrl, recipientLightningAddress, amount } =
         subscription;
@@ -83,7 +116,7 @@ const periodicZap = inngest.createFunction(
 
         // FIXME: noswebln does not fully implement WebLNProvider
         const ln = new LightningAddress(recipientLightningAddress, {
-          webln: noswebln as unknown as WebLNProvider,
+          webln: noswebln,
         });
         await ln.fetch();
 
@@ -226,6 +259,9 @@ const periodicZap = inngest.createFunction(
     });
 
     if (!sleepDuration) {
+      logger.info(`Not rescheduling a new event`, {
+        subscriptionId: event.data.subscriptionId,
+      });
       return;
     }
 

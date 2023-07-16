@@ -1,6 +1,5 @@
 import { captureException } from "@sentry/nextjs";
 import { StatusCodes } from "http-status-codes";
-import { getSubscriptionUrl } from "lib/server/getSubscriptionUrl";
 import { logger } from "lib/server/logger";
 import { prismaClient } from "lib/server/prisma";
 import { sendEmail } from "lib/server/sendEmail";

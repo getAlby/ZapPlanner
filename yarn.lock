@@ -603,11 +603,6 @@
     "@typescript-eslint/types" "5.57.0"
     eslint-visitor-keys "^3.3.0"
 
-"@webbtc/webln-types@^1.0.10":
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/@webbtc/webln-types/-/webln-types-1.0.10.tgz#03e41779df6ba9bdca57635ca6b5a70c7233c8c6"
-  integrity sha512-Cy9+uNqvRct3yHB+bs5hJ3idf4VEmnyKxwMpe1/lWpOXbbdi/h7GgAB1JMsnblwN74QKSBEnOPvURoA+RAG9qg==
-
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -635,22 +630,19 @@ ajv@^6.10.0, ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-alby-js-sdk@^1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/alby-js-sdk/-/alby-js-sdk-1.7.1.tgz#0f60c2a32d821042123d14307c2b8f4aa3f9d6d3"
-  integrity sha512-L5q4U2lMtsLLYs5UREzCT+XgNWKV4CV1iWx3QYrUuvws6qSpoTUyk+j/RhUa8YkSJ/78rytOIYlIT9VuHxmftg==
+alby-js-sdk@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/alby-js-sdk/-/alby-js-sdk-2.1.0.tgz#4c12dab8b3acfa927b0bd8789ee93bb9e80ede99"
+  integrity sha512-fpKDwT3vTkVgBmjTFVshw6yh3TITfEwMgYIT0f1l2EByJss7BcZ7CJjvrGYtIkhZMPWQm1g8dJuzpjAc6PKOlQ==
   dependencies:
-    cross-fetch "^3.1.5"
     crypto-js "^4.1.1"
     nostr-tools "^1.10.0"
 
-alby-tools@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/alby-tools/-/alby-tools-2.3.0.tgz#7f87360b078ea2b1ac63f54d630a46ca4f3c7527"
-  integrity sha512-WSoTEyTJvB0XWTz/lJAOYY8y0hJERjm3odqyfMB6CeJKPU9qjrsdCYo0BIfp7gflbutMqXIG6hLtsdBUXq53hA==
+alby-tools@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/alby-tools/-/alby-tools-3.2.0.tgz#73fa9b2e16daadb1ea478b314f8e29bbaa525294"
+  integrity sha512-m7yuy/DBRFF0a3NzmtX1McTmWMkpYO/2qsvDBgPDEAoisA5ta0VjuBfv2bBTDXBJ1SIXxKk1ZztnJGRGHrsUqQ==
   dependencies:
-    "@webbtc/webln-types" "^1.0.10"
-    cross-fetch "^3.1.5"
     crypto-js "^4.1.1"
     light-bolt11-decoder "^3.0.0"
 
