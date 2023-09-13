@@ -30,6 +30,7 @@ export function PayAgainButton({ subscriptionId }: PayAgainButtonProps) {
 
   return (
     <button
+      type="button"
       className={clsx(
         "btn btn-outline btn-sm btn-secondary normal-case",
         isLoading && "btn-disabled",
