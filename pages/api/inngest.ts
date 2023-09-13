@@ -1,8 +1,7 @@
-import "websocket-polyfill";
 import crypto from "crypto";
 import { webln } from "alby-js-sdk";
 import { LightningAddress } from "alby-tools";
-import { Inngest } from "inngest";
+import { EventSchemas, Inngest } from "inngest";
 import { serve } from "inngest/next";
 import { prismaClient } from "lib/server/prisma";
 import { MAX_RETRIES } from "lib/constants";
@@ -39,7 +38,10 @@ type NWCPaymentError = {
   code: string;
 };
 
-export const inngest = new Inngest<Events>({ name: "NWC Periodic Payments" });
+export const inngest = new Inngest({
+  name: "NWC Periodic Payments",
+  schemas: new EventSchemas().fromRecord<Events>(),
+});
 
 const ENABLE_REPEAT_EVENTS = true;
 
@@ -87,7 +89,7 @@ const periodicZap = inngest.createFunction(
             expectedDateTime: expectedNextEvent.toISOString(),
             currentDateTime: new Date().toISOString(),
             diffSeconds: Math.floor(
-              (expectedNextEvent.getTime() - Date.now()) / 1000
+              (expectedNextEvent.getTime() - Date.now()) / 1000,
             ),
           });
           return undefined;
@@ -122,7 +124,7 @@ const periodicZap = inngest.createFunction(
 
         if (!ln.lnurlpData) {
           throw new Error(
-            "Failed to retrieve LNURLp data for " + recipientLightningAddress
+            "Failed to retrieve LNURLp data for " + recipientLightningAddress,
           );
         }
 
@@ -145,7 +147,7 @@ const periodicZap = inngest.createFunction(
         });
         logger.info("Sending payment", { subscriptionId });
         const response = (await noswebln.sendPayment(
-          invoice.paymentRequest
+          invoice.paymentRequest,
         )) as { preimage: string };
         if (response.preimage) {
           logger.info("Payment sent successfully", {
@@ -274,7 +276,7 @@ const periodicZap = inngest.createFunction(
     }
 
     return { event, body: "OK" };
-  }
+  },
 );
 
 export default serve(inngest, [periodicZap]);
