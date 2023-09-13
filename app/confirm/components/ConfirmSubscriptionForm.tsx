@@ -5,7 +5,7 @@ import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
-import { webln } from "alby-js-sdk";
+import { webln } from "@getalby/sdk";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { isValidNostrConnectUrl } from "lib/validation";
 import { Box } from "app/components/Box";

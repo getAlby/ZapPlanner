@@ -1,4 +1,4 @@
-import { LightningAddress } from "alby-tools";
+import { LightningAddress } from "@getalby/lightning-tools";
 
 export const isValidPositiveValue = (value: number) => {
   return !isNaN(value) && value > 0;

@@ -87,6 +87,23 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.49.0.tgz#86f79756004a97fa4df866835093f1df3d03c333"
   integrity sha512-1S8uAY/MTJqVx0SC4epBq+N2yhuwtNwLbJYNZyhL2pO1ZVKn5HFXav5T41Ryzy9K9V7ZId2JB2oy/W4aCd9/2w==
 
+"@getalby/lightning-tools@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@getalby/lightning-tools/-/lightning-tools-4.0.2.tgz#a6f5127ca768de28e87cff101508cd2d90590b60"
+  integrity sha512-6EOo4iqjc4BB37KPtzkTR2Fn/Bf5W7Zqb7sYW4pdPRHKTwbtPSgCFqsankAqn6pXxvnvy/kn0ueFz6af7zYijg==
+  dependencies:
+    crypto-js "^4.1.1"
+    light-bolt11-decoder "^3.0.0"
+
+"@getalby/sdk@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@getalby/sdk/-/sdk-2.4.0.tgz#fd3a6b24585e3dc32462da97c4b13a70294c7dee"
+  integrity sha512-aIGNwLRF9coj6koxfq7P4GtFZbFjQbnIheix39x9176PwFw4dXOdGXHPXnqioJTmeq80y+vX1yd+u/f03YGoeg==
+  dependencies:
+    crypto-js "^4.1.1"
+    events "^3.3.0"
+    nostr-tools "1.13.1"
+
 "@humanwhocodes/config-array@^0.11.11":
   version "0.11.11"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.11.tgz#88a04c570dbbc7dd943e4712429c3df09bc32844"
@@ -618,23 +635,6 @@ ajv@^6.12.4:
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
-
-alby-js-sdk@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/alby-js-sdk/-/alby-js-sdk-2.3.0.tgz#d460436d5078b4d229b1f10bcf0d40f341374f1b"
-  integrity sha512-EZ7c1tk85IjDC6fzzIcliZNCUnAHhL5EfoqzXCfn7DExvaFHxJLOpacy6X9zdtXWVFX/SPWovQtR/OioG6uDUw==
-  dependencies:
-    crypto-js "^4.1.1"
-    events "^3.3.0"
-    nostr-tools "1.13.1"
-
-alby-tools@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/alby-tools/-/alby-tools-3.2.1.tgz#60f15983454b6635cd90da40f097d32fd0875308"
-  integrity sha512-dSQ6dBD/qXeBfF40g3PtzLo6yvN5w9zaQ9qeGFkez6feQ4qVMFq+iuxurCDTaR2KFxAf5fboWNZechl7DuH5Sw==
-  dependencies:
-    crypto-js "^4.1.1"
-    light-bolt11-decoder "^3.0.0"
 
 ansi-regex@^5.0.1:
   version "5.0.1"

@@ -4,16 +4,16 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { Timeframe, timeframes } from "types/Timeframe";
-import { LightningAddress } from "alby-tools";
-import { RequestInvoiceArgs } from "alby-tools/dist/types";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { isValidPositiveValue, validateLightningAddress } from "lib/validation";
 import { Box } from "app/components/Box";
 import { Button } from "app/components/Button";
-
-// TODO: remove when alby-tools exposes LUD18PayerData
-type LUD18PayerData = RequestInvoiceArgs["payerdata"];
+import {
+  LUD18PayerData,
+  LightningAddress,
+  RequestInvoiceArgs,
+} from "@getalby/lightning-tools";
 
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,

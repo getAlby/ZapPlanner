@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import { webln } from "alby-js-sdk";
-import { LightningAddress } from "alby-tools";
+import { webln } from "@getalby/sdk";
+import { LightningAddress } from "@getalby/lightning-tools";
 import { EventSchemas, Inngest } from "inngest";
 import { serve } from "inngest/next";
 import { prismaClient } from "lib/server/prisma";
@@ -272,7 +272,15 @@ const periodicZap = inngest.createFunction(
     if (ENABLE_REPEAT_EVENTS) {
       // create a new event object without inngest-added properties (id, ts)
       const newEvent: typeof event = { data: event.data, name: event.name };
-      await step.sendEvent(newEvent);
+      try {
+        await step.sendEvent(newEvent);
+      } catch (error) {
+        logger.error("Failed to reschedule event", {
+          error,
+          subscriptionId: event.data.subscriptionId,
+        });
+        throw error;
+      }
     }
 
     return { event, body: "OK" };

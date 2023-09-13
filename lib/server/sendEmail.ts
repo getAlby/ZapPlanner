@@ -50,7 +50,7 @@ type EmailTemplate = (
   subscription: Subscription;
 };
 
-export const sendEmail = (to: string, template: EmailTemplate) => {
+export const sendEmail = async (to: string, template: EmailTemplate) => {
   const subscriptionUrl = getSubscriptionUrl(template.subscription.id);
   if (transport) {
     // TODO: templates
@@ -59,7 +59,7 @@ export const sendEmail = (to: string, template: EmailTemplate) => {
       getEmailHtml(template) +
       `<br/><br/>Manage your recurring payment: <a href="${subscriptionUrl}">${subscriptionUrl}</a>`;
     try {
-      transport.sendMail({
+      await transport.sendMail({
         to,
         subject,
         html,
