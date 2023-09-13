@@ -20,9 +20,10 @@ export function PayAgainButton({ subscriptionId }: PayAgainButtonProps) {
     if (!res.ok) {
       toast.error(res.status + " " + res.statusText);
     } else {
-      toast.success("Payment triggered");
-      // NOTE: there is no guarantee payment will be done in 3 seconds
-      setTimeout(() => refresh(), 3000);
+      toast.success("Payment triggered. Please wait...");
+      // NOTE: there is no guarantee payment will be done in 5 seconds.
+      // the user can refresh in that case.
+      setTimeout(() => refresh(), 5000);
     }
     setIsLoading(false);
   }, [refresh, subscriptionId]);
