@@ -1,5 +1,4 @@
 version: "3"
-name: nwc-periodic-payments
 
 services:
   database:
@@ -15,5 +14,5 @@ services:
   mailhog:
     image: mailhog/mailhog
     ports:
-      - "1025:1025"
+      - "1026:1026"
       - "8025:8025"
