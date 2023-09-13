@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const { errorMessage } = await validateLightningAddress(
       createSubscriptionRequest.recipientLightningAddress,
-      parseInt(createSubscriptionRequest.amount)
+      parseInt(createSubscriptionRequest.amount),
     );
 
     if (errorMessage) {

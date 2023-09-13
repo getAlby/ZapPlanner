@@ -59,7 +59,7 @@ export function CreateSubscriptionForm() {
     searchParams.append("recipient", data.recipientLightningAddress);
     searchParams.append(
       "timeframe",
-      data.timeframeValue + " " + data.timeframe
+      data.timeframeValue + " " + data.timeframe,
     );
     if (data.message) {
       searchParams.append("comment", encodeURIComponent(data.message));
@@ -74,7 +74,7 @@ export function CreateSubscriptionForm() {
   const watchedTimeframe = watch("timeframe");
   const setSelectedTimeframe = React.useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
-    [setValue]
+    [setValue],
   );
   const [validatingLightningAddress, setValidatingLightningAddress] =
     React.useState(false);
@@ -107,7 +107,7 @@ export function CreateSubscriptionForm() {
                   setValidatingLightningAddress(true);
                   const { ln, errorMessage } = await validateLightningAddress(
                     address,
-                    parseInt(watchedAmount)
+                    parseInt(watchedAmount),
                   );
 
                   if (!errorMessage) {

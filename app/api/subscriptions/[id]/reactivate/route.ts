@@ -7,7 +7,7 @@ import { inngest } from "pages/api/inngest";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const subscriptionId = params.id;
@@ -62,7 +62,7 @@ export async function POST(
       "Failed to reactivate subscription. Please try again.",
       {
         status: StatusCodes.INTERNAL_SERVER_ERROR,
-      }
+      },
     );
   }
 }

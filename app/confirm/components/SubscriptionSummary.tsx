@@ -71,7 +71,7 @@ export function SubscriptionSummary({
           right={formatDistance(
             values.lastSuccessfulPaymentDateTime,
             new Date(),
-            { addSuffix: true }
+            { addSuffix: true },
           )}
         />
       )}
@@ -93,14 +93,14 @@ export function SubscriptionSummary({
                         values.lastFailedPaymentDateTime ||
                         values.lastSuccessfulPaymentDateTime ||
                         values.createdDateTime
-                      ).getTime()
+                      ).getTime(),
                     ),
                     {
                       seconds: ms(values.sleepDuration) / 1000,
-                    }
+                    },
                   ),
                   new Date(),
-                  { addSuffix: true }
+                  { addSuffix: true },
                 )
               : "Now"
           }

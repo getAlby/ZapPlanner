@@ -32,7 +32,7 @@ export function CancelSubscriptionButton({
     <button
       className={clsx(
         "btn btn-outline btn-sm btn-error normal-case",
-        isLoading && "btn-disabled"
+        isLoading && "btn-disabled",
       )}
       onClick={cancelSubscription}
       disabled={isLoading}

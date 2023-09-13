@@ -6,7 +6,7 @@ export const isValidPositiveValue = (value: number) => {
 
 export const validateLightningAddress = async (
   address: string,
-  amount: number
+  amount: number,
 ) => {
   let errorMessage: string | undefined = undefined;
   let ln: LightningAddress | undefined;

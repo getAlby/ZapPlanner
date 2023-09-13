@@ -32,7 +32,7 @@ export function ReactivateSubscriptionButton({
     <button
       className={clsx(
         "btn btn-outline btn-sm btn-secondary normal-case",
-        isLoading && "btn-disabled"
+        isLoading && "btn-disabled",
       )}
       onClick={reactivateSubscription}
       disabled={isLoading}

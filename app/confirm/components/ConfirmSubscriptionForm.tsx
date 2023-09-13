@@ -54,7 +54,7 @@ export function ConfirmSubscriptionForm({
             walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
             authorizationUrl: process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL,
           }
-        : undefined
+        : undefined,
     );
     try {
       await nwc.initNWC({
@@ -85,7 +85,7 @@ export function ConfirmSubscriptionForm({
       push(
         `/subscriptions/${subscriptionId}${
           returnUrl ? `?returnUrl=${returnUrl}` : ""
-        }`
+        }`,
       );
     }
   });
@@ -255,7 +255,7 @@ export function ConfirmSubscriptionForm({
 }
 
 async function createSubscription(
-  createSubscriptionRequest: CreateSubscriptionRequest
+  createSubscriptionRequest: CreateSubscriptionRequest,
 ): Promise<string | undefined> {
   const res = await fetch("/api/subscriptions", {
     method: "POST",

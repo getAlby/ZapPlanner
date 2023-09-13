@@ -37,7 +37,7 @@ export function SubscriptionPageForm({
   const watchedEmail = watch("email");
 
   const onSubmit = handleSubmit((data) =>
-    updateSubscription(subscriptionId, data)
+    updateSubscription(subscriptionId, data),
   );
 
   return (
@@ -71,14 +71,14 @@ export function SubscriptionPageForm({
                 type="checkbox"
                 className={clsx(
                   "checkbox checkbox-sm",
-                  isValidEmail(watchedEmail) && "checkbox-warning"
+                  isValidEmail(watchedEmail) && "checkbox-warning",
                 )}
                 disabled={!isValidEmail(watchedEmail)}
               />
               <span
                 className={clsx(
                   "font-body text-sm font-medium",
-                  !isValidEmail(watchedEmail) && "text-gray-300"
+                  !isValidEmail(watchedEmail) && "text-gray-300",
                 )}
               >
                 I want to receive email confirmation for every payment
@@ -110,7 +110,7 @@ export function SubscriptionPageForm({
 }
 async function updateSubscription(
   subscriptionId: string,
-  data: SubscriptionFormData
+  data: SubscriptionFormData,
 ) {
   const res = await fetch(`/api/subscriptions/${subscriptionId}`, {
     method: "PUT",

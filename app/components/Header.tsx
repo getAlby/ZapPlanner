@@ -25,7 +25,7 @@ export function Header({ minimal = true }: HeaderProps) {
         <h1
           className={clsx(
             "font-heading font-bold text-center text-primary",
-            minimal ? "text-3xl" : "text-4xl"
+            minimal ? "text-3xl" : "text-4xl",
           )}
         >
           ZapPlanner

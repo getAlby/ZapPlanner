@@ -21,7 +21,7 @@ export function Button({
         block ? "w-full" : "w-64",
         (props.disabled || variant === "disabled") && "text-gray-400",
         props.className,
-        variant === "primary" ? "text-black" : "text-primary-content"
+        variant === "primary" ? "text-black" : "text-primary-content",
       )}
       style={
         props.disabled || variant === "disabled"
