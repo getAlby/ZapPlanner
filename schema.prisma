@@ -18,6 +18,7 @@ model Subscription {
   message String?
   payerData String? // LUD-18 encoded JSON payer data
   sleepDuration String
+  sleepDurationMs Int?
   createdDateTime DateTime @default(now())
   lastEventDateTime DateTime?
   lastSuccessfulPaymentDateTime DateTime?

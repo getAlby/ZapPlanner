@@ -16,9 +16,12 @@ export async function POST(request: Request) {
     const createSubscriptionRequest: CreateSubscriptionRequest =
       await request.json();
 
+    const sleepDurationMs = ms(createSubscriptionRequest.sleepDuration);
+
     if (
       !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
-      ms(createSubscriptionRequest.sleepDuration) < 1000 ||
+      !sleepDurationMs ||
+      sleepDurationMs < 60 * 60 * 1000 ||
       !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
     ) {
       return new Response("One or more invalid subscription fields", {
@@ -46,6 +49,7 @@ export async function POST(request: Request) {
         message: createSubscriptionRequest.message,
         payerData: createSubscriptionRequest.payerData,
         sleepDuration: createSubscriptionRequest.sleepDuration,
+        sleepDurationMs,
       },
     });
 
