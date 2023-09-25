@@ -3,6 +3,8 @@
 app = "nwc-periodic-payments"
 kill_signal = "SIGINT"
 kill_timeout = 5
+#primary_region = "sin"
+primary_region = "hkg"
 processes = []
 
 [build]
