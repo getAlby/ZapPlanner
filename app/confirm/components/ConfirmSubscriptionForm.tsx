@@ -1,10 +1,8 @@
-"use client";
-
 import { useForm } from "react-hook-form";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { webln } from "@getalby/sdk";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { isValidNostrConnectUrl } from "lib/validation";
@@ -42,7 +40,7 @@ export function ConfirmSubscriptionForm({
     },
   });
 
-  const [isNavigating, setNavigating] = React.useState(false);
+  const [isNavigating, setNavigating] = useState(false);
   const { push } = useRouter();
   const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
 
@@ -73,11 +71,39 @@ export function ConfirmSubscriptionForm({
     }
   };
 
+  const getSatoshisForInterval = (interval: string) => {
+    // Calculate the number of satoshis based on the desired interval
+    switch (interval) {
+      case "daily":
+        return 1; // Adjust this as needed
+      case "weekly":
+        return 7; // Adjust this as needed
+      case "monthly":
+        return 30; // Adjust this as needed
+      default:
+        return 1; // Default to daily
+    }
+  };
+
   const onSubmit = handleSubmit(async (data) => {
     if (!data.nostrWalletConnectUrl) {
       toast.error("Please link your wallet");
       return;
     }
+
+    const selectedInterval = data.sleepDuration;
+
+    // Enforce that the interval should not be more than 1 year (365 days)
+    if (selectedInterval === "yearly") {
+      toast.error("Interval cannot be more than 1 year");
+      return;
+    }
+
+    // Calculate the number of satoshis based on the desired interval
+    const satoshis = getSatoshisForInterval(selectedInterval);
+
+    data.amount = satoshis;
+
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       toast.success("Recurring payment created");
@@ -85,7 +111,7 @@ export function ConfirmSubscriptionForm({
       push(
         `/subscriptions/${subscriptionId}${
           returnUrl ? `?returnUrl=${returnUrl}` : ""
-        }`,
+        }`
       );
     }
   });
@@ -255,7 +281,7 @@ export function ConfirmSubscriptionForm({
 }
 
 async function createSubscription(
-  createSubscriptionRequest: CreateSubscriptionRequest,
+  createSubscriptionRequest: CreateSubscriptionRequest
 ): Promise<string | undefined> {
   const res = await fetch("/api/subscriptions", {
     method: "POST",
@@ -267,7 +293,6 @@ async function createSubscription(
     toast.error(res.status + " " + res.statusText);
     return undefined;
   }
-  const createSubscriptionResponse =
-    (await res.json()) as CreateSubscriptionResponse;
+  const createSubscriptionResponse = (await res.json()) as CreateSubscriptionResponse;
   return createSubscriptionResponse.subscriptionId;
 }
