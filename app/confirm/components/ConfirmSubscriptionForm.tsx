@@ -10,7 +10,7 @@ import { Box } from "app/components/Box";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import Link from "next/link";
 import { Button } from "app/components/Button";
-import { Loading } from "app/components/Loading";
+import { Loading from "app/components/Loading";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { Modal } from "app/components/Modal";
@@ -72,7 +72,6 @@ export function ConfirmSubscriptionForm({
   };
 
   const getSatoshisForInterval = (interval: string) => {
-    // Calculate the number of satoshis based on the desired interval
     switch (interval) {
       case "daily":
         return 1; // Adjust this as needed
@@ -90,20 +89,19 @@ export function ConfirmSubscriptionForm({
       toast.error("Please link your wallet");
       return;
     }
-
+  
     const selectedInterval = data.sleepDuration;
-
-    // Enforce that the interval should not be more than 1 year (365 days)
-    if (selectedInterval === "yearly") {
+    
+    const oneYearInMilliseconds = 31536000000;
+    if (selectedInterval === "yearly" && selectedInterval > oneYearInMilliseconds) {
       toast.error("Interval cannot be more than 1 year");
       return;
     }
-
-    // Calculate the number of satoshis based on the desired interval
+  
     const satoshis = getSatoshisForInterval(selectedInterval);
-
-    data.amount = satoshis;
-
+  
+    data.max_amount = satoshis;
+  
     const subscriptionId = await createSubscription(data);
     if (subscriptionId) {
       toast.success("Recurring payment created");
@@ -115,6 +113,7 @@ export function ConfirmSubscriptionForm({
       );
     }
   });
+
 
   const isLoading = isSubmitting || isNavigating;
 
