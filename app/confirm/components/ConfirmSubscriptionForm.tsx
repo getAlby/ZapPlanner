@@ -10,7 +10,7 @@ import { Box } from "app/components/Box";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import Link from "next/link";
 import { Button } from "app/components/Button";
-import { Loading from "app/components/Loading";
+import { Loading } from "app/components/Loading";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { Modal } from "app/components/Modal";
@@ -62,7 +62,7 @@ export function ConfirmSubscriptionForm({
       if (isValidNostrConnectUrl(url)) {
         setValue("nostrWalletConnectUrl", url);
       } else {
-        throw new Error("Received invalid NWC URL");
+        throw an Error("Received invalid NWC URL");
       }
     } catch (error) {
       if (error) {
@@ -71,16 +71,17 @@ export function ConfirmSubscriptionForm({
     }
   };
 
-  const getSatoshisForInterval = (interval: string) => {
+  const getMillisecondsForInterval = (interval: string) => {
     switch (interval) {
       case "daily":
-        return 1; // Adjust this as needed
+        return 24 * 60 * 60 * 1000; // 1 day in milliseconds
       case "weekly":
-        return 7; // Adjust this as needed
+        return 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
       case "monthly":
-        return 30; // Adjust this as needed
+        // Note: This is a simplified calculation; adjust as needed
+        return 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
       default:
-        return 1; // Default to daily
+        return 24 * 60 * 60 * 1000; // Default to daily (1 day in milliseconds)
     }
   };
 
@@ -91,14 +92,15 @@ export function ConfirmSubscriptionForm({
     }
   
     const selectedInterval = data.sleepDuration;
+    const intervalMilliseconds = getMillisecondsForInterval(selectedInterval);
     
-    const oneYearInMilliseconds = 31536000000;
-    if (selectedInterval === "yearly" && selectedInterval > oneYearInMilliseconds) {
+    const oneYearInMilliseconds = 31536000000; // One year in milliseconds
+    if (selectedInterval === "yearly" && intervalMilliseconds > oneYearInMilliseconds) {
       toast.error("Interval cannot be more than 1 year");
       return;
     }
   
-    const satoshis = getSatoshisForInterval(selectedInterval);
+    const satoshis = getSatoshisForInterval(intervalMilliseconds);
   
     data.max_amount = satoshis;
   
@@ -113,7 +115,6 @@ export function ConfirmSubscriptionForm({
       );
     }
   });
-
 
   const isLoading = isSubmitting || isNavigating;
 
@@ -166,7 +167,7 @@ export function ConfirmSubscriptionForm({
                     </h2>
                   </div>
                   <p className="font-body">
-                    Nostr Wallet Connect allows you to securely authorise
+                    Nostr Wallet Connect allows you to securely authorize
                     ZapPlanner to perform transactions from your lightning
                     wallet on your behalf.
                   </p>
