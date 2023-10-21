@@ -254,20 +254,69 @@ export function ConfirmSubscriptionForm({
   );
 }
 
+function convertIntervalToMilliseconds(interval: string): number {
+  switch (interval) {
+    case "daily":
+      return 86400000;
+    case "weekly":
+      return 604800000;
+    case "monthly":
+      return 2592000000;
+    case "yearly":
+      return 31536000000;
+    default:
+      throw new Error("Invalid interval provided.");
+  }
+}
+
+function calculateAdjustedBudget(amount: number, interval: string, delay: number): number {
+  let adjustedBudget = amount;
+  switch (interval) {
+    case "daily":
+      adjustedBudget *= 30 - delay / 1000; // considering a month as 30 days for simplicity
+      break;
+    case "weekly":
+      adjustedBudget *= 4 - delay / (7 * 24 * 60 * 60 * 1000); // considering a month as 4 weeks for simplicity
+      break;
+    case "monthly":
+      adjustedBudget -= delay / (30 * 24 * 60 * 60 * 1000);
+      break;
+    default:
+      throw new Error("Invalid interval provided.");
+  }
+
+  return adjustedBudget;
+}
+
 async function createSubscription(
-  createSubscriptionRequest: CreateSubscriptionRequest,
+  createSubscriptionRequest: CreateSubscriptionRequest
 ): Promise<string | undefined> {
+  const { interval, delay } = createSubscriptionRequest;
+  const intervalInMilliseconds = convertIntervalToMilliseconds(interval);
+  if (intervalInMilliseconds > 31536000000) {
+    throw new Error("Interval cannot be greater than 1 year.");
+  }
+
+  const adjustedBudget = calculateAdjustedBudget(
+    createSubscriptionRequest.amount,
+    interval,
+    delay
+  );
+  createSubscriptionRequest.budget = adjustedBudget;
+
   const res = await fetch("/api/subscriptions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(createSubscriptionRequest),
   });
+
   if (!res.ok) {
     captureException(new Error("Failed to create subscription: " + res.status));
-    toast.error(res.status + " " + res.statusText);
+    toast.error(`${res.status} ${res.statusText}`);
     return undefined;
   }
-  const createSubscriptionResponse =
-    (await res.json()) as CreateSubscriptionResponse;
+
+  const createSubscriptionResponse = await res.json() as CreateSubscriptionResponse;
   return createSubscriptionResponse.subscriptionId;
 }
+
