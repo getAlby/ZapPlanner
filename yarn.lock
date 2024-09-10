@@ -87,22 +87,18 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.49.0.tgz#86f79756004a97fa4df866835093f1df3d03c333"
   integrity sha512-1S8uAY/MTJqVx0SC4epBq+N2yhuwtNwLbJYNZyhL2pO1ZVKn5HFXav5T41Ryzy9K9V7ZId2JB2oy/W4aCd9/2w==
 
-"@getalby/lightning-tools@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@getalby/lightning-tools/-/lightning-tools-4.0.2.tgz#a6f5127ca768de28e87cff101508cd2d90590b60"
-  integrity sha512-6EOo4iqjc4BB37KPtzkTR2Fn/Bf5W7Zqb7sYW4pdPRHKTwbtPSgCFqsankAqn6pXxvnvy/kn0ueFz6af7zYijg==
-  dependencies:
-    crypto-js "^4.1.1"
-    light-bolt11-decoder "^3.0.0"
+"@getalby/lightning-tools@^5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@getalby/lightning-tools/-/lightning-tools-5.0.3.tgz#4cc6ef1253a30fb4913af89b842645e0c04994bf"
+  integrity sha512-QG3/SBI5n2py5IgsjP3K+c8eq55eiI3PQB12yo9Pot0b5hcN7TNNoTKn0fgLJjO1iEVCUkF513kDOpjjXwK0hQ==
 
-"@getalby/sdk@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@getalby/sdk/-/sdk-2.4.0.tgz#fd3a6b24585e3dc32462da97c4b13a70294c7dee"
-  integrity sha512-aIGNwLRF9coj6koxfq7P4GtFZbFjQbnIheix39x9176PwFw4dXOdGXHPXnqioJTmeq80y+vX1yd+u/f03YGoeg==
+"@getalby/sdk@^3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@getalby/sdk/-/sdk-3.7.0.tgz#bff8ce2b2138a5860f24d48323c1219ecb6dbf5d"
+  integrity sha512-GorSxIErXm5nbM819Ib3aOyjqH0N4YyUqcD7yAQAgm/ejPpV8vTV0btp2cYl1XtYyHzZEcffDMt8luCOYCekJw==
   dependencies:
-    crypto-js "^4.1.1"
-    events "^3.3.0"
-    nostr-tools "1.13.1"
+    eventemitter3 "^5.0.1"
+    nostr-tools "^1.17.0"
 
 "@humanwhocodes/config-array@^0.11.11":
   version "0.11.11"
@@ -212,7 +208,7 @@
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-13.4.19.tgz#648f79c4e09279212ac90d871646ae12d80cdfce"
   integrity sha512-YzA78jBDXMYiINdPdJJwGgPNT3YqBNNGhsthsDoWHL9p24tEJn9ViQf/ZqTbwSpX/RrkPupLfuuTH2sf73JBAw==
 
-"@noble/ciphers@^0.2.0":
+"@noble/ciphers@0.2.0", "@noble/ciphers@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@noble/ciphers/-/ciphers-0.2.0.tgz#a12cda60f3cf1ab5d7c77068c3711d2366649ed7"
   integrity sha512-6YBxJDAapHSdd3bLDv6x2wRPwq4QFMUaB3HvljNBUTThDd12eSm7/3F+2lnfzx2jvM+S6Nsy0jEt9QbPqSwqRw==
@@ -1083,11 +1079,6 @@ cross-spawn@7.0.3, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-crypto-js@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
-  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
-
 css-selector-tokenizer@^0.8:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/css-selector-tokenizer/-/css-selector-tokenizer-0.8.0.tgz#88267ef6238e64f2215ea2764b3e2cf498b845dd"
@@ -1584,10 +1575,10 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-events@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
-  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
@@ -2364,13 +2355,6 @@ lie@3.1.1:
   dependencies:
     immediate "~3.0.5"
 
-light-bolt11-decoder@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/light-bolt11-decoder/-/light-bolt11-decoder-3.0.0.tgz#f644576120426c9ef65621bde254f11016055044"
-  integrity sha512-AKvOigD2pmC8ktnn2TIqdJu0K0qk6ukUmTvHwF3JNkm8uWCqt18Ijn33A/a7gaRZ4PghJ59X+8+MXrzLKdBTmQ==
-  dependencies:
-    "@scure/base" "1.1.1"
-
 lilconfig@^2.0.5, lilconfig@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/lilconfig/-/lilconfig-2.1.0.tgz#78e23ac89ebb7e1bfbf25b18043de756548e7f52"
@@ -2604,23 +2588,24 @@ normalize-range@^0.1.2:
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
   integrity sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==
 
-nostr-tools@1.13.1:
-  version "1.13.1"
-  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-1.13.1.tgz#191298d85a977cc50790e1c1d1cb83b86d3a9656"
-  integrity sha512-DTwpbxTH1/ar+afWd4gmVdpHH8CF290kdaxi00Llra88SHE6e38XuyzlRABVTcrBaceLMnoDdHmV3x16MoEFJg==
-  dependencies:
-    "@noble/curves" "1.1.0"
-    "@noble/hashes" "1.3.1"
-    "@scure/base" "1.1.1"
-    "@scure/bip32" "1.3.1"
-    "@scure/bip39" "1.2.1"
-
 nostr-tools@^1.15.0:
   version "1.15.0"
   resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-1.15.0.tgz#92e487654d1f6994923176aedf3b27fb617f7a78"
   integrity sha512-Dh7LVAUqaSiSs61QddsWluLVWpMwyMGaVlbhDYEy03ZwnBBzm10pz+mQZSdVV88/B3a5843gHZ4dIBUeS5upoA==
   dependencies:
     "@noble/ciphers" "^0.2.0"
+    "@noble/curves" "1.1.0"
+    "@noble/hashes" "1.3.1"
+    "@scure/base" "1.1.1"
+    "@scure/bip32" "1.3.1"
+    "@scure/bip39" "1.2.1"
+
+nostr-tools@^1.17.0:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/nostr-tools/-/nostr-tools-1.17.0.tgz#b6f62e32fedfd9e68ec0a7ce57f74c44fc768e8c"
+  integrity sha512-LZmR8GEWKZeElbFV5Xte75dOeE9EFUW/QLI1Ncn3JKn0kFddDKEfBbFN8Mu4TMs+L4HR/WTPha2l+PPuRnJcMw==
+  dependencies:
+    "@noble/ciphers" "0.2.0"
     "@noble/curves" "1.1.0"
     "@noble/hashes" "1.3.1"
     "@scure/base" "1.1.1"
