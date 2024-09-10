@@ -287,4 +287,7 @@ const periodicZap = inngest.createFunction(
   },
 );
 
-export default serve(inngest, [periodicZap]);
+export default serve(inngest, [periodicZap], {
+  serveHost: "https://nwc-periodic-payments.fly.dev",
+  servePath: "/api/inngest",
+});
