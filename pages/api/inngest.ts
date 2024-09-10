@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { webln } from "@getalby/sdk";
 import { LightningAddress } from "@getalby/lightning-tools";
 import { EventSchemas, Inngest } from "inngest";
@@ -12,8 +11,6 @@ import { captureException } from "@sentry/nextjs";
 import { isError } from "lib/utils";
 import { add } from "date-fns";
 import ms from "ms";
-
-global.crypto = crypto;
 
 type PeriodicZapEvent = {
   name: "zap";
