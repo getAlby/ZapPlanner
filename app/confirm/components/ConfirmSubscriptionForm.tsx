@@ -5,21 +5,16 @@ import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
-import { webln } from "@getalby/sdk";
 import {
   Button as BitcoinConnectButton,
   init,
 } from "@getalby/bitcoin-connect-react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
-import { isValidNostrConnectUrl } from "lib/validation";
 import { Box } from "app/components/Box";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
-import Link from "next/link";
 import { Button } from "app/components/Button";
 import { Loading } from "app/components/Loading";
 import { toast } from "react-hot-toast";
-import Image from "next/image";
-import { Modal } from "app/components/Modal";
 import { captureException } from "@sentry/nextjs";
 import { NostrWebLNProvider } from "@getalby/sdk/dist/webln";
 
@@ -28,8 +23,10 @@ type FormData = CreateSubscriptionRequest;
 type ConfirmSubscriptionFormProps = {
   unconfirmedSubscription: UnconfirmedSubscription;
   returnUrl?: string;
+  nwcUrl?: string;
 };
 
+// always use a new NWC connection
 init({
   filters: ["nwc"],
   appName: "ZapPlanner",
@@ -38,6 +35,7 @@ init({
 export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
   returnUrl,
+  nwcUrl,
 }: ConfirmSubscriptionFormProps) {
   const {
     handleSubmit,
@@ -48,40 +46,13 @@ export function ConfirmSubscriptionForm({
     defaultValues: {
       ...unconfirmedSubscription,
       nostrWalletConnectUrl:
-        process.env.NEXT_PUBLIC_DEFAULT_NOSTR_WALLET_CONNECT_URL,
+        nwcUrl || process.env.NEXT_PUBLIC_DEFAULT_NOSTR_WALLET_CONNECT_URL,
     },
   });
 
   const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
   const hasLinkedWallet = !!watch("nostrWalletConnectUrl");
-
-  const linkWallet = async () => {
-    const nwc = webln.NostrWebLNProvider.withNewSecret(
-      process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY &&
-        process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL
-        ? {
-            walletPubkey: process.env.NEXT_PUBLIC_NWC_WALLET_PUBKEY,
-            authorizationUrl: process.env.NEXT_PUBLIC_NWC_AUTHORIZATION_URL,
-          }
-        : undefined,
-    );
-    try {
-      await nwc.initNWC({
-        name: `ZapPlanner (${unconfirmedSubscription.recipientLightningAddress})`,
-      });
-      const url = nwc.getNostrWalletConnectUrl(true);
-      if (isValidNostrConnectUrl(url)) {
-        setValue("nostrWalletConnectUrl", url);
-      } else {
-        throw new Error("Received invalid NWC URL");
-      }
-    } catch (error) {
-      if (error) {
-        console.error("Init NWC failed", error);
-      }
-    }
-  };
 
   const onSubmit = handleSubmit(async (data) => {
     if (!data.nostrWalletConnectUrl) {
@@ -120,25 +91,31 @@ export function ConfirmSubscriptionForm({
             }}
             showFirstPayment
           />
-          <div className="divider my-0" />
-          <div className="flex justify-center items-start lg:px-8">
-            <div className="flex flex-col gap-8 p-4 w-full relative">
-              <div className="flex justify-center">
-                <div className="flex flex-col items-center">
-                  <BitcoinConnectButton
-                    onDisconnected={() => setValue("nostrWalletConnectUrl", "")}
-                    onConnected={(provider) =>
-                      setValue(
-                        "nostrWalletConnectUrl",
-                        (provider as NostrWebLNProvider).client
-                          .nostrWalletConnectUrl,
-                      )
-                    }
-                  />
+          {!nwcUrl && (
+            <>
+              <div className="divider my-0" />
+              <div className="flex justify-center items-start lg:px-8">
+                <div className="flex flex-col gap-8 p-4 w-full relative">
+                  <div className="flex justify-center">
+                    <div className="flex flex-col items-center">
+                      <BitcoinConnectButton
+                        onDisconnected={() =>
+                          setValue("nostrWalletConnectUrl", "")
+                        }
+                        onConnected={(provider) =>
+                          setValue(
+                            "nostrWalletConnectUrl",
+                            (provider as NostrWebLNProvider).client
+                              .nostrWalletConnectUrl,
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </Box>
         <Button
           type="submit"
