@@ -19,6 +19,7 @@ https://zapplanner.albylabs.com/confirm?amount=21&recipient=hello@getalby.com&ti
 - `payerdata` should be a URL-encoded JSON object as per [LUD-18](https://github.com/lnurl/luds/blob/luds/18.md)
 - `comment` and `payerdata` will only be sent if the recipient lightning address supports it
 - `returnUrl` encoded URL to show as link on confirmation page
+- `nwcUrl` a url-encoded NWC connection secret
 
 ## Installation
 

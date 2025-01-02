@@ -112,6 +112,10 @@ export default async function RootLayout({
                     show on the confirmation page to link users back to your
                     site
                   </li>
+                  <li className="list-item">
+                    <span className="font-bold">nwcUrl</span> url-encoded NWC
+                    connection secret
+                  </li>
                 </ul>
                 <div className="divider my-0" />
                 <p>

@@ -9,7 +9,7 @@ import { UpdateSubscriptionRequest } from "types/UpdateSubscriptionRequest";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const updateSubscriptionRequest: UpdateSubscriptionRequest =
@@ -23,7 +23,7 @@ export async function PUT(
       });
     }
 
-    const subscriptionId = params.id;
+    const { id: subscriptionId } = await params;
     if (!subscriptionId) {
       return new Response(undefined, {
         status: StatusCodes.BAD_REQUEST,
@@ -72,10 +72,10 @@ export async function PUT(
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const subscriptionId = params.id;
+    const { id: subscriptionId } = await params;
     if (!subscriptionId) {
       return new Response(undefined, {
         status: StatusCodes.BAD_REQUEST,

@@ -14,10 +14,12 @@ export default async function SubscriptionPage({
   params,
   searchParams,
 }: {
-  params: { id: string };
-  searchParams?: { returnUrl?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ returnUrl?: string }>;
 }) {
-  const subscriptionId = params.id;
+  const { id: subscriptionId } = await params;
+
+  const { returnUrl } = await searchParams;
 
   const subscription = await prismaClient.subscription.findUnique({
     where: {
@@ -78,12 +80,12 @@ export default async function SubscriptionPage({
           </>
         }
       />
-      {searchParams?.returnUrl && (
+      {returnUrl && (
         <div className="w-full max-w-xs flex flex-col justify-center items-center">
           <div className="divider mb-8" />
-          <Link href={searchParams?.returnUrl}>
+          <Link href={returnUrl}>
             <button className="btn btn-primary btn-sm normal-case">
-              Return to {searchParams?.returnUrl}
+              Return to {returnUrl}
             </button>
           </Link>
         </div>
