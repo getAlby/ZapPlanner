@@ -10,12 +10,12 @@
     "format:fix": "yarn prettier --write . --check '!.db'",
     "format:check": "yarn prettier --check . --check '!.db'",
     "inngest:local": "inngest-cli dev",
-    "docker:start": "docker-compose up",
-    "docker:stop": "docker-compose stop",
-    "docker:remove": "docker-compose down",
+    "docker:start": "docker compose up",
+    "docker:stop": "docker compose stop",
+    "docker:remove": "docker compose down",
     "db:migrate:local": "dotenv -e .env.local -- prisma migrate dev",
     "db:migrate:local:createonly": "dotenv -e .env.local -- prisma migrate dev --create-only",
-    "db:connect:local": "psql postgres://user:password@localhost:5432/nwc-periodic-payments",
+    "db:connect:local": "psql postgres://user:password@localhost:5442/nwc-periodic-payments",
     "db:connect:fly": "flyctl postgres connect -a nwc-periodic-payments-db -d nwc_periodic_payments",
     "db:studio:local": "dotenv -e .env.local -- prisma studio",
     "db:reset:local": "dotenv -e .env.local -- prisma migrate reset",
@@ -62,7 +62,7 @@
     "@types/nodemailer": "^6.4.10",
     "dotenv-cli": "^7.3.0",
     "husky": "^8.0.0",
-    "inngest-cli": "^0.11.0",
+    "inngest-cli": "^1.3.3",
     "prettier": "^3.0.3"
   }
 }
