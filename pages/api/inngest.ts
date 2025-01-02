@@ -13,7 +13,9 @@ import { isError } from "lib/utils";
 import { add } from "date-fns";
 import ms from "ms";
 
-global.crypto = crypto;
+if (!global.crypto) {
+  global.crypto = crypto;
+}
 
 type PeriodicZapEvent = {
   name: "zap";
@@ -287,4 +289,8 @@ const periodicZap = inngest.createFunction(
   },
 );
 
-export default serve(inngest, [periodicZap]);
+export default serve(inngest, [periodicZap], {
+  serveHost:
+    process.env.INNGEST_SERVE_HOST || "https://nwc-periodic-payments.fly.dev",
+  servePath: "/api/inngest",
+});

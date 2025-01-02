@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
 import { webln } from "@getalby/sdk";
-import { Button as BitcoinConnectButton } from "@getalby/bitcoin-connect-react";
+import {
+  Button as BitcoinConnectButton,
+  init,
+} from "@getalby/bitcoin-connect-react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { isValidNostrConnectUrl } from "lib/validation";
 import { Box } from "app/components/Box";
@@ -18,6 +21,7 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { Modal } from "app/components/Modal";
 import { captureException } from "@sentry/nextjs";
+import { NostrWebLNProvider } from "@getalby/sdk/dist/webln";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -25,6 +29,11 @@ type ConfirmSubscriptionFormProps = {
   unconfirmedSubscription: UnconfirmedSubscription;
   returnUrl?: string;
 };
+
+init({
+  filters: ["nwc"],
+  appName: "ZapPlanner",
+});
 
 export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
@@ -117,16 +126,12 @@ export function ConfirmSubscriptionForm({
               <div className="flex justify-center">
                 <div className="flex flex-col items-center">
                   <BitcoinConnectButton
-                    filters="nwc"
-                    onDisconnect={() => setValue("nostrWalletConnectUrl", "")}
-                    onConnect={() =>
+                    onDisconnected={() => setValue("nostrWalletConnectUrl", "")}
+                    onConnected={(provider) =>
                       setValue(
                         "nostrWalletConnectUrl",
-                        (
-                          window as unknown as {
-                            webln: { nostrWalletConnectUrl: string };
-                          }
-                        ).webln.nostrWalletConnectUrl,
+                        (provider as NostrWebLNProvider).client
+                          .nostrWalletConnectUrl,
                       )
                     }
                   />
