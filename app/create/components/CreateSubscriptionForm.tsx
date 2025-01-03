@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Timeframe, timeframes } from "types/Timeframe";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
@@ -13,6 +13,7 @@ import {
   LUD18PayerData,
   LightningAddress,
   RequestInvoiceArgs,
+  fiat,
 } from "@getalby/lightning-tools";
 
 type CreateSubscriptionFormData = Omit<
@@ -71,6 +72,26 @@ export function CreateSubscriptionForm() {
     push(`/confirm?${searchParams.toString()}`);
   });
   const watchedAmount = watch("amount");
+
+  const [convertedAmount, setConvertedAmount] = useState<string>("");
+
+  useEffect(() => {
+    const updateConversion = async () => {
+      if (watchedAmount === undefined) {
+        return;
+      }
+
+      const value = await fiat.getFormattedFiatValue({
+        satoshi: watchedAmount,
+        currency: "usd",
+        locale: "en-US",
+      });
+      setConvertedAmount(`~${value}`);
+    };
+
+    updateConversion();
+  }, [watchedAmount]);
+
   const watchedTimeframe = watch("timeframe");
   const setSelectedTimeframe = React.useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
@@ -136,15 +157,24 @@ export function CreateSubscriptionForm() {
           <label className="zp-label">
             Amount in sats<span className="text-red-500">*</span>
           </label>
-          <input
-            {...register("amount", {
-              validate: (value) =>
-                !isValidPositiveValue(parseInt(value))
-                  ? "Please enter a positive value"
-                  : undefined,
-            })}
-            className="zp-input"
-          />
+          <div className="relative flex items-center justify-center">
+            {convertedAmount && (
+              <p className="absolute right-2 text-gray-500 text-sm mt-1 font-mono">
+                {convertedAmount}
+              </p>
+            )}
+            <input
+              {...register("amount", {
+                validate: (value) => {
+                  return !isValidPositiveValue(parseInt(value))
+                    ? "Please enter a positive value"
+                    : undefined;
+                },
+              })}
+              className="zp-input flex-1"
+              placeholder={`Enter amount in sats`}
+            />
+          </div>
           {errors.amount && (
             <p className="zp-form-error">{errors.amount.message}</p>
           )}
