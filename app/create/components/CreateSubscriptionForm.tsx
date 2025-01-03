@@ -198,7 +198,6 @@ export function CreateSubscriptionForm() {
             <select
               {...register("timeframe")}
               className="select select-bordered"
-              defaultValue={watchedTimeframe}
               onChange={(event) =>
                 setSelectedTimeframe(event.target.value as Timeframe)
               }

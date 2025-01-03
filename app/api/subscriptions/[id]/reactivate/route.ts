@@ -7,10 +7,10 @@ import { inngest } from "pages/api/inngest";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const subscriptionId = params.id;
+    const { id: subscriptionId } = await params;
     if (!subscriptionId) {
       return new Response(undefined, {
         status: StatusCodes.BAD_REQUEST,
