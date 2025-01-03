@@ -73,23 +73,20 @@ export function CreateSubscriptionForm() {
   });
   const watchedAmount = watch("amount");
 
-  const userLocale =
-    typeof window !== "undefined"
-      ? navigator.language || navigator.languages?.[0] || "en-US"
-      : "en-US";
-
   const [convertedAmount, setConvertedAmount] = useState<string>("");
 
   useEffect(() => {
     const updateConversion = async () => {
-      if (!watchedAmount) return;
+      if (watchedAmount === undefined) {
+        return;
+      }
 
       const value = await fiat.getFormattedFiatValue({
         satoshi: watchedAmount,
         currency: "usd",
-        locale: userLocale,
+        locale: "en-US",
       });
-      setConvertedAmount(`currently ≈${value}`);
+      setConvertedAmount(`~${value}`);
     };
 
     updateConversion();
@@ -160,23 +157,23 @@ export function CreateSubscriptionForm() {
           <label className="zp-label">
             Amount in sats<span className="text-red-500">*</span>
           </label>
-          <div className="relative">
-            <div className="flex gap-2">
-              <input
-                {...register("amount", {
-                  validate: (value) => {
-                    return !isValidPositiveValue(parseInt(value))
-                      ? "Please enter a positive value"
-                      : undefined;
-                  },
-                })}
-                className="zp-input flex-1"
-                placeholder={`Enter amount in sats`}
-              />
-            </div>
+          <div className="relative flex items-center justify-center">
             {convertedAmount && (
-              <p className="text-gray-500 text-sm mt-1">{convertedAmount}</p>
+              <p className="absolute right-2 text-gray-500 text-sm mt-1 font-mono">
+                {convertedAmount}
+              </p>
             )}
+            <input
+              {...register("amount", {
+                validate: (value) => {
+                  return !isValidPositiveValue(parseInt(value))
+                    ? "Please enter a positive value"
+                    : undefined;
+                },
+              })}
+              className="zp-input flex-1"
+              placeholder={`Enter amount in sats`}
+            />
           </div>
           {errors.amount && (
             <p className="zp-form-error">{errors.amount.message}</p>
