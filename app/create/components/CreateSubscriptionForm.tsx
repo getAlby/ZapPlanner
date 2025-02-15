@@ -12,9 +12,9 @@ import { Button } from "app/components/Button";
 import {
   LUD18PayerData,
   LightningAddress,
-  RequestInvoiceArgs,
   fiat,
 } from "@getalby/lightning-tools";
+import { SATS_CURRENCY } from "lib/constants";
 
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,
@@ -32,6 +32,7 @@ export function CreateSubscriptionForm() {
     reValidateMode: "onBlur",
     mode: "onBlur",
     defaultValues: {
+      currency: SATS_CURRENCY,
       amount: process.env.NEXT_PUBLIC_DEFAULT_AMOUNT,
       recipientLightningAddress:
         process.env.NEXT_PUBLIC_DEFAULT_LIGHTNING_ADDRESS,
@@ -43,6 +44,31 @@ export function CreateSubscriptionForm() {
         "days",
     },
   });
+
+  const [currencies, setCurrencies] = React.useState<string[]>([SATS_CURRENCY]);
+  useEffect(() => {
+    async function fetchCurrencies() {
+      try {
+        const response = await fetch(`https://getalby.com/api/rates`);
+        const data = (await response.json()) as Record<
+          string,
+          { priority: number }
+        >;
+
+        const mappedCurrencies = Object.entries(data);
+
+        mappedCurrencies.sort((a, b) => a[1].priority - b[1].priority);
+
+        setCurrencies(
+          mappedCurrencies.map((currency) => currency[0].toUpperCase()),
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchCurrencies();
+  }, []);
 
   const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
@@ -57,6 +83,9 @@ export function CreateSubscriptionForm() {
 
     const searchParams = new URLSearchParams();
     searchParams.append("amount", data.amount);
+    if (data.currency) {
+      searchParams.append("currency", data.currency);
+    }
     searchParams.append("recipient", data.recipientLightningAddress);
     searchParams.append(
       "timeframe",
@@ -73,13 +102,32 @@ export function CreateSubscriptionForm() {
   });
   const watchedAmount = watch("amount");
 
+  const [satoshiAmount, setSatoshiAmount] = useState<number>();
   const [convertedAmount, setConvertedAmount] = useState<string>("");
+
+  const watchedCurrency = watch("currency");
+  const setSelectedCurrency = React.useCallback(
+    (currency: string) => setValue("currency", currency),
+    [setValue],
+  );
 
   useEffect(() => {
     const updateConversion = async () => {
       if (watchedAmount === undefined) {
         return;
       }
+
+      if (watchedCurrency && watchedCurrency !== SATS_CURRENCY) {
+        const value = await fiat.getSatoshiValue({
+          amount: watchedAmount,
+          currency: watchedCurrency,
+        });
+        setSatoshiAmount(value);
+        setConvertedAmount("~" + value + " sats");
+        return;
+      }
+
+      setSatoshiAmount(+watchedAmount);
 
       const value = await fiat.getFormattedFiatValue({
         satoshi: watchedAmount,
@@ -90,7 +138,7 @@ export function CreateSubscriptionForm() {
     };
 
     updateConversion();
-  }, [watchedAmount]);
+  }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
   const setSelectedTimeframe = React.useCallback(
@@ -128,7 +176,7 @@ export function CreateSubscriptionForm() {
                   setValidatingLightningAddress(true);
                   const { ln, errorMessage } = await validateLightningAddress(
                     address,
-                    parseInt(watchedAmount),
+                    satoshiAmount || 0,
                   );
 
                   if (!errorMessage) {
@@ -155,7 +203,18 @@ export function CreateSubscriptionForm() {
             </p>
           )}
           <label className="zp-label">
-            Amount in sats<span className="text-red-500">*</span>
+            Amount<span className="text-red-500 mr-2">*</span>
+            <select
+              className="select select-sm"
+              onChange={(e) => setSelectedCurrency(e.target.value)}
+              value={watchedCurrency}
+            >
+              {currencies.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
           </label>
           <div className="relative flex items-center justify-center">
             {convertedAmount && (
@@ -172,7 +231,7 @@ export function CreateSubscriptionForm() {
                 },
               })}
               className="zp-input flex-1"
-              placeholder={`Enter amount in sats`}
+              placeholder={`Enter amount in ${watchedCurrency}`}
             />
           </div>
           {errors.amount && (

@@ -6,7 +6,7 @@ import { CancelSubscriptionButton } from "app/components/CancelSubscriptionButto
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import Link from "next/link";
-import { MAX_RETRIES } from "lib/constants";
+import { DEFAULT_CURRENCY, MAX_RETRIES } from "lib/constants";
 import { ReactivateSubscriptionButton } from "app/components/ReactivateSubscriptionButton";
 import { PayAgainButton } from "app/components/PayAgainButton";
 
@@ -49,6 +49,7 @@ export default async function SubscriptionPage({
             </h2>
             <SubscriptionSummary
               values={{
+                currency: subscription.currency || DEFAULT_CURRENCY,
                 amount: subscription.amount.toString(),
                 recipientLightningAddress:
                   subscription.recipientLightningAddress,

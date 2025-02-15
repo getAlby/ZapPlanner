@@ -6,6 +6,7 @@ import { MAX_RETRIES } from "lib/constants";
 type SubscriptionSummaryProps = {
   values: {
     amount: string;
+    currency: string;
     recipientLightningAddress: string;
     sleepDuration: string;
     message: string | undefined;
@@ -35,7 +36,7 @@ export function SubscriptionSummary({
             <span className="mono">
               {parseInt(values.amount).toLocaleString()}
             </span>{" "}
-            sats
+            {values.currency}
           </div>
         }
       />

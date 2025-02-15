@@ -11,6 +11,9 @@ import ms from "ms";
 import { inngest } from "pages/api/inngest";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
+import { SATS_CURRENCY } from "lib/constants";
+import { fiat } from "@getalby/lightning-tools";
+
 export async function POST(request: Request) {
   try {
     const createSubscriptionRequest: CreateSubscriptionRequest =
@@ -29,9 +32,20 @@ export async function POST(request: Request) {
       });
     }
 
+    let satoshi = +createSubscriptionRequest.amount;
+    if (
+      createSubscriptionRequest.currency &&
+      createSubscriptionRequest.currency !== SATS_CURRENCY
+    ) {
+      satoshi = await fiat.getSatoshiValue({
+        amount: createSubscriptionRequest.amount,
+        currency: createSubscriptionRequest.currency,
+      });
+    }
+
     const { errorMessage } = await validateLightningAddress(
       createSubscriptionRequest.recipientLightningAddress,
-      parseInt(createSubscriptionRequest.amount),
+      satoshi,
     );
 
     if (errorMessage) {
@@ -43,6 +57,7 @@ export async function POST(request: Request) {
     const subscription = await prismaClient.subscription.create({
       data: {
         amount: parseInt(createSubscriptionRequest.amount),
+        currency: createSubscriptionRequest.currency,
         recipientLightningAddress:
           createSubscriptionRequest.recipientLightningAddress,
         nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,

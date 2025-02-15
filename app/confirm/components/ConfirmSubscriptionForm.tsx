@@ -17,6 +17,7 @@ import { Loading } from "app/components/Loading";
 import { toast } from "react-hot-toast";
 import { captureException } from "@sentry/nextjs";
 import { NostrWebLNProvider } from "@getalby/sdk/dist/webln";
+import { DEFAULT_CURRENCY } from "lib/constants";
 
 type FormData = CreateSubscriptionRequest;
 
@@ -83,6 +84,7 @@ export function ConfirmSubscriptionForm({
           <SubscriptionSummary
             values={{
               amount: unconfirmedSubscription.amount,
+              currency: unconfirmedSubscription.currency || DEFAULT_CURRENCY,
               recipientLightningAddress:
                 unconfirmedSubscription.recipientLightningAddress,
               sleepDuration: unconfirmedSubscription.sleepDuration,
