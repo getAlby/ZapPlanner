@@ -123,10 +123,10 @@ export function SubscriptionSummary({
       )}
       {(values.numSuccessfulPayments || 0) > 0 && (
         <SubscriptionSummaryItem
-          left="Total sats sent"
+          left={`Total ${values.currency} sent`}
           right={`${
             (values.numSuccessfulPayments || 0) * parseInt(values.amount)
-          }⚡`}
+          }`}
         />
       )}
       {(values.numFailedPayments || 0) > 0 && (
