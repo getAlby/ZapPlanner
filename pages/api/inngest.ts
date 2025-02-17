@@ -127,6 +127,7 @@ const periodicZap = inngest.createFunction(
           logger.info("calculated satoshi amount for fiat payment", {
             subscriptionId,
             currency,
+            amount,
             satoshi,
           });
         }
