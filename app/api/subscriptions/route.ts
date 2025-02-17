@@ -37,6 +37,17 @@ export async function POST(request: Request) {
       createSubscriptionRequest.currency &&
       createSubscriptionRequest.currency !== SATS_CURRENCY
     ) {
+      // check the currency exists
+      const response = await fetch(
+        `https://getalby.com/api/rates/${createSubscriptionRequest.currency}.json`,
+      );
+      if (!response.ok) {
+        throw new Error(
+          "Failed to fetch rates for currency: " +
+            createSubscriptionRequest.currency,
+        );
+      }
+
       satoshi = await fiat.getSatoshiValue({
         amount: createSubscriptionRequest.amount,
         currency: createSubscriptionRequest.currency,
