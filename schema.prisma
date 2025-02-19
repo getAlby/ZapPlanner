@@ -15,6 +15,7 @@ model Subscription {
   nostrWalletConnectUrl String /// @encrypted
   recipientLightningAddress String
   amount Int
+  currency String?
   message String?
   payerData String? // LUD-18 encoded JSON payer data
   sleepDuration String

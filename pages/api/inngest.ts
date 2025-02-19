@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import { webln } from "@getalby/sdk";
-import { LightningAddress } from "@getalby/lightning-tools";
+import { LightningAddress, fiat } from "@getalby/lightning-tools";
 import { EventSchemas, Inngest } from "inngest";
 import { serve } from "inngest/next";
 import { prismaClient } from "lib/server/prisma";
-import { MAX_RETRIES } from "lib/constants";
+import { MAX_RETRIES, SATS_CURRENCY } from "lib/constants";
 import { logger } from "lib/server/logger";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import { sendEmail } from "lib/server/sendEmail";
@@ -106,22 +106,37 @@ const periodicZap = inngest.createFunction(
         },
       });
 
-      const { nostrWalletConnectUrl, recipientLightningAddress, amount } =
-        subscription;
+      const {
+        nostrWalletConnectUrl,
+        recipientLightningAddress,
+        amount,
+        currency,
+      } = subscription;
       const message = subscription.message ?? undefined;
 
       let paymentSucceeded = false;
       let paymentRecovered = false;
       let errorMessage = "";
       try {
+        let satoshi = amount;
+        if (currency && currency !== SATS_CURRENCY) {
+          satoshi = await fiat.getSatoshiValue({
+            amount,
+            currency,
+          });
+          logger.info("calculated satoshi amount for fiat payment", {
+            subscriptionId,
+            currency,
+            amount,
+            satoshi,
+          });
+        }
+
         const noswebln = new webln.NostrWebLNProvider({
           nostrWalletConnectUrl,
         });
 
-        // FIXME: noswebln does not fully implement WebLNProvider
-        const ln = new LightningAddress(recipientLightningAddress, {
-          webln: noswebln,
-        });
+        const ln = new LightningAddress(recipientLightningAddress);
         await ln.fetch();
 
         if (!ln.lnurlpData) {
@@ -134,7 +149,7 @@ const periodicZap = inngest.createFunction(
         await noswebln.enable();
         logger.info("Requesting invoice", { subscriptionId });
         const invoice = await ln.requestInvoice({
-          satoshi: amount,
+          satoshi,
           comment:
             message &&
             ln.lnurlpData.commentAllowed &&
@@ -147,7 +162,7 @@ const periodicZap = inngest.createFunction(
               ? JSON.parse(subscription.payerData)
               : undefined,
         });
-        logger.info("Sending payment", { subscriptionId });
+        logger.info("Sending payment", { subscriptionId, satoshi });
         const response = (await noswebln.sendPayment(
           invoice.paymentRequest,
         )) as { preimage: string };

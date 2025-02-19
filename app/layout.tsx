@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 const exampleConfirmationLink =
-  "https://zapplanner.albylabs.com/confirm?amount=21&recipient=hello@getalby.com&timeframe=30%20days&comment=baz&payerdata=%7B%22name%22%3A%22Bob%22%7D&returnUrl=https%3A%2F%2Fexample.com";
+  "https://zapplanner.albylabs.com/confirm?amount=21&currency=SATS&recipient=hello@getalby.com&timeframe=30%20days&comment=baz&payerdata=%7B%22name%22%3A%22Bob%22%7D&returnUrl=https%3A%2F%2Fexample.com";
 
 export default async function RootLayout({
   children,
@@ -73,7 +73,18 @@ export default async function RootLayout({
                     <span className="font-bold">timeframe</span> are required
                   </li>
                   <li className="list-item">
-                    <span className="font-bold">amount</span> is in sats
+                    <span className="font-bold">amount</span> in chosen currency
+                  </li>
+                  <li className="list-item">
+                    <span className="font-bold">currency</span> (default SATS)
+                    see{" "}
+                    <Link
+                      href="https://getalby.com/api/rates"
+                      target="_blank"
+                      className="link"
+                    >
+                      available currencies
+                    </Link>{" "}
                   </li>
                   <li className="list-item">
                     <span className="font-bold">recipient</span> must be a
