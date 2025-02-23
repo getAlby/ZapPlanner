@@ -41,3 +41,8 @@ processes = []
     interval = "15s"
     restart_limit = 0
     timeout = "2s"
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory = '1024mb'
