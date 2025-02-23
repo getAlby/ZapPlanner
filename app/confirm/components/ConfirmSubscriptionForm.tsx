@@ -5,10 +5,6 @@ import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
 import { useRouter } from "next/navigation";
 import { CreateSubscriptionResponse } from "types/CreateSubscriptionResponse";
 import React from "react";
-import {
-  Button as BitcoinConnectButton,
-  init,
-} from "@getalby/bitcoin-connect-react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
 import { Box } from "app/components/Box";
 import { SubscriptionSummary } from "app/confirm/components/SubscriptionSummary";
@@ -18,6 +14,13 @@ import { toast } from "react-hot-toast";
 import { captureException } from "@sentry/nextjs";
 import { NostrWebLNProvider } from "@getalby/sdk/dist/webln";
 import { DEFAULT_CURRENCY } from "lib/constants";
+import dynamic from "next/dynamic";
+const BitcoinConnectButton = dynamic(
+  () => import("@getalby/bitcoin-connect-react").then((mod) => mod.Button),
+  {
+    ssr: false,
+  },
+);
 
 type FormData = CreateSubscriptionRequest;
 
@@ -26,12 +29,6 @@ type ConfirmSubscriptionFormProps = {
   returnUrl?: string;
   nwcUrl?: string;
 };
-
-// always use a new NWC connection
-init({
-  filters: ["nwc"],
-  appName: "ZapPlanner",
-});
 
 export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
@@ -50,6 +47,15 @@ export function ConfirmSubscriptionForm({
         nwcUrl || process.env.NEXT_PUBLIC_DEFAULT_NOSTR_WALLET_CONNECT_URL,
     },
   });
+
+  React.useEffect(() => {
+    import("@getalby/bitcoin-connect-react").then((mod) =>
+      mod.init({
+        filters: ["nwc"],
+        appName: "ZapPlanner",
+      }),
+    );
+  }, []);
 
   const [isNavigating, setNavigating] = React.useState(false);
   const { push } = useRouter();
