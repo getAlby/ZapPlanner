@@ -11,7 +11,6 @@ import { sendEmail } from "lib/server/sendEmail";
 import { captureException } from "@sentry/nextjs";
 import { isError } from "lib/utils";
 import { add } from "date-fns";
-import ms from "ms";
 
 if (!global.crypto) {
   global.crypto = crypto;
@@ -59,7 +58,7 @@ const periodicZap = inngest.createFunction(
   },
   { event: "zap" },
   async ({ event, step }) => {
-    const sleepDuration = await step.run("Send payment", async () => {
+    const sleepUntil = await step.run("Send payment", async () => {
       const { subscriptionId } = event.data;
       const subscription = await prismaClient.subscription.findUnique({
         where: {
@@ -82,11 +81,11 @@ const periodicZap = inngest.createFunction(
       // safety check in case inngest fires unexpected event
       if (subscription.lastEventDateTime) {
         const expectedNextEvent = add(subscription.lastEventDateTime, {
-          seconds: ms(subscription.sleepDuration) / 1000,
+          seconds: Math.floor(Number(subscription.sleepDurationMs) / 1000),
         });
 
         if (Date.now() < expectedNextEvent.getTime()) {
-          logger.error("Subscription event requested too early. Skipping", {
+          logger.error("Subscription event requested too early.", {
             subscriptionId,
             expectedDateTime: expectedNextEvent.toISOString(),
             currentDateTime: new Date().toISOString(),
@@ -94,7 +93,7 @@ const periodicZap = inngest.createFunction(
               (expectedNextEvent.getTime() - Date.now()) / 1000,
             ),
           });
-          return undefined;
+          throw new Error("subscription event requested too early");
         }
       }
       await prismaClient.subscription.update({
@@ -239,7 +238,9 @@ const periodicZap = inngest.createFunction(
       });
 
       if (
-        areEmailNotificationsSupported(updatedSubscription.sleepDuration) &&
+        areEmailNotificationsSupported(
+          Number(updatedSubscription.sleepDurationMs),
+        ) &&
         updatedSubscription.email &&
         updatedSubscription.sendPaymentNotifications
       ) {
@@ -271,20 +272,25 @@ const periodicZap = inngest.createFunction(
         return undefined;
       }
 
-      logger.info(`Sleeping for ${subscription.sleepDuration}`, {
+      const sleepUntil = new Date(
+        Date.now() + Number(subscription.sleepDurationMs),
+      );
+      logger.info(`Sleeping until next payment`, {
+        sleepDurationMs: Number(subscription.sleepDurationMs),
+        sleepUntil,
         subscriptionId,
       });
-      return subscription.sleepDuration;
+      return sleepUntil;
     });
 
-    if (!sleepDuration) {
+    if (!sleepUntil) {
       logger.info(`Not rescheduling a new event`, {
         subscriptionId: event.data.subscriptionId,
       });
       return;
     }
 
-    await step.sleep(sleepDuration);
+    await step.sleepUntil(sleepUntil);
 
     if (ENABLE_REPEAT_EVENTS) {
       // create a new event object without inngest-added properties (id, ts)

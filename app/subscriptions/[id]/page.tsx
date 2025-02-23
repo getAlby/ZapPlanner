@@ -40,7 +40,7 @@ export default async function SubscriptionPage({
         }}
         subscriptionId={subscription.id}
         emailNotificationsSupported={areEmailNotificationsSupported(
-          subscription.sleepDuration,
+          Number(subscription.sleepDurationMs),
         )}
         beforeFormContent={
           <>
