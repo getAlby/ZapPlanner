@@ -24,7 +24,8 @@ export async function POST(request: Request) {
     if (
       !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
       !sleepDurationMs ||
-      sleepDurationMs < 60 * 60 * 1000 ||
+      (process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !== "true" &&
+        sleepDurationMs < 60 * 60 * 1000) ||
       !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
     ) {
       return new Response("One or more invalid subscription fields", {

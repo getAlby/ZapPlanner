@@ -8,9 +8,9 @@ import ms from "ms";
  * @param sleepDuration timeframe between payments as a ms string
  * @returns true if sleepDuration is at least 1 hour
  */
-export function areEmailNotificationsSupported(sleepDuration: string) {
+export function areEmailNotificationsSupported(sleepDurationMs: number) {
   return (
-    millisecondsToHours(ms(sleepDuration)) >= 1 ||
+    millisecondsToHours(sleepDurationMs) >= 1 ||
     process.env.ALWAYS_ALLOW_NOTIFICATIONS === "true"
   );
 }
