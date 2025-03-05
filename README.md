@@ -74,11 +74,12 @@ ZapPlanner is a serverless application that uses [Inngest](https://www.inngest.c
 ## Alby Labs Project
 
 ZapPlanner is a hackday / Alby Labs project to show how lightning subscriptions can be possible through the power of NWC. To be taken further the architecture needs to be re-thought so that it is more reliable and more scalable.
- 
+
 - NextJS as a serverless platform is not the right tool (and because of this requires inngest, which we also kind of abuse the purpose of inngest)
 - It doesn't really make sense that each subscription itself is responsible for re-scheduling payments for itself
 
 There are two main use cases we see for subscription payments:
+
 - Setting up a recurring payment yourself - however, the UI/UX of this might be better directly integrated into the wallet (e.g. Alby Hub)
 - Setting up a subscription on a third party platform for some sort of service (e.g. a monthly movies platform subscription or internet / mobile plan). Similar to subscriptions powered by Paypal or Stripe, but using an NWC connection instead of a credit card, ZapPlanner would power the subscription payments behind the scenes. The UX is quite nice with the NWC 1-click connection flow - the user could simply connect their wallet (e.g. with [Bitcoin Connect](https://github.com/getAlby/bitcoin-connect)) and then confirm the subscription, without visiting ZapPlanner (the platform/site would just use the ZapPlanner API directly).
 
