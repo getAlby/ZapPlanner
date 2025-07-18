@@ -9,6 +9,7 @@ type SubscriptionSummaryProps = {
     currency: string;
     recipientLightningAddress: string;
     sleepDuration: string;
+    cronExpression?: string;
     message: string | undefined;
     createdDateTime?: Date;
     lastSuccessfulPaymentDateTime?: Date;
@@ -46,7 +47,11 @@ export function SubscriptionSummary({
       />
       <SubscriptionSummaryItem
         left="Frequency"
-        right={"every " + values.sleepDuration}
+        right={
+          values.cronExpression
+            ? `Cron: ${values.cronExpression}`
+            : "every " + values.sleepDuration
+        }
       />
       <SubscriptionSummaryItem
         left="Message"

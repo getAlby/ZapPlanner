@@ -12,10 +12,11 @@ As a service you can programmatically create a URL with all the subscription pro
 https://zapplanner.albylabs.com/confirm?amount=21&recipient=hello@getalby.com&timeframe=30d&comment=baz&payerdata=%7B%22name%22%3A%22Bob%22%7D&returnUrl=https%3A%2F%2Fexample.com
 ```
 
-- `amount`, `recipient`, `timeframe` are required
+- `amount`, `recipient`, (`timeframe`|`cron`) are required
 - `amount` is in sats
 - `recipient` must be a lightning address
 - `timeframe` must be in milliseconds, or a valid [ms](https://www.npmjs.com/package/ms) string e.g. `1d`, `30%20minutes`
+- `cron` [cron expression](https://crontab.guru/) e.g. `0 10 * * 0`, `0 12 15 * *`
 - `payerdata` should be a URL-encoded JSON object as per [LUD-18](https://github.com/lnurl/luds/blob/luds/18.md)
 - `comment` and `payerdata` will only be sent if the recipient lightning address supports it
 - `returnUrl` encoded URL to show as link on confirmation page

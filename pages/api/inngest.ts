@@ -9,7 +9,7 @@ import { logger } from "lib/server/logger";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import { sendEmail } from "lib/server/sendEmail";
 import { captureException } from "@sentry/nextjs";
-import { isError } from "lib/utils";
+import { isError, getNextCronExecution } from "lib/utils";
 import { add } from "date-fns";
 
 if (!global.crypto) {
@@ -272,14 +272,34 @@ const periodicZap = inngest.createFunction(
         return undefined;
       }
 
-      const sleepUntil = new Date(
-        Date.now() + Number(subscription.sleepDurationMs),
-      );
-      logger.info(`Sleeping until next payment`, {
-        sleepDurationMs: Number(subscription.sleepDurationMs),
-        sleepUntil,
-        subscriptionId,
-      });
+      let sleepUntil: Date;
+
+      if (subscription.cronExpression) {
+        const nextExecution = getNextCronExecution(subscription.cronExpression);
+        if (!nextExecution) {
+          logger.error("Failed to calculate next cron execution", {
+            subscriptionId,
+            cronExpression: subscription.cronExpression,
+          });
+          return undefined;
+        }
+        sleepUntil = nextExecution;
+        logger.info(`Sleeping until next cron execution`, {
+          cronExpression: subscription.cronExpression,
+          sleepUntil,
+          subscriptionId,
+        });
+      } else {
+        sleepUntil = new Date(
+          Date.now() + Number(subscription.sleepDurationMs),
+        );
+        logger.info(`Sleeping until next payment`, {
+          sleepDurationMs: Number(subscription.sleepDurationMs),
+          sleepUntil,
+          subscriptionId,
+        });
+      }
+
       return sleepUntil;
     });
 
