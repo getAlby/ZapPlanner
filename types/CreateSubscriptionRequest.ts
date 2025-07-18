@@ -6,4 +6,5 @@ export type CreateSubscriptionRequest = {
   payerData?: string;
   nostrWalletConnectUrl: string;
   sleepDuration: string;
+  cronExpression?: string;
 };

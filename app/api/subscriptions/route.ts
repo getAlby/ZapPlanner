@@ -15,18 +15,38 @@ import { SATS_CURRENCY } from "lib/constants";
 import { fiat } from "@getalby/lightning-tools";
 import { RestartStuckSubscriptionsResponse } from "types/RestartStuckSubscriptionsResponse";
 import { RestartStuckSubscriptionsRequest } from "types/RestartStuckSubscriptionsRequest";
+import { isValidCronExpression, getCronSleepDurationMs } from "lib/utils";
 
 export async function POST(request: Request) {
   try {
     const createSubscriptionRequest: CreateSubscriptionRequest =
       await request.json();
 
-    const sleepDurationMs = ms(createSubscriptionRequest.sleepDuration);
+    let sleepDurationMs: number | null = null;
+
+    if (createSubscriptionRequest.cronExpression) {
+      if (!isValidCronExpression(createSubscriptionRequest.cronExpression)) {
+        return new Response("Invalid cron expression", {
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+      sleepDurationMs = getCronSleepDurationMs(
+        createSubscriptionRequest.cronExpression,
+      );
+      if (!sleepDurationMs) {
+        return new Response("Cron expression would execute in the past", {
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+    } else {
+      sleepDurationMs = ms(createSubscriptionRequest.sleepDuration);
+    }
 
     if (
       !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
       !sleepDurationMs ||
       (process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !== "true" &&
+        !createSubscriptionRequest.cronExpression &&
         sleepDurationMs < 60 * 60 * 1000) ||
       !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
     ) {
@@ -79,6 +99,7 @@ export async function POST(request: Request) {
         payerData: createSubscriptionRequest.payerData,
         sleepDuration: createSubscriptionRequest.sleepDuration,
         sleepDurationMs,
+        cronExpression: createSubscriptionRequest.cronExpression,
       },
     });
 

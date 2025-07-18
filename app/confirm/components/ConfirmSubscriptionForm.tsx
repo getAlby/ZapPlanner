@@ -94,6 +94,7 @@ export function ConfirmSubscriptionForm({
               recipientLightningAddress:
                 unconfirmedSubscription.recipientLightningAddress,
               sleepDuration: unconfirmedSubscription.sleepDuration,
+              cronExpression: unconfirmedSubscription.cronExpression,
               message: unconfirmedSubscription.message,
               payerData: unconfirmedSubscription.payerData,
             }}

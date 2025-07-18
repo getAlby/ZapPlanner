@@ -10,6 +10,7 @@ type ConfirmSubscriptionPageProps = {
     amount?: string;
     recipient?: string;
     timeframe?: string;
+    cron?: string;
     comment?: string;
     payerdata?: string;
     returnUrl?: string;
@@ -27,6 +28,7 @@ export default async function ConfirmSubscriptionPage({
     amount,
     recipient,
     timeframe,
+    cron,
     comment,
     payerdata,
     returnUrl,
@@ -34,14 +36,15 @@ export default async function ConfirmSubscriptionPage({
     currency,
   } = await searchParams;
 
-  if (!amount || !recipient || !timeframe) {
+  if (!amount || !recipient || (!timeframe && !cron)) {
     redirect("/");
   }
 
   const unconfirmedSubscription: UnconfirmedSubscription = {
     amount: amount,
     recipientLightningAddress: recipient,
-    sleepDuration: decodeURIComponent(timeframe),
+    sleepDuration: timeframe ? decodeURIComponent(timeframe) : "",
+    cronExpression: cron ? decodeURIComponent(cron) : "",
     message: comment ? decodeURIComponent(comment) : undefined,
     payerData: payerdata ? decodeURIComponent(payerdata) : undefined,
     currency,
