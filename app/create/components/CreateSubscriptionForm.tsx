@@ -258,10 +258,13 @@ export function CreateSubscriptionForm() {
           <div className="flex items-center gap-2 mb-4">
             <input
               type="checkbox"
+              id="useCron"
               {...register("useCron")}
               className="checkbox"
             />
-            <label className="label-text">Use cron expression</label>
+            <label className="label-text" htmlFor="useCron">
+              Use cron expression
+            </label>
           </div>
 
           {watch("useCron") ? (
@@ -316,35 +319,37 @@ export function CreateSubscriptionForm() {
               </div>
             </div>
           ) : (
-            <div className={`flex justify-center gap-2 items-center`}>
-              <p className="lg:flex-shrink-0">Repeat payment every</p>
-              <input
-                {...register("timeframeValue", {
-                  validate: (value) =>
-                    !isValidPositiveValue(parseInt(value))
-                      ? "Please enter a positive value"
-                      : undefined,
-                })}
-                className={`zp-input w-full`}
-              />
-              <select
-                {...register("timeframe")}
-                className="select select-bordered"
-                onChange={(event) =>
-                  setSelectedTimeframe(event.target.value as Timeframe)
-                }
-                value={watchedTimeframe}
-              >
-                {timeframes.map((timeframe) => (
-                  <option key={timeframe} value={timeframe}>
-                    {timeframe}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          {errors.timeframeValue && !watch("useCron") && (
-            <p className="zp-form-error">{errors.timeframeValue.message}</p>
+            <>
+              <div className={`flex justify-center gap-2 items-center`}>
+                <p className="lg:flex-shrink-0">Repeat payment every</p>
+                <input
+                  {...register("timeframeValue", {
+                    validate: (value) =>
+                      !isValidPositiveValue(parseInt(value))
+                        ? "Please enter a positive value"
+                        : undefined,
+                  })}
+                  className={`zp-input w-full`}
+                />
+                <select
+                  {...register("timeframe")}
+                  className="select select-bordered"
+                  onChange={(event) =>
+                    setSelectedTimeframe(event.target.value as Timeframe)
+                  }
+                  value={watchedTimeframe}
+                >
+                  {timeframes.map((timeframe) => (
+                    <option key={timeframe} value={timeframe}>
+                      {timeframe}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.timeframeValue && (
+                <p className="zp-form-error">{errors.timeframeValue.message}</p>
+              )}
+            </>
           )}
 
           {lightningAddress &&

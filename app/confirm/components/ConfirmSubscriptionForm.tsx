@@ -98,7 +98,7 @@ export function ConfirmSubscriptionForm({
               message: unconfirmedSubscription.message,
               payerData: unconfirmedSubscription.payerData,
             }}
-            showFirstPayment
+            showFirstPayment={!unconfirmedSubscription.cronExpression}
           />
           {!nwcUrl && (
             <>
