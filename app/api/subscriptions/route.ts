@@ -46,7 +46,6 @@ export async function POST(request: Request) {
       !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
       !sleepDurationMs ||
       (process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !== "true" &&
-        !createSubscriptionRequest.cronExpression &&
         sleepDurationMs < 60 * 60 * 1000) ||
       !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
     ) {
