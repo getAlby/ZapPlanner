@@ -66,9 +66,10 @@ export function CreateSubscriptionForm() {
 
         mappedCurrencies.sort((a, b) => a[1].priority - b[1].priority);
 
-        setCurrencies(
-          mappedCurrencies.map((currency) => currency[0].toUpperCase()),
-        );
+        setCurrencies([
+          SATS_CURRENCY,
+          ...mappedCurrencies.map((currency) => currency[0].toUpperCase()),
+        ]);
       } catch (error) {
         console.error(error);
       }
