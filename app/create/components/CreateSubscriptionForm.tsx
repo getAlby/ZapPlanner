@@ -276,8 +276,12 @@ export function CreateSubscriptionForm() {
                   validate: (value) => {
                     if (!value) return "Cron expression is required";
                     const parts = value.split(" ");
-                    if (parts.length !== 5)
+                    if (parts.length !== 5) {
                       return "Cron expression must have 5 parts (minute hour day month weekday)";
+                    }
+                    if (/^[0-5]?[0-9] /g.test(value)) {
+                      return "Cron expression must repeat only once per hour";
+                    }
                   },
                 })}
                 className="zp-input"
