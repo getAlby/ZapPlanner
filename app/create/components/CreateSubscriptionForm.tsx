@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Timeframe, timeframes } from "types/Timeframe";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
@@ -52,7 +52,7 @@ export function CreateSubscriptionForm() {
     },
   });
 
-  const [currencies, setCurrencies] = React.useState<string[]>([SATS_CURRENCY]);
+  const [currencies, setCurrencies] = useState<string[]>([SATS_CURRENCY]);
   useEffect(() => {
     async function fetchCurrencies() {
       try {
@@ -78,7 +78,7 @@ export function CreateSubscriptionForm() {
     fetchCurrencies();
   }, []);
 
-  const [isNavigating, setNavigating] = React.useState(false);
+  const [isNavigating, setNavigating] = useState(false);
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
     let encodedPayerData: string | undefined;
@@ -120,7 +120,7 @@ export function CreateSubscriptionForm() {
   const [convertedAmount, setConvertedAmount] = useState<string>("");
 
   const watchedCurrency = watch("currency");
-  const setSelectedCurrency = React.useCallback(
+  const setSelectedCurrency = useCallback(
     (currency: string) => setValue("currency", currency),
     [setValue],
   );
@@ -155,13 +155,13 @@ export function CreateSubscriptionForm() {
   }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
-  const setSelectedTimeframe = React.useCallback(
+  const setSelectedTimeframe = useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
     [setValue],
   );
   const [validatingLightningAddress, setValidatingLightningAddress] =
-    React.useState(false);
-  const [lightningAddress, setLightningAddress] = React.useState<
+    useState(false);
+  const [lightningAddress, setLightningAddress] = useState<
     LightningAddress | undefined
   >(undefined);
 
@@ -279,7 +279,7 @@ export function CreateSubscriptionForm() {
                     if (parts.length !== 5) {
                       return "Cron expression must have 5 parts (minute hour day month weekday)";
                     }
-                    if (/^[0-5]?[0-9] /g.test(value)) {
+                    if (!/^[0-5]?[0-9] /.test(value)) {
                       return "Cron expression must repeat only once per hour";
                     }
                   },

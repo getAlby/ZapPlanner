@@ -43,8 +43,8 @@ export default async function ConfirmSubscriptionPage({
   const unconfirmedSubscription: UnconfirmedSubscription = {
     amount: amount,
     recipientLightningAddress: recipient,
-    sleepDuration: timeframe ? decodeURIComponent(timeframe) : "",
-    cronExpression: cron ? decodeURIComponent(cron) : "",
+    sleepDuration: timeframe ? decodeURIComponent(timeframe) : undefined,
+    cronExpression: cron ? decodeURIComponent(cron) : undefined,
     message: comment ? decodeURIComponent(comment) : undefined,
     payerData: payerdata ? decodeURIComponent(payerdata) : undefined,
     currency,

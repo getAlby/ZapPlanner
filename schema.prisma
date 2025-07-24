@@ -18,8 +18,8 @@ model Subscription {
   currency                      String?
   message                       String?
   payerData                     String? // LUD-18 encoded JSON payer data
-  sleepDuration                 String
-  sleepDurationMs               BigInt
+  sleepDuration                 String?
+  sleepDurationMs               BigInt?
   cronExpression                String?
   createdDateTime               DateTime  @default(now())
   lastEventDateTime             DateTime?

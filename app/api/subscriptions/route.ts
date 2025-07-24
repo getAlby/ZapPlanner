@@ -15,7 +15,7 @@ import { SATS_CURRENCY } from "lib/constants";
 import { fiat } from "@getalby/lightning-tools";
 import { RestartStuckSubscriptionsResponse } from "types/RestartStuckSubscriptionsResponse";
 import { RestartStuckSubscriptionsRequest } from "types/RestartStuckSubscriptionsRequest";
-import { isValidCronExpression, getCronSleepDurationMs } from "lib/utils";
+import { isValidCronExpression, getCronNextExecutionFromNow } from "lib/utils";
 
 export async function POST(request: Request) {
   try {
@@ -24,43 +24,50 @@ export async function POST(request: Request) {
 
     let sleepDurationMs: number | null = null;
 
-    if (createSubscriptionRequest.cronExpression) {
-      if (!isValidCronExpression(createSubscriptionRequest.cronExpression)) {
-        return new Response("Invalid cron expression", {
-          status: StatusCodes.BAD_REQUEST,
-        });
-      }
-      if (/^[0-5]?[0-9] /g.test(createSubscriptionRequest.cronExpression)) {
-        return new Response("Cron expression must repeat only once per hour", {
-          status: StatusCodes.BAD_REQUEST,
-        });
-      }
-      sleepDurationMs = getCronSleepDurationMs(
-        createSubscriptionRequest.cronExpression,
-      );
-      if (!sleepDurationMs) {
-        return new Response("Cron expression would execute in the past", {
-          status: StatusCodes.BAD_REQUEST,
-        });
-      }
-    } else {
-      sleepDurationMs = ms(createSubscriptionRequest.sleepDuration);
-    }
+    const { amount, nostrWalletConnectUrl, sleepDuration, cronExpression } =
+      createSubscriptionRequest;
 
     if (
-      !isValidPositiveValue(parseInt(createSubscriptionRequest.amount)) ||
-      !sleepDurationMs ||
-      (process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !== "true" &&
-        !createSubscriptionRequest.cronExpression &&
-        sleepDurationMs < 60 * 60 * 1000) ||
-      !isValidNostrConnectUrl(createSubscriptionRequest.nostrWalletConnectUrl)
+      (!sleepDuration && !cronExpression) ||
+      !isValidPositiveValue(parseInt(amount)) ||
+      !isValidNostrConnectUrl(nostrWalletConnectUrl)
     ) {
       return new Response("One or more invalid subscription fields", {
         status: StatusCodes.BAD_REQUEST,
       });
     }
 
-    let satoshi = +createSubscriptionRequest.amount;
+    if (cronExpression) {
+      if (!isValidCronExpression(cronExpression)) {
+        return new Response("Invalid cron expression", {
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+      if (!/^[0-5]?[0-9] /.test(cronExpression)) {
+        return new Response("Cron expression must repeat only once per hour", {
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+      const crontNextTime = getCronNextExecutionFromNow(cronExpression);
+      if (!crontNextTime) {
+        return new Response("Cron expression would execute in the past", {
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+    } else {
+      sleepDurationMs = ms(sleepDuration!);
+      if (
+        !sleepDurationMs ||
+        (process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !== "true" &&
+          sleepDurationMs < 60 * 60 * 1000)
+      ) {
+        return new Response("One or more invalid subscription fields", {
+          status: StatusCodes.BAD_REQUEST,
+        });
+      }
+    }
+
+    let satoshi = +amount;
     if (
       createSubscriptionRequest.currency &&
       createSubscriptionRequest.currency !== SATS_CURRENCY
@@ -99,12 +106,12 @@ export async function POST(request: Request) {
         currency: createSubscriptionRequest.currency,
         recipientLightningAddress:
           createSubscriptionRequest.recipientLightningAddress,
-        nostrWalletConnectUrl: createSubscriptionRequest.nostrWalletConnectUrl,
         message: createSubscriptionRequest.message,
         payerData: createSubscriptionRequest.payerData,
-        sleepDuration: createSubscriptionRequest.sleepDuration,
+        nostrWalletConnectUrl,
+        sleepDuration,
         sleepDurationMs,
-        cronExpression: createSubscriptionRequest.cronExpression,
+        cronExpression,
       },
     });
 
@@ -181,13 +188,14 @@ export async function PATCH(request: Request) {
         });
         break;
       }
+      const subscriptionId = subscription.id;
       logger.info("Restarting stuck subscription", {
-        subscriptionId: subscription.id,
+        subscriptionId,
       });
       await inngest.send({
         name: "zap",
         data: {
-          subscriptionId: subscription.id,
+          subscriptionId,
         },
       });
       ++processed;

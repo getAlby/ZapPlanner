@@ -32,7 +32,9 @@ export function isValidCronExpression(cronExpression: string): boolean {
 /**
  * Calculate milliseconds until next cron execution
  */
-export function getCronSleepDurationMs(cronExpression: string): number | null {
+export function getCronNextExecutionFromNow(
+  cronExpression: string,
+): number | null {
   const nextExecution = getNextCronExecution(cronExpression);
   if (!nextExecution) return null;
 

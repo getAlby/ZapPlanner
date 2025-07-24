@@ -2,13 +2,14 @@ import React from "react";
 import { formatDistance, add, max } from "date-fns";
 import ms from "ms";
 import { MAX_RETRIES } from "lib/constants";
+import { getCronNextExecutionFromNow } from "lib/utils";
 
 type SubscriptionSummaryProps = {
   values: {
     amount: string;
     currency: string;
     recipientLightningAddress: string;
-    sleepDuration: string;
+    sleepDuration?: string;
     cronExpression?: string;
     message: string | undefined;
     createdDateTime?: Date;
@@ -85,26 +86,29 @@ export function SubscriptionSummary({
         <SubscriptionSummaryItem
           left="Next payment"
           right={
+            values.cronExpression ||
             values.lastSuccessfulPaymentDateTime ||
             values.lastFailedPaymentDateTime
               ? formatDistance(
-                  add(
-                    Math.max(
-                      (
-                        values.lastSuccessfulPaymentDateTime ||
-                        values.lastFailedPaymentDateTime ||
-                        values.createdDateTime
-                      ).getTime(),
-                      (
-                        values.lastFailedPaymentDateTime ||
-                        values.lastSuccessfulPaymentDateTime ||
-                        values.createdDateTime
-                      ).getTime(),
-                    ),
-                    {
-                      seconds: ms(values.sleepDuration) / 1000,
-                    },
-                  ),
+                  values.cronExpression
+                    ? getCronNextExecutionFromNow(values.cronExpression)!
+                    : add(
+                        Math.max(
+                          (
+                            values.lastSuccessfulPaymentDateTime ||
+                            values.lastFailedPaymentDateTime ||
+                            values.createdDateTime
+                          ).getTime(),
+                          (
+                            values.lastFailedPaymentDateTime ||
+                            values.lastSuccessfulPaymentDateTime ||
+                            values.createdDateTime
+                          ).getTime(),
+                        ),
+                        {
+                          seconds: ms(values.sleepDuration!) / 1000,
+                        },
+                      ),
                   new Date(),
                   { addSuffix: true },
                 )

@@ -53,7 +53,7 @@ export default async function SubscriptionPage({
                 amount: subscription.amount.toString(),
                 recipientLightningAddress:
                   subscription.recipientLightningAddress,
-                sleepDuration: subscription.sleepDuration,
+                sleepDuration: subscription.sleepDuration ?? undefined,
                 message: subscription.message || undefined,
                 createdDateTime: subscription.createdDateTime,
                 lastFailedPaymentDateTime:
