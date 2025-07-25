@@ -40,7 +40,7 @@ Run `$ yarn cloak:generate` and set `PRISMA_FIELD_ENCRYPTION_KEY=<CLOAK_MASTER_K
 
 Run `$ yarn docker:start`
 
-Run `$ yarn db:migrate:deploy`
+Run `$ yarn db:migrate:local`
 
 ### Database Setup (Non-Docker)
 
@@ -48,7 +48,7 @@ Unless you already have it, create the database with: `$ createdb boostagram-vie
 
 Make sure to set your Postgres username and password in `.env.local`. To list Postgres users, open `$ psql` followed by `> \du`. To set no password, leave it empty like this: `postgres://username:@localhost...`.
 
-Run `$ yarn db:migrate:deploy`
+Run `$ yarn db:migrate:local`
 
 ## Development (Docker)
 
