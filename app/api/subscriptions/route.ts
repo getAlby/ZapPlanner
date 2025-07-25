@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { logger } from "lib/server/logger";
 import { prismaClient } from "lib/server/prisma";
 import {
-  isValidNostrConnectUrl,
+  isValidNostrWalletConnectUrl,
   isValidPositiveValue,
   validateLightningAddress,
 } from "lib/validation";
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     if (
       (!sleepDuration && !cronExpression) ||
       !isValidPositiveValue(parseInt(amount)) ||
-      !isValidNostrConnectUrl(nostrWalletConnectUrl)
+      !isValidNostrWalletConnectUrl(nostrWalletConnectUrl)
     ) {
       return new Response("One or more invalid subscription fields", {
         status: StatusCodes.BAD_REQUEST,
@@ -43,13 +43,16 @@ export async function POST(request: Request) {
           status: StatusCodes.BAD_REQUEST,
         });
       }
-      if (!/^[0-5]?[0-9] /.test(cronExpression)) {
+      if (
+        process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !== "true" &&
+        !/^[0-5]?[0-9] /.test(cronExpression)
+      ) {
         return new Response("Cron expression must repeat only once per hour", {
           status: StatusCodes.BAD_REQUEST,
         });
       }
-      const crontNextTime = getCronNextExecutionFromNow(cronExpression);
-      if (!crontNextTime) {
+      const cronNextTime = getCronNextExecutionFromNow(cronExpression);
+      if (!cronNextTime) {
         return new Response("Cron expression would execute in the past", {
           status: StatusCodes.BAD_REQUEST,
         });

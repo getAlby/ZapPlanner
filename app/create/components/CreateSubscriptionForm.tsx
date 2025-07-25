@@ -279,7 +279,11 @@ export function CreateSubscriptionForm() {
                     if (parts.length !== 5) {
                       return "Cron expression must have 5 parts (minute hour day month weekday)";
                     }
-                    if (!/^[0-5]?[0-9] /.test(value)) {
+                    if (
+                      process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !==
+                        "true" &&
+                      !/^[0-5]?[0-9] /.test(value)
+                    ) {
                       return "Cron expression must repeat only once per hour";
                     }
                   },
