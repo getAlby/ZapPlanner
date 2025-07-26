@@ -40,9 +40,10 @@ export default async function SubscriptionPage({
           email: subscription.email || "",
         }}
         subscriptionId={subscription.id}
-        emailNotificationsSupported={areEmailNotificationsSupported(
-          Number(subscription.sleepDurationMs),
-        )}
+        emailNotificationsSupported={
+          !!subscription.cronExpression ||
+          areEmailNotificationsSupported(Number(subscription.sleepDurationMs))
+        }
         beforeFormContent={
           <>
             <h2 className="font-heading font-bold text-2xl text-primary">
