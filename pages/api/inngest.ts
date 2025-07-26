@@ -94,7 +94,7 @@ const periodicZap = inngest.createFunction(
             seconds: Math.floor(Number(subscription.sleepDurationMs) / 1000),
           });
         }
-        if (expectedNextEvent && Date.now() < expectedNextEvent.getTime()) {
+        if (Date.now() < expectedNextEvent.getTime()) {
           logger.error("Subscription event requested too early.", {
             subscriptionId,
             expectedDateTime: expectedNextEvent.toISOString(),
