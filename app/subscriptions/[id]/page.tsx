@@ -74,7 +74,9 @@ export default async function SubscriptionPage({
             {subscription.retryCount >= MAX_RETRIES && (
               <ReactivateSubscriptionButton subscriptionId={subscription.id} />
             )}
-            <PayAgainButton subscriptionId={subscription.id} />
+            {!subscription.cronExpression && (
+              <PayAgainButton subscriptionId={subscription.id} />
+            )}
             <CancelSubscriptionButton subscriptionId={subscription.id} />
             <div className="divider my-0" />
 
