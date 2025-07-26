@@ -1,6 +1,6 @@
 import { Header } from "app/components/Header";
 import { ConfirmSubscriptionForm } from "app/confirm/components/ConfirmSubscriptionForm";
-import Link from "next/link";
+import { getNextCronExecution } from "lib/utils";
 import { redirect } from "next/navigation";
 import React from "react";
 import { UnconfirmedSubscription } from "types/UnconfirmedSubscription";
@@ -58,6 +58,13 @@ export default async function ConfirmSubscriptionPage({
         nwcUrl={nwcUrl}
         unconfirmedSubscription={unconfirmedSubscription}
         returnUrl={returnUrl}
+        nextCronExecution={
+          unconfirmedSubscription.cronExpression
+            ? getNextCronExecution(
+                unconfirmedSubscription.cronExpression,
+              ).getTime()
+            : undefined
+        }
       />
     </>
   );

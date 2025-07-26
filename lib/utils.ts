@@ -7,13 +7,13 @@ export function isError(obj: any) {
 /**
  * Calculate the next execution time for a cron expression
  */
-export function getNextCronExecution(cronExpression: string): Date | null {
+export function getNextCronExecution(cronExpression: string): Date {
   try {
     const job = new CronJob(cronExpression, () => {}, null, false);
     return job.nextDate().toJSDate();
   } catch (error) {
     console.error("Invalid cron expression:", cronExpression, error);
-    return null;
+    throw error;
   }
 }
 

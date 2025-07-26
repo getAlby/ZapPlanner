@@ -2,7 +2,6 @@ import React from "react";
 import { formatDistance, add, max } from "date-fns";
 import ms from "ms";
 import { MAX_RETRIES } from "lib/constants";
-import { getCronNextExecutionFromNow } from "lib/utils";
 
 type SubscriptionSummaryProps = {
   values: {
@@ -11,6 +10,7 @@ type SubscriptionSummaryProps = {
     recipientLightningAddress: string;
     sleepDuration?: string;
     cronExpression?: string;
+    nextCronExecution?: number;
     message: string | undefined;
     createdDateTime?: Date;
     lastSuccessfulPaymentDateTime?: Date;
@@ -54,15 +54,17 @@ export function SubscriptionSummary({
             : "every " + values.sleepDuration
         }
       />
-      <SubscriptionSummaryItem
-        left="Message"
-        right={values.message || "(no message provided)"}
-      />
-      {values.payerData && (
-        <SubscriptionSummaryItem left="Payer Data" right={values.payerData} />
-      )}
       {showFirstPayment && (
-        <SubscriptionSummaryItem left="First payment" right="Immediately" />
+        <SubscriptionSummaryItem
+          left="First payment"
+          right={
+            values.nextCronExecution
+              ? formatDistance(values.nextCronExecution, new Date(), {
+                  addSuffix: true,
+                })
+              : "Immediately"
+          }
+        />
       )}
       {values.createdDateTime && (
         <SubscriptionSummaryItem
@@ -86,23 +88,25 @@ export function SubscriptionSummary({
         <SubscriptionSummaryItem
           left="Next payment"
           right={
-            values.cronExpression ||
+            values.nextCronExecution ||
             values.lastSuccessfulPaymentDateTime ||
             values.lastFailedPaymentDateTime
               ? formatDistance(
-                  values.cronExpression
-                    ? getCronNextExecutionFromNow(values.cronExpression)!
+                  values.nextCronExecution
+                    ? values.nextCronExecution
                     : add(
                         Math.max(
                           (
                             values.lastSuccessfulPaymentDateTime ||
                             values.lastFailedPaymentDateTime ||
-                            values.createdDateTime
+                            values.createdDateTime ||
+                            new Date()
                           ).getTime(),
                           (
                             values.lastFailedPaymentDateTime ||
                             values.lastSuccessfulPaymentDateTime ||
-                            values.createdDateTime
+                            values.createdDateTime ||
+                            new Date()
                           ).getTime(),
                         ),
                         {
@@ -115,6 +119,13 @@ export function SubscriptionSummary({
               : "Now"
           }
         />
+      )}
+      <SubscriptionSummaryItem
+        left="Message"
+        right={values.message || "(no message provided)"}
+      />
+      {values.payerData && (
+        <SubscriptionSummaryItem left="Payer Data" right={values.payerData} />
       )}
       {values.lastFailedPaymentDateTime && (
         <SubscriptionSummaryItem

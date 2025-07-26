@@ -9,6 +9,7 @@ import Link from "next/link";
 import { DEFAULT_CURRENCY, MAX_RETRIES } from "lib/constants";
 import { ReactivateSubscriptionButton } from "app/components/ReactivateSubscriptionButton";
 import { PayAgainButton } from "app/components/PayAgainButton";
+import { getNextCronExecution } from "lib/utils";
 
 export default async function SubscriptionPage({
   params,
@@ -64,6 +65,10 @@ export default async function SubscriptionPage({
                 numSuccessfulPayments: subscription.numSuccessfulPayments,
                 retryCount: subscription.retryCount,
                 payerData: subscription.payerData ?? undefined,
+                cronExpression: subscription.cronExpression ?? undefined,
+                nextCronExecution: subscription.cronExpression
+                  ? getNextCronExecution(subscription.cronExpression).getTime()
+                  : undefined,
               }}
             />
             {subscription.retryCount >= MAX_RETRIES && (

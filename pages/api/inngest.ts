@@ -80,25 +80,21 @@ const periodicZap = inngest.createFunction(
       }
       // safety check in case inngest fires unexpected event
       if (subscription.lastEventDateTime) {
-        let expectedNextEvent: Date;
+        let expectedNextEvent: Date | undefined;
         if (subscription.cronExpression) {
-          const cronNextExecution = getNextCronExecution(
-            subscription.cronExpression,
-          );
-          if (!cronNextExecution) {
-            logger.error("Failed to calculate next cron execution", {
-              subscriptionId,
-              cronExpression: subscription.cronExpression,
-            });
-            return undefined;
-          }
-          expectedNextEvent = cronNextExecution;
+          // We can't use the next cron time here because it's already passed
+          // by the time this event fires. Also, due to months not being the same length
+          // we cannot reliably calculate this.
+          // for now just do a simple check to ensure inngest isn't called without a delay
+          expectedNextEvent = add(subscription.lastEventDateTime, {
+            seconds: 50,
+          });
         } else {
           expectedNextEvent = add(subscription.lastEventDateTime, {
             seconds: Math.floor(Number(subscription.sleepDurationMs) / 1000),
           });
         }
-        if (Date.now() < expectedNextEvent.getTime()) {
+        if (expectedNextEvent && Date.now() < expectedNextEvent.getTime()) {
           logger.error("Subscription event requested too early.", {
             subscriptionId,
             expectedDateTime: expectedNextEvent.toISOString(),

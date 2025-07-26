@@ -187,6 +187,10 @@ export function CreateSubscriptionForm() {
             <input
               {...register("recipientLightningAddress", {
                 validate: async (address) => {
+                  if (!satoshiAmount) {
+                    // don't trigger when input field is empty (it's required and will have its own error message)
+                    return;
+                  }
                   setValidatingLightningAddress(true);
                   const { ln, errorMessage } = await validateLightningAddress(
                     address,
@@ -321,7 +325,7 @@ export function CreateSubscriptionForm() {
                     rel="noopener noreferrer"
                     className="underline"
                   >
-                    📅 Use crontab.guru for help.
+                    📅 Use crontab.guru for help
                   </a>
                 </p>
               </div>

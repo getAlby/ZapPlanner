@@ -28,12 +28,14 @@ type ConfirmSubscriptionFormProps = {
   unconfirmedSubscription: UnconfirmedSubscription;
   returnUrl?: string;
   nwcUrl?: string;
+  nextCronExecution?: number;
 };
 
 export function ConfirmSubscriptionForm({
   unconfirmedSubscription,
   returnUrl,
   nwcUrl,
+  nextCronExecution,
 }: ConfirmSubscriptionFormProps) {
   const {
     handleSubmit,
@@ -95,10 +97,11 @@ export function ConfirmSubscriptionForm({
                 unconfirmedSubscription.recipientLightningAddress,
               sleepDuration: unconfirmedSubscription.sleepDuration,
               cronExpression: unconfirmedSubscription.cronExpression,
+              nextCronExecution,
               message: unconfirmedSubscription.message,
               payerData: unconfirmedSubscription.payerData,
             }}
-            showFirstPayment={!unconfirmedSubscription.cronExpression}
+            showFirstPayment
           />
           {!nwcUrl && (
             <>
