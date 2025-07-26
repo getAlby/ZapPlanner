@@ -1,6 +1,5 @@
 import { Modal } from "app/components/Modal";
 import "./globals.css";
-import Image from "next/image";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
 import { AlbyLogo } from "app/components/icons/AlbyLogo";
@@ -69,8 +68,9 @@ export default async function RootLayout({
                 <ul className="list-disc list-inside">
                   <li className="list-item">
                     <span className="font-bold">amount</span>,{" "}
-                    <span className="font-bold">recipient</span>, and{" "}
-                    <span className="font-bold">timeframe</span> are required
+                    <span className="font-bold">recipient</span>, and (
+                    <span className="font-bold">timeframe</span> or{" "}
+                    <span className="font-bold">cron</span>) are required
                   </li>
                   <li className="list-item">
                     <span className="font-bold">amount</span> in chosen currency
@@ -95,12 +95,26 @@ export default async function RootLayout({
                     <Link
                       href="https://www.npmjs.com/package/ms"
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="link"
                     >
                       ms
                     </Link>{" "}
                     string e.g. <span className="font-bold">1 day</span> or{" "}
                     <span className="font-bold">30 minutes</span>
+                  </li>
+                  <li className="list-item">
+                    <span className="font-bold">cron</span> must be a valid{" "}
+                    <Link
+                      href="https://crontab.guru/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link"
+                    >
+                      cron expression
+                    </Link>{" "}
+                    e.g. <span className="font-bold">0 10 * * 0</span> or{" "}
+                    <span className="font-bold">0 12 15 * *</span>
                   </li>
                   <li className="list-item">
                     <span className="font-bold">payerdata</span> should be a

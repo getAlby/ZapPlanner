@@ -41,7 +41,7 @@ export const validateLightningAddress = async (
   return { errorMessage, ln };
 };
 
-export const isValidNostrConnectUrl = (url: string) => {
+export const isValidNostrWalletConnectUrl = (url: string) => {
   return (
     (url.startsWith("nostrwalletconnect://") ||
       url.startsWith("nostr+walletconnect://")) &&

@@ -8,7 +8,9 @@ type SubscriptionSummaryProps = {
     amount: string;
     currency: string;
     recipientLightningAddress: string;
-    sleepDuration: string;
+    sleepDuration?: string;
+    cronExpression?: string;
+    nextCronExecution?: number;
     message: string | undefined;
     createdDateTime?: Date;
     lastSuccessfulPaymentDateTime?: Date;
@@ -46,17 +48,23 @@ export function SubscriptionSummary({
       />
       <SubscriptionSummaryItem
         left="Frequency"
-        right={"every " + values.sleepDuration}
+        right={
+          values.cronExpression
+            ? `Cron: ${values.cronExpression}`
+            : "every " + values.sleepDuration
+        }
       />
-      <SubscriptionSummaryItem
-        left="Message"
-        right={values.message || "(no message provided)"}
-      />
-      {values.payerData && (
-        <SubscriptionSummaryItem left="Payer Data" right={values.payerData} />
-      )}
       {showFirstPayment && (
-        <SubscriptionSummaryItem left="First payment" right="Immediately" />
+        <SubscriptionSummaryItem
+          left="First payment"
+          right={
+            values.nextCronExecution
+              ? formatDistance(values.nextCronExecution, new Date(), {
+                  addSuffix: true,
+                })
+              : "Immediately"
+          }
+        />
       )}
       {values.createdDateTime && (
         <SubscriptionSummaryItem
@@ -80,32 +88,44 @@ export function SubscriptionSummary({
         <SubscriptionSummaryItem
           left="Next payment"
           right={
+            values.nextCronExecution ||
             values.lastSuccessfulPaymentDateTime ||
             values.lastFailedPaymentDateTime
               ? formatDistance(
-                  add(
-                    Math.max(
-                      (
-                        values.lastSuccessfulPaymentDateTime ||
-                        values.lastFailedPaymentDateTime ||
-                        values.createdDateTime
-                      ).getTime(),
-                      (
-                        values.lastFailedPaymentDateTime ||
-                        values.lastSuccessfulPaymentDateTime ||
-                        values.createdDateTime
-                      ).getTime(),
-                    ),
-                    {
-                      seconds: ms(values.sleepDuration) / 1000,
-                    },
-                  ),
+                  values.nextCronExecution
+                    ? values.nextCronExecution
+                    : add(
+                        Math.max(
+                          (
+                            values.lastSuccessfulPaymentDateTime ||
+                            values.lastFailedPaymentDateTime ||
+                            values.createdDateTime ||
+                            new Date()
+                          ).getTime(),
+                          (
+                            values.lastFailedPaymentDateTime ||
+                            values.lastSuccessfulPaymentDateTime ||
+                            values.createdDateTime ||
+                            new Date()
+                          ).getTime(),
+                        ),
+                        {
+                          seconds: ms(values.sleepDuration!) / 1000,
+                        },
+                      ),
                   new Date(),
                   { addSuffix: true },
                 )
               : "Now"
           }
         />
+      )}
+      <SubscriptionSummaryItem
+        left="Message"
+        right={values.message || "(no message provided)"}
+      />
+      {values.payerData && (
+        <SubscriptionSummaryItem left="Payer Data" right={values.payerData} />
       )}
       {values.lastFailedPaymentDateTime && (
         <SubscriptionSummaryItem

@@ -9,7 +9,7 @@ import { logger } from "lib/server/logger";
 import { areEmailNotificationsSupported } from "lib/server/areEmailNotificationsSupported";
 import { sendEmail } from "lib/server/sendEmail";
 import { captureException } from "@sentry/nextjs";
-import { isError } from "lib/utils";
+import { isError, getNextCronExecution } from "lib/utils";
 import { add } from "date-fns";
 
 if (!global.crypto) {
@@ -80,10 +80,20 @@ const periodicZap = inngest.createFunction(
       }
       // safety check in case inngest fires unexpected event
       if (subscription.lastEventDateTime) {
-        const expectedNextEvent = add(subscription.lastEventDateTime, {
-          seconds: Math.floor(Number(subscription.sleepDurationMs) / 1000),
-        });
-
+        let expectedNextEvent: Date | undefined;
+        if (subscription.cronExpression) {
+          // We can't use the next cron time here because it's already passed
+          // by the time this event fires. Also, due to months not being the same length
+          // we cannot reliably calculate this.
+          // for now just do a simple check to ensure inngest isn't called without a delay
+          expectedNextEvent = add(subscription.lastEventDateTime, {
+            seconds: 50,
+          });
+        } else {
+          expectedNextEvent = add(subscription.lastEventDateTime, {
+            seconds: Math.floor(Number(subscription.sleepDurationMs) / 1000),
+          });
+        }
         if (Date.now() < expectedNextEvent.getTime()) {
           logger.error("Subscription event requested too early.", {
             subscriptionId,
@@ -110,8 +120,8 @@ const periodicZap = inngest.createFunction(
         recipientLightningAddress,
         amount,
         currency,
+        message,
       } = subscription;
-      const message = subscription.message ?? undefined;
 
       let paymentSucceeded = false;
       let paymentRecovered = false;
@@ -238,9 +248,10 @@ const periodicZap = inngest.createFunction(
       });
 
       if (
-        areEmailNotificationsSupported(
-          Number(updatedSubscription.sleepDurationMs),
-        ) &&
+        (updatedSubscription.cronExpression ||
+          areEmailNotificationsSupported(
+            Number(updatedSubscription.sleepDurationMs),
+          )) &&
         updatedSubscription.email &&
         updatedSubscription.sendPaymentNotifications
       ) {
@@ -272,14 +283,34 @@ const periodicZap = inngest.createFunction(
         return undefined;
       }
 
-      const sleepUntil = new Date(
-        Date.now() + Number(subscription.sleepDurationMs),
-      );
-      logger.info(`Sleeping until next payment`, {
-        sleepDurationMs: Number(subscription.sleepDurationMs),
-        sleepUntil,
-        subscriptionId,
-      });
+      let sleepUntil: Date;
+
+      if (subscription.cronExpression) {
+        const nextExecution = getNextCronExecution(subscription.cronExpression);
+        if (!nextExecution) {
+          logger.error("Failed to calculate next cron execution", {
+            subscriptionId,
+            cronExpression: subscription.cronExpression,
+          });
+          return undefined;
+        }
+        sleepUntil = nextExecution;
+        logger.info(`Sleeping until next cron execution`, {
+          cronExpression: subscription.cronExpression,
+          sleepUntil,
+          subscriptionId,
+        });
+      } else {
+        sleepUntil = new Date(
+          Date.now() + Number(subscription.sleepDurationMs),
+        );
+        logger.info(`Sleeping until next payment`, {
+          sleepDurationMs: Number(subscription.sleepDurationMs),
+          sleepUntil,
+          subscriptionId,
+        });
+      }
+
       return sleepUntil;
     });
 

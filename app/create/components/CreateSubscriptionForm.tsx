@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Timeframe, timeframes } from "types/Timeframe";
 import { Loading } from "app/components/Loading";
 import { CreateSubscriptionRequest } from "types/CreateSubscriptionRequest";
@@ -19,7 +19,13 @@ import { SATS_CURRENCY } from "lib/constants";
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,
   "nostrWalletConnectUrl" | "payerData" | "sleepDuration"
-> & { payerName: string; timeframe: Timeframe; timeframeValue: string };
+> & {
+  payerName: string;
+  timeframe: Timeframe;
+  timeframeValue: string;
+  useCron: boolean;
+  cronExpression: string;
+};
 
 export function CreateSubscriptionForm() {
   const {
@@ -39,13 +45,14 @@ export function CreateSubscriptionForm() {
       message: process.env.NEXT_PUBLIC_DEFAULT_MESSAGE,
       timeframeValue:
         process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME_VALUE || "1",
+      cronExpression: process.env.NEXT_PUBLIC_DEFAULT_CRON_EXPRESSION || "",
       timeframe:
         (process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME as Timeframe) ||
         "days",
     },
   });
 
-  const [currencies, setCurrencies] = React.useState<string[]>([SATS_CURRENCY]);
+  const [currencies, setCurrencies] = useState<string[]>([SATS_CURRENCY]);
   useEffect(() => {
     async function fetchCurrencies() {
       try {
@@ -71,7 +78,7 @@ export function CreateSubscriptionForm() {
     fetchCurrencies();
   }, []);
 
-  const [isNavigating, setNavigating] = React.useState(false);
+  const [isNavigating, setNavigating] = useState(false);
   const { push } = useRouter();
   const onSubmit = handleSubmit(async (data) => {
     let encodedPayerData: string | undefined;
@@ -88,10 +95,16 @@ export function CreateSubscriptionForm() {
       searchParams.append("currency", data.currency);
     }
     searchParams.append("recipient", data.recipientLightningAddress);
-    searchParams.append(
-      "timeframe",
-      data.timeframeValue + " " + data.timeframe,
-    );
+
+    if (data.useCron) {
+      searchParams.append("cron", data.cronExpression);
+    } else {
+      searchParams.append(
+        "timeframe",
+        data.timeframeValue + " " + data.timeframe,
+      );
+    }
+
     if (data.message) {
       searchParams.append("comment", encodeURIComponent(data.message));
     }
@@ -107,7 +120,7 @@ export function CreateSubscriptionForm() {
   const [convertedAmount, setConvertedAmount] = useState<string>("");
 
   const watchedCurrency = watch("currency");
-  const setSelectedCurrency = React.useCallback(
+  const setSelectedCurrency = useCallback(
     (currency: string) => setValue("currency", currency),
     [setValue],
   );
@@ -142,13 +155,13 @@ export function CreateSubscriptionForm() {
   }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
-  const setSelectedTimeframe = React.useCallback(
+  const setSelectedTimeframe = useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
     [setValue],
   );
   const [validatingLightningAddress, setValidatingLightningAddress] =
-    React.useState(false);
-  const [lightningAddress, setLightningAddress] = React.useState<
+    useState(false);
+  const [lightningAddress, setLightningAddress] = useState<
     LightningAddress | undefined
   >(undefined);
 
@@ -174,6 +187,10 @@ export function CreateSubscriptionForm() {
             <input
               {...register("recipientLightningAddress", {
                 validate: async (address) => {
+                  if (!satoshiAmount) {
+                    // don't trigger when input field is empty (it's required and will have its own error message)
+                    return;
+                  }
                   setValidatingLightningAddress(true);
                   const { ln, errorMessage } = await validateLightningAddress(
                     address,
@@ -241,34 +258,110 @@ export function CreateSubscriptionForm() {
           <label className="zp-label">
             Frequency<span className="text-red-500">*</span>
           </label>
-          <div className={`flex justify-center gap-2 items-center`}>
-            <p className="lg:flex-shrink-0">Repeat payment every</p>
+
+          <div className="flex items-center gap-2 mb-4">
             <input
-              {...register("timeframeValue", {
-                validate: (value) =>
-                  !isValidPositiveValue(parseInt(value))
-                    ? "Please enter a positive value"
-                    : undefined,
-              })}
-              className={`zp-input w-full`}
+              type="checkbox"
+              id="useCron"
+              {...register("useCron")}
+              className="checkbox"
             />
-            <select
-              {...register("timeframe")}
-              className="select select-bordered"
-              onChange={(event) =>
-                setSelectedTimeframe(event.target.value as Timeframe)
-              }
-              value={watchedTimeframe}
-            >
-              {timeframes.map((timeframe) => (
-                <option key={timeframe} value={timeframe}>
-                  {timeframe}
-                </option>
-              ))}
-            </select>
+            <label className="label-text" htmlFor="useCron">
+              Use cron expression
+            </label>
           </div>
-          {errors.timeframeValue && (
-            <p className="zp-form-error">{errors.timeframeValue.message}</p>
+
+          {watch("useCron") ? (
+            <div className="space-y-2">
+              <label className="zp-label">Cron Expression</label>
+              <input
+                key="cronExpression"
+                {...register("cronExpression", {
+                  validate: (value) => {
+                    if (!value) return "Cron expression is required";
+                    const parts = value.split(" ");
+                    if (parts.length !== 5) {
+                      return "Cron expression must have 5 parts (minute hour day month weekday)";
+                    }
+                    if (
+                      process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !==
+                        "true" &&
+                      !/^[0-5]?[0-9] /.test(value)
+                    ) {
+                      return "Cron expression must repeat only once per hour";
+                    }
+                  },
+                })}
+                className="zp-input"
+                placeholder="0 10 * * 0 (Every Sunday at 10:00 AM UTC)"
+              />
+              {errors.cronExpression && (
+                <p className="zp-form-error">{errors.cronExpression.message}</p>
+              )}
+              <div className="text-sm text-gray-600">
+                <p>Examples:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>
+                    <code>0 10 * * 0</code> - Every Sunday at 10:00 AM UTC
+                  </li>
+                  <li>
+                    <code>0 23 * * 0</code> - Every Sunday at 11:00 PM UTC
+                  </li>
+                  <li>
+                    <code>0 9 * * 1</code> - Every Monday at 9:00 AM UTC
+                  </li>
+                  <li>
+                    <code>0 12 * * *</code> - Every day at 12:00 PM UTC
+                  </li>
+                  <li>
+                    <code>0 0 1 * *</code> - First day of every month at
+                    midnight UTC
+                  </li>
+                </ul>
+                <p className="mt-2">
+                  <a
+                    href="https://crontab.guru/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    📅 Use crontab.guru for help
+                  </a>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className={`flex justify-center gap-2 items-center`}>
+                <p className="lg:flex-shrink-0">Repeat payment every</p>
+                <input
+                  {...register("timeframeValue", {
+                    validate: (value) =>
+                      !isValidPositiveValue(parseInt(value))
+                        ? "Please enter a positive value"
+                        : undefined,
+                  })}
+                  className={`zp-input w-full`}
+                />
+                <select
+                  {...register("timeframe")}
+                  className="select select-bordered"
+                  onChange={(event) =>
+                    setSelectedTimeframe(event.target.value as Timeframe)
+                  }
+                  value={watchedTimeframe}
+                >
+                  {timeframes.map((timeframe) => (
+                    <option key={timeframe} value={timeframe}>
+                      {timeframe}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.timeframeValue && (
+                <p className="zp-form-error">{errors.timeframeValue.message}</p>
+              )}
+            </>
           )}
 
           {lightningAddress &&
