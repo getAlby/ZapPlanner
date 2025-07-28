@@ -106,6 +106,12 @@ const periodicZap = inngest.createFunction(
           throw new Error("subscription event requested too early");
         }
       }
+
+      // when a subscription is created this zap event is immediately fired.
+      // for cron payments we don't want to pay instantly - only at the scheduled cron time.
+      const skipFirstCronPayment =
+        !subscription.lastEventDateTime && !!subscription.cronExpression;
+
       await prismaClient.subscription.update({
         where: {
           id: subscription.id,
@@ -115,172 +121,176 @@ const periodicZap = inngest.createFunction(
         },
       });
 
-      const {
-        nostrWalletConnectUrl,
-        recipientLightningAddress,
-        amount,
-        currency,
-        message,
-      } = subscription;
-
-      let paymentSucceeded = false;
-      let paymentRecovered = false;
-      let errorMessage = "";
-      try {
-        let satoshi = amount;
-        if (currency && currency !== SATS_CURRENCY) {
-          satoshi = await fiat.getSatoshiValue({
-            amount,
-            currency,
-          });
-          logger.info("calculated satoshi amount for fiat payment", {
-            subscriptionId,
-            currency,
-            amount,
-            satoshi,
-          });
-        }
-
-        const noswebln = new webln.NostrWebLNProvider({
+      if (!skipFirstCronPayment) {
+        const {
           nostrWalletConnectUrl,
-        });
+          recipientLightningAddress,
+          amount,
+          currency,
+          message,
+        } = subscription;
 
-        const ln = new LightningAddress(recipientLightningAddress);
-        await ln.fetch();
-
-        if (!ln.lnurlpData) {
-          throw new Error(
-            "Failed to retrieve LNURLp data for " + recipientLightningAddress,
-          );
-        }
-
-        logger.info("Enabling noswebln", { subscriptionId });
-        await noswebln.enable();
-        logger.info("Requesting invoice", { subscriptionId });
-        const invoice = await ln.requestInvoice({
-          satoshi,
-          comment:
-            message &&
-            ln.lnurlpData.commentAllowed &&
-            ln.lnurlpData.commentAllowed >= message.length
-              ? message
-              : undefined,
-          // TODO: only send supported payerData?
-          payerdata:
-            ln.lnurlpData.payerData && subscription.payerData
-              ? JSON.parse(subscription.payerData)
-              : undefined,
-        });
-        logger.info("Sending payment", { subscriptionId, satoshi });
-        const response = (await noswebln.sendPayment(
-          invoice.paymentRequest,
-        )) as { preimage: string };
-        if (response.preimage) {
-          logger.info("Payment sent successfully", {
-            response,
-            subscriptionId,
-          });
-        } else {
-          logger.error("Payment sent but no preimage in response", {
-            response,
-            subscriptionId,
-          });
-          throw new Error("Payment sent but no preimage in response");
-        }
-
-        if (subscription.retryCount > 0) {
-          paymentRecovered = true;
-        }
-        paymentSucceeded = true;
+        let paymentSucceeded = false;
+        let paymentRecovered = false;
+        let errorMessage = "";
         try {
-          noswebln.close();
-        } catch (error) {
-          logger.error("Failed to close noswebln", { subscriptionId });
-        }
-      } catch (error) {
-        try {
-          if (isError(error)) {
-            captureException(error);
+          let satoshi = amount;
+          if (currency && currency !== SATS_CURRENCY) {
+            satoshi = await fiat.getSatoshiValue({
+              amount,
+              currency,
+            });
+            logger.info("calculated satoshi amount for fiat payment", {
+              subscriptionId,
+              currency,
+              amount,
+              satoshi,
+            });
+          }
+
+          const noswebln = new webln.NostrWebLNProvider({
+            nostrWalletConnectUrl,
+          });
+
+          const ln = new LightningAddress(recipientLightningAddress);
+          await ln.fetch();
+
+          if (!ln.lnurlpData) {
+            throw new Error(
+              "Failed to retrieve LNURLp data for " + recipientLightningAddress,
+            );
+          }
+
+          logger.info("Enabling noswebln", { subscriptionId });
+          await noswebln.enable();
+          logger.info("Requesting invoice", { subscriptionId });
+          const invoice = await ln.requestInvoice({
+            satoshi,
+            comment:
+              message &&
+              ln.lnurlpData.commentAllowed &&
+              ln.lnurlpData.commentAllowed >= message.length
+                ? message
+                : undefined,
+            // TODO: only send supported payerData?
+            payerdata:
+              ln.lnurlpData.payerData && subscription.payerData
+                ? JSON.parse(subscription.payerData)
+                : undefined,
+          });
+          logger.info("Sending payment", { subscriptionId, satoshi });
+          const response = (await noswebln.sendPayment(
+            invoice.paymentRequest,
+          )) as { preimage: string };
+          if (response.preimage) {
+            logger.info("Payment sent successfully", {
+              response,
+              subscriptionId,
+            });
           } else {
-            captureException(new Error(JSON.stringify(error)));
+            logger.error("Payment sent but no preimage in response", {
+              response,
+              subscriptionId,
+            });
+            throw new Error("Payment sent but no preimage in response");
+          }
+
+          if (subscription.retryCount > 0) {
+            paymentRecovered = true;
+          }
+          paymentSucceeded = true;
+          try {
+            noswebln.close();
+          } catch (error) {
+            logger.error("Failed to close noswebln", { subscriptionId });
           }
         } catch (error) {
-          console.error("Failed to capture error", error);
+          try {
+            if (isError(error)) {
+              captureException(error);
+            } else {
+              captureException(new Error(JSON.stringify(error)));
+            }
+          } catch (error) {
+            console.error("Failed to capture error", error);
+          }
+          logger.error("Failed to send periodic zap", {
+            subscriptionId,
+            error,
+            noSuccessfulPayments: subscription.numSuccessfulPayments === 0,
+          });
+          if (typeof error === "string") {
+            errorMessage = error;
+          } else if (
+            (error as NWCPaymentError).error &&
+            typeof (error as NWCPaymentError).error === "string"
+          ) {
+            errorMessage = (
+              ((error as NWCPaymentError).code || "") +
+              " " +
+              (error as NWCPaymentError).error
+            ).trim();
+          } else if ((error as Error).message) {
+            errorMessage = (error as Error).message;
+          } else {
+            logger.error("Unparsable error", { error });
+            errorMessage = "Unknown";
+          }
         }
-        logger.error("Failed to send periodic zap", {
-          subscriptionId,
-          error,
-          noSuccessfulPayments: subscription.numSuccessfulPayments === 0,
+        const updatedSubscription = await prismaClient.subscription.update({
+          where: {
+            id: subscriptionId,
+          },
+          data: {
+            retryCount: paymentSucceeded ? 0 : subscription.retryCount + 1,
+            lastSuccessfulPaymentDateTime: paymentSucceeded
+              ? new Date()
+              : undefined,
+            lastFailedPaymentDateTime: !paymentSucceeded
+              ? new Date()
+              : undefined,
+            numFailedPayments:
+              subscription.numFailedPayments + (paymentSucceeded ? 0 : 1),
+            numSuccessfulPayments:
+              subscription.numSuccessfulPayments + (paymentSucceeded ? 1 : 0),
+          },
         });
-        if (typeof error === "string") {
-          errorMessage = error;
-        } else if (
-          (error as NWCPaymentError).error &&
-          typeof (error as NWCPaymentError).error === "string"
+
+        if (
+          (updatedSubscription.cronExpression ||
+            areEmailNotificationsSupported(
+              Number(updatedSubscription.sleepDurationMs),
+            )) &&
+          updatedSubscription.email &&
+          updatedSubscription.sendPaymentNotifications
         ) {
-          errorMessage = (
-            ((error as NWCPaymentError).code || "") +
-            " " +
-            (error as NWCPaymentError).error
-          ).trim();
-        } else if ((error as Error).message) {
-          errorMessage = (error as Error).message;
-        } else {
-          logger.error("Unparsable error", { error });
-          errorMessage = "Unknown";
-        }
-      }
-      const updatedSubscription = await prismaClient.subscription.update({
-        where: {
-          id: subscriptionId,
-        },
-        data: {
-          retryCount: paymentSucceeded ? 0 : subscription.retryCount + 1,
-          lastSuccessfulPaymentDateTime: paymentSucceeded
-            ? new Date()
-            : undefined,
-          lastFailedPaymentDateTime: !paymentSucceeded ? new Date() : undefined,
-          numFailedPayments:
-            subscription.numFailedPayments + (paymentSucceeded ? 0 : 1),
-          numSuccessfulPayments:
-            subscription.numSuccessfulPayments + (paymentSucceeded ? 1 : 0),
-        },
-      });
+          if (paymentRecovered) {
+            await sendEmail(updatedSubscription.email, {
+              type: "payment-recovered",
+              subscription: updatedSubscription,
+              numRetries: subscription.retryCount,
+            });
+          }
 
-      if (
-        (updatedSubscription.cronExpression ||
-          areEmailNotificationsSupported(
-            Number(updatedSubscription.sleepDurationMs),
-          )) &&
-        updatedSubscription.email &&
-        updatedSubscription.sendPaymentNotifications
-      ) {
-        if (paymentRecovered) {
           await sendEmail(updatedSubscription.email, {
-            type: "payment-recovered",
+            type: paymentSucceeded ? "payment-success" : "payment-failed",
             subscription: updatedSubscription,
-            numRetries: subscription.retryCount,
+            errorMessage,
           });
         }
 
-        await sendEmail(updatedSubscription.email, {
-          type: paymentSucceeded ? "payment-success" : "payment-failed",
-          subscription: updatedSubscription,
-          errorMessage,
-        });
-      }
-
-      if (updatedSubscription.retryCount >= MAX_RETRIES) {
-        logger.error("subscription payment failed too many times", {
-          subscriptionId,
-        });
-        if (subscription.email) {
-          await sendEmail(subscription.email, {
-            type: "subscription-deactivated",
-            subscription,
+        if (updatedSubscription.retryCount >= MAX_RETRIES) {
+          logger.error("subscription payment failed too many times", {
+            subscriptionId,
           });
+          if (subscription.email) {
+            await sendEmail(subscription.email, {
+              type: "subscription-deactivated",
+              subscription,
+            });
+          }
+          return undefined;
         }
-        return undefined;
       }
 
       let sleepUntil: Date;

@@ -84,7 +84,9 @@ function getEmailHtml(template: EmailTemplate) {
     case "subscription-updated":
       return (
         `Your notification settings have been updated for your recurring payment to ${template.subscription.recipientLightningAddress}.` +
-        `<br/><br/>Payments of ${template.subscription.amount} ${template.subscription.currency || DEFAULT_CURRENCY} will be made every ${template.subscription.sleepDuration}.` +
+        `<br/><br/>Payments of ${template.subscription.amount} ${
+          template.subscription.currency || DEFAULT_CURRENCY
+        } will be made every ${template.subscription.sleepDuration}.` +
         `<br/><br/>${
           template.subscription.sendPaymentNotifications
             ? "You'll receive a confirmation email for each payment."
@@ -108,7 +110,9 @@ function getEmailSubject(template: EmailTemplate) {
     case "subscription-updated":
       return `Details of your Recurring Payment to ${template.subscription.recipientLightningAddress}`;
     case "payment-success":
-      return `Successful Payment of ${template.subscription.amount} ${template.subscription.currency || DEFAULT_CURRENCY} to ${template.subscription.recipientLightningAddress}`;
+      return `Successful Payment of ${template.subscription.amount} ${
+        template.subscription.currency || DEFAULT_CURRENCY
+      } to ${template.subscription.recipientLightningAddress}`;
     case "payment-recovered":
       return `Payment to ${template.subscription.recipientLightningAddress} recovered`;
     case "payment-failed":
