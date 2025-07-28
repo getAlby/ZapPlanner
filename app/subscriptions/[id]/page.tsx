@@ -9,6 +9,7 @@ import Link from "next/link";
 import { DEFAULT_CURRENCY, MAX_RETRIES } from "lib/constants";
 import { ReactivateSubscriptionButton } from "app/components/ReactivateSubscriptionButton";
 import { PayAgainButton } from "app/components/PayAgainButton";
+import { getNextCronExecution } from "lib/utils";
 
 export default async function SubscriptionPage({
   params,
@@ -39,9 +40,10 @@ export default async function SubscriptionPage({
           email: subscription.email || "",
         }}
         subscriptionId={subscription.id}
-        emailNotificationsSupported={areEmailNotificationsSupported(
-          Number(subscription.sleepDurationMs),
-        )}
+        emailNotificationsSupported={
+          !!subscription.cronExpression ||
+          areEmailNotificationsSupported(Number(subscription.sleepDurationMs))
+        }
         beforeFormContent={
           <>
             <h2 className="font-heading font-bold text-2xl text-primary">
@@ -53,7 +55,7 @@ export default async function SubscriptionPage({
                 amount: subscription.amount.toString(),
                 recipientLightningAddress:
                   subscription.recipientLightningAddress,
-                sleepDuration: subscription.sleepDuration,
+                sleepDuration: subscription.sleepDuration ?? undefined,
                 message: subscription.message || undefined,
                 createdDateTime: subscription.createdDateTime,
                 lastFailedPaymentDateTime:
@@ -64,12 +66,18 @@ export default async function SubscriptionPage({
                 numSuccessfulPayments: subscription.numSuccessfulPayments,
                 retryCount: subscription.retryCount,
                 payerData: subscription.payerData ?? undefined,
+                cronExpression: subscription.cronExpression ?? undefined,
+                nextCronExecution: subscription.cronExpression
+                  ? getNextCronExecution(subscription.cronExpression).getTime()
+                  : undefined,
               }}
             />
             {subscription.retryCount >= MAX_RETRIES && (
               <ReactivateSubscriptionButton subscriptionId={subscription.id} />
             )}
-            <PayAgainButton subscriptionId={subscription.id} />
+            {!subscription.cronExpression && (
+              <PayAgainButton subscriptionId={subscription.id} />
+            )}
             <CancelSubscriptionButton subscriptionId={subscription.id} />
             <div className="divider my-0" />
 

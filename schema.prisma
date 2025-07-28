@@ -11,22 +11,23 @@ datasource db {
 }
 
 model Subscription {
-  id String @id @default(cuid())
-  nostrWalletConnectUrl String /// @encrypted
-  recipientLightningAddress String
-  amount Int
-  currency String?
-  message String?
-  payerData String? // LUD-18 encoded JSON payer data
-  sleepDuration String
-  sleepDurationMs BigInt
-  createdDateTime DateTime @default(now())
-  lastEventDateTime DateTime?
+  id                            String    @id @default(cuid())
+  nostrWalletConnectUrl         String /// @encrypted
+  recipientLightningAddress     String
+  amount                        Int
+  currency                      String?
+  message                       String?
+  payerData                     String? // LUD-18 encoded JSON payer data
+  sleepDuration                 String?
+  sleepDurationMs               BigInt?
+  cronExpression                String?
+  createdDateTime               DateTime  @default(now())
+  lastEventDateTime             DateTime?
   lastSuccessfulPaymentDateTime DateTime?
-  lastFailedPaymentDateTime DateTime?
-  numSuccessfulPayments Int @default(0)
-  numFailedPayments Int @default(0)
-  retryCount Int @default(0)
-  email String?
-  sendPaymentNotifications Boolean @default(true)
+  lastFailedPaymentDateTime     DateTime?
+  numSuccessfulPayments         Int       @default(0)
+  numFailedPayments             Int       @default(0)
+  retryCount                    Int       @default(0)
+  email                         String?
+  sendPaymentNotifications      Boolean   @default(true)
 }
