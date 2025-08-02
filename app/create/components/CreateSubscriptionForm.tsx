@@ -314,7 +314,7 @@ export function CreateSubscriptionForm() {
                     <code>0 12 * * *</code> - Every day at 12:00 PM UTC
                   </li>
                   <li>
-                    <code>0 0 1 * *</code> - First day of every month at
+                    <code>0 0 * * 1#1</code> - First Monday of every month at
                     midnight UTC
                   </li>
                 </ul>
