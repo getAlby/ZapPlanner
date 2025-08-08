@@ -1,4 +1,4 @@
-import { CronJob } from "cron";
+import { CronExpressionParser } from "cron-parser";
 
 export function isError(obj: any) {
   return Object.prototype.toString.call(obj) === "[object Error]";
@@ -9,8 +9,8 @@ export function isError(obj: any) {
  */
 export function getNextCronExecution(cronExpression: string): Date {
   try {
-    const job = new CronJob(cronExpression, () => {}, null, false);
-    return job.nextDate().toJSDate();
+    const interval = CronExpressionParser.parse(cronExpression);
+    return interval.next().toDate();
   } catch (error) {
     console.error("Invalid cron expression:", cronExpression, error);
     throw error;
@@ -22,7 +22,7 @@ export function getNextCronExecution(cronExpression: string): Date {
  */
 export function isValidCronExpression(cronExpression: string): boolean {
   try {
-    new CronJob(cronExpression, () => {}, null, false);
+    CronExpressionParser.parse(cronExpression);
     return true;
   } catch (error) {
     return false;
