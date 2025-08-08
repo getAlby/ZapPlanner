@@ -7,6 +7,7 @@ export const isValidPositiveValue = (value: number) => {
 export const validateLightningAddress = async (
   address: string,
   amount: number,
+  validateAmount = true,
 ) => {
   let errorMessage: string | undefined = undefined;
   let ln: LightningAddress | undefined;
@@ -22,7 +23,7 @@ export const validateLightningAddress = async (
       await ln.fetch();
       if (ln.lnurlpData) {
         if (
-          amount * 1000 < ln.lnurlpData.min ||
+          (validateAmount && amount * 1000 < ln.lnurlpData.min) ||
           amount * 1000 > ln.lnurlpData.max
         ) {
           errorMessage = `This lightning address only accepts amounts between ${
