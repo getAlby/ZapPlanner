@@ -187,14 +187,11 @@ export function CreateSubscriptionForm() {
             <input
               {...register("recipientLightningAddress", {
                 validate: async (address) => {
-                  if (!satoshiAmount) {
-                    // don't trigger when input field is empty (it's required and will have its own error message)
-                    return;
-                  }
                   setValidatingLightningAddress(true);
                   const { ln, errorMessage } = await validateLightningAddress(
                     address,
                     satoshiAmount || 0,
+                    !!satoshiAmount, // only validate amount if provided (there's a required attribute on the field too)
                   );
 
                   if (!errorMessage) {
