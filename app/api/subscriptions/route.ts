@@ -164,8 +164,10 @@ export async function PATCH(request: Request) {
           lt: 3,
         },
         lastEventDateTime: {
-          gt: new Date("2025-01-01"),
+          gt: new Date("2025-06-01"),
         },
+        // TODO: support checking cron too
+        cronExpression: null,
       },
     });
 
