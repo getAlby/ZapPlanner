@@ -34,6 +34,7 @@ export function CreateSubscriptionForm() {
     formState: { errors, isSubmitting },
     watch,
     setValue,
+    trigger,
   } = useForm<CreateSubscriptionFormData>({
     reValidateMode: "onBlur",
     mode: "onBlur",
@@ -48,7 +49,7 @@ export function CreateSubscriptionForm() {
       cronExpression: process.env.NEXT_PUBLIC_DEFAULT_CRON_EXPRESSION || "",
       timeframe:
         (process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME as Timeframe) ||
-        "days",
+        "months", // Changed default to months
     },
   });
 
@@ -99,10 +100,23 @@ export function CreateSubscriptionForm() {
     if (data.useCron) {
       searchParams.append("cron", data.cronExpression);
     } else {
-      searchParams.append(
-        "timeframe",
-        data.timeframeValue + " " + data.timeframe,
-      );
+      // Handle monthly payments specially
+      if (data.timeframe === "months") {
+        const monthValue = parseInt(data.timeframeValue);
+        if (monthValue === 1) {
+          // Use cron expression for exactly once per month
+          searchParams.append("cron", "0 0 1 * *");
+        } else {
+          // This case is prevented by validation, but still handle it gracefully
+          const weeks = monthValue * 4;
+          searchParams.append("timeframe", `${weeks} weeks`);
+        }
+      } else {
+        searchParams.append(
+          "timeframe",
+          data.timeframeValue + " " + data.timeframe,
+        );
+      }
     }
 
     if (data.message) {
@@ -155,6 +169,12 @@ export function CreateSubscriptionForm() {
   }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
+
+  // Trigger validation when timeframe changes to handle months validation
+  useEffect(() => {
+    trigger("timeframeValue");
+  }, [watchedTimeframe, trigger]);
+
   const setSelectedTimeframe = useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
     [setValue],
@@ -280,6 +300,7 @@ export function CreateSubscriptionForm() {
                     if (parts.length !== 5) {
                       return "Cron expression must have 5 parts (minute hour day month weekday)";
                     }
+                    3;
                     if (
                       process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !==
                         "true" &&
@@ -290,7 +311,7 @@ export function CreateSubscriptionForm() {
                   },
                 })}
                 className="zp-input"
-                placeholder="0 10 * * 0 (Every Sunday at 10:00 AM UTC)"
+                placeholder="0 0 1 * * (Every month on the 1st at midnight UTC)"
               />
               {errors.cronExpression && (
                 <p className="zp-form-error">{errors.cronExpression.message}</p>
@@ -298,6 +319,10 @@ export function CreateSubscriptionForm() {
               <div className="text-sm text-gray-600">
                 <p>Examples:</p>
                 <ul className="list-disc list-inside space-y-1">
+                  <li>
+                    <code>0 0 1 * *</code> - First day of every month at
+                    midnight UTC
+                  </li>
                   <li>
                     <code>0 10 * * 0</code> - Every Sunday at 10:00 AM UTC
                   </li>
@@ -309,10 +334,6 @@ export function CreateSubscriptionForm() {
                   </li>
                   <li>
                     <code>0 12 * * *</code> - Every day at 12:00 PM UTC
-                  </li>
-                  <li>
-                    <code>0 0 1 * *</code> - First day of every month at
-                    midnight UTC
                   </li>
                   <li>
                     <code>0 0 * * 1#1</code> - First Monday of every month at
@@ -337,10 +358,21 @@ export function CreateSubscriptionForm() {
                 <p className="lg:flex-shrink-0">Repeat payment every</p>
                 <input
                   {...register("timeframeValue", {
-                    validate: (value) =>
-                      !isValidPositiveValue(parseInt(value))
-                        ? "Please enter a positive value"
-                        : undefined,
+                    validate: (value) => {
+                      if (!isValidPositiveValue(parseInt(value))) {
+                        return "Please enter a positive value";
+                      }
+
+                      // Special validation for months
+                      if (
+                        watchedTimeframe === "months" &&
+                        parseInt(value) > 1
+                      ) {
+                        return "Multiple months not supported. Please use weeks instead (e.g., 8 weeks for 2 months)";
+                      }
+
+                      return undefined;
+                    },
                   })}
                   className={`zp-input w-full`}
                 />
