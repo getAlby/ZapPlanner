@@ -1,7 +1,7 @@
 import React from "react";
 import { formatDistance, add, max } from "date-fns";
 import ms from "ms";
-import { MAX_RETRIES } from "lib/constants";
+import { MAX_RETRIES, SATS_CURRENCY } from "lib/constants";
 
 type SubscriptionSummaryProps = {
   values: {
@@ -36,7 +36,9 @@ export function SubscriptionSummary({
         right={
           <div>
             <span className="mono">
-              {parseInt(values.amount).toLocaleString()}
+              {values.currency === SATS_CURRENCY
+                ? parseInt(values.amount).toLocaleString()
+                : parseFloat(values.amount).toLocaleString()}
             </span>{" "}
             {values.currency}
           </div>
@@ -145,7 +147,10 @@ export function SubscriptionSummary({
         <SubscriptionSummaryItem
           left={`Total ${values.currency} sent`}
           right={`${
-            (values.numSuccessfulPayments || 0) * parseInt(values.amount)
+            (values.numSuccessfulPayments || 0) *
+            (values.currency === SATS_CURRENCY
+              ? parseInt(values.amount)
+              : parseFloat(values.amount))
           }`}
         />
       )}

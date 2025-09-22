@@ -240,9 +240,25 @@ export function CreateSubscriptionForm() {
             <input
               {...register("amount", {
                 validate: (value) => {
-                  return !isValidPositiveValue(parseInt(value))
-                    ? "Please enter a positive value"
-                    : undefined;
+                  // Use parseInt for sats (no decimals), parseFloat for fiat currencies
+                  const numValue =
+                    watchedCurrency === SATS_CURRENCY
+                      ? parseInt(value)
+                      : parseFloat(value);
+
+                  if (!isValidPositiveValue(numValue)) {
+                    return "Please enter a positive value";
+                  }
+
+                  // Additional validation for sats to prevent decimals
+                  if (
+                    watchedCurrency === SATS_CURRENCY &&
+                    value.includes(".")
+                  ) {
+                    return "Millisatoshis (msat) are not supported. Please enter a whole number of sats.";
+                  }
+
+                  return undefined;
                 },
               })}
               className="zp-input flex-1"
