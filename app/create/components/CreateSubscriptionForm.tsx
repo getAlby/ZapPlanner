@@ -300,7 +300,6 @@ export function CreateSubscriptionForm() {
                     if (parts.length !== 5) {
                       return "Cron expression must have 5 parts (minute hour day month weekday)";
                     }
-                    3;
                     if (
                       process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !==
                         "true" &&
