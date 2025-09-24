@@ -34,7 +34,6 @@ export function CreateSubscriptionForm() {
     formState: { errors, isSubmitting },
     watch,
     setValue,
-    trigger,
   } = useForm<CreateSubscriptionFormData>({
     reValidateMode: "onBlur",
     mode: "onBlur",
@@ -99,21 +98,19 @@ export function CreateSubscriptionForm() {
 
     if (data.useCron) {
       searchParams.append("cron", data.cronExpression);
-    } else {
+    } else if (data.timeframe === "months") {
       // Handle monthly payments specially
-      if (data.timeframe === "months") {
-        const monthValue = parseInt(data.timeframeValue);
-        if (monthValue !== 1) {
-          throw new Error("only once per month is supported");
-        }
-        // Use cron expression for exactly once per month
-        searchParams.append("cron", "0 0 1 * *");
-      } else {
-        searchParams.append(
-          "timeframe",
-          data.timeframeValue + " " + data.timeframe,
-        );
+      const monthValue = parseInt(data.timeframeValue);
+      if (monthValue !== 1) {
+        throw new Error("only once per month is supported");
       }
+      // Use cron expression for exactly once per month
+      searchParams.append("cron", "0 0 1 * *");
+    } else {
+      searchParams.append(
+        "timeframe",
+        data.timeframeValue + " " + data.timeframe,
+      );
     }
 
     if (data.message) {
