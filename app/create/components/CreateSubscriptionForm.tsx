@@ -103,14 +103,11 @@ export function CreateSubscriptionForm() {
       // Handle monthly payments specially
       if (data.timeframe === "months") {
         const monthValue = parseInt(data.timeframeValue);
-        if (monthValue === 1) {
-          // Use cron expression for exactly once per month
-          searchParams.append("cron", "0 0 1 * *");
-        } else {
-          // This case is prevented by validation, but still handle it gracefully
-          const weeks = monthValue * 4;
-          searchParams.append("timeframe", `${weeks} weeks`);
+        if (monthValue !== 1) {
+          throw new Error("only once per month is supported");
         }
+        // Use cron expression for exactly once per month
+        searchParams.append("cron", "0 0 1 * *");
       } else {
         searchParams.append(
           "timeframe",
@@ -169,11 +166,6 @@ export function CreateSubscriptionForm() {
   }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
-
-  // Trigger validation when timeframe changes to handle months validation
-  useEffect(() => {
-    trigger("timeframeValue");
-  }, [watchedTimeframe, trigger]);
 
   const setSelectedTimeframe = useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
@@ -362,7 +354,7 @@ export function CreateSubscriptionForm() {
                         return "Please enter a positive value";
                       }
 
-                      // Special validation for months
+                      // Multiple months cannot easily be done with cron
                       if (
                         watchedTimeframe === "months" &&
                         parseInt(value) > 1
