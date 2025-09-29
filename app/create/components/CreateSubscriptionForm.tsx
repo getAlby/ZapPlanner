@@ -111,6 +111,9 @@ export function CreateSubscriptionForm() {
     if (encodedPayerData) {
       searchParams.append("payerdata", encodeURIComponent(encodedPayerData));
     }
+    if (data.endDateTime) {
+      searchParams.append("endDateTime", data.endDateTime);
+    }
     setNavigating(true);
     push(`/confirm?${searchParams.toString()}`);
   });
@@ -385,6 +388,25 @@ export function CreateSubscriptionForm() {
                 <input {...register("payerName")} className="zp-input" />
               </>
             )}
+
+          <label className="zp-label">End date and time (Optional)</label>
+          <input
+            {...register("endDateTime", {
+              validate: (value) => {
+                if (value && new Date(value) <= new Date()) {
+                  return "End date must be in the future";
+                }
+                return undefined;
+              },
+            })}
+            type="datetime-local"
+            className="zp-input"
+            min={new Date().toISOString().slice(0, 16)}
+            placeholder="Leave empty for unlimited payments"
+          />
+          {errors.endDateTime && (
+            <p className="zp-form-error">{errors.endDateTime.message}</p>
+          )}
         </div>
       </Box>
       <Button type="submit" className="mt-8" disabled={isLoading}>

@@ -21,6 +21,7 @@ https://zapplanner.albylabs.com/confirm?amount=21&recipient=hello@getalby.com&ti
 - `comment` and `payerdata` will only be sent if the recipient lightning address supports it
 - `returnUrl` encoded URL to show as link on confirmation page
 - `nwcUrl` a url-encoded NWC connection secret
+- `endDateTime` (optional) ISO 8601 date string when payments should stop e.g. `2025-12-31T23:59:59.000Z`
 
 ## API
 

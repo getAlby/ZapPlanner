@@ -19,6 +19,7 @@ type SubscriptionSummaryProps = {
     numFailedPayments?: number;
     retryCount?: number;
     payerData?: string;
+    endDateTime?: Date;
   };
   showFirstPayment?: boolean;
 };
@@ -118,6 +119,12 @@ export function SubscriptionSummary({
                 )
               : "Now"
           }
+        />
+      )}
+      {values.endDateTime && (
+        <SubscriptionSummaryItem
+          left="Auto-stop date"
+          right={new Date(values.endDateTime).toLocaleDateString()}
         />
       )}
       <SubscriptionSummaryItem

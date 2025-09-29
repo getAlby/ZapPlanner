@@ -100,6 +100,9 @@ export function ConfirmSubscriptionForm({
               nextCronExecution,
               message: unconfirmedSubscription.message,
               payerData: unconfirmedSubscription.payerData,
+              endDateTime: unconfirmedSubscription.endDateTime
+                ? new Date(unconfirmedSubscription.endDateTime)
+                : undefined,
             }}
             showFirstPayment
           />

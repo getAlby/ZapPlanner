@@ -78,6 +78,16 @@ const periodicZap = inngest.createFunction(
         });
         return undefined;
       }
+
+      // Check if end date has been reached
+      if (subscription.endDateTime && new Date() >= subscription.endDateTime) {
+        logger.info("Subscription has reached end date. Cancelling", {
+          subscriptionId,
+          endDateTime: subscription.endDateTime.toISOString(),
+          currentDateTime: new Date().toISOString(),
+        });
+        return undefined;
+      }
       // safety check in case inngest fires unexpected event
       if (subscription.lastEventDateTime) {
         let expectedNextEvent: Date | undefined;

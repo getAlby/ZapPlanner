@@ -16,6 +16,7 @@ type ConfirmSubscriptionPageProps = {
     returnUrl?: string;
     nwcUrl?: string;
     currency?: string;
+    endDateTime?: string;
   }>;
 };
 
@@ -34,6 +35,7 @@ export default async function ConfirmSubscriptionPage({
     returnUrl,
     nwcUrl,
     currency,
+    endDateTime,
   } = await searchParams;
 
   if (!amount || !recipient || (!timeframe && !cron)) {
@@ -48,6 +50,7 @@ export default async function ConfirmSubscriptionPage({
     message: comment ? decodeURIComponent(comment) : undefined,
     payerData: payerdata ? decodeURIComponent(payerdata) : undefined,
     currency,
+    endDateTime: endDateTime,
   };
 
   return (

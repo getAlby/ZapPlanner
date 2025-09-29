@@ -115,6 +115,9 @@ export async function POST(request: Request) {
         sleepDuration,
         sleepDurationMs,
         cronExpression,
+        endDateTime: createSubscriptionRequest.endDateTime
+          ? new Date(createSubscriptionRequest.endDateTime)
+          : null,
       },
     });
 

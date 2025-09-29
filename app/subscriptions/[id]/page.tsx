@@ -70,6 +70,7 @@ export default async function SubscriptionPage({
                 nextCronExecution: subscription.cronExpression
                   ? getNextCronExecution(subscription.cronExpression).getTime()
                   : undefined,
+                endDateTime: subscription.endDateTime ?? undefined,
               }}
             />
             {subscription.retryCount >= MAX_RETRIES && (

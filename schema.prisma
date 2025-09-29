@@ -30,4 +30,5 @@ model Subscription {
   retryCount                    Int       @default(0)
   email                         String?
   sendPaymentNotifications      Boolean   @default(true)
+  endDateTime                   DateTime? // End date/time for payments (optional)
 }
