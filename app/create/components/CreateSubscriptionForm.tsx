@@ -111,6 +111,9 @@ export function CreateSubscriptionForm() {
     if (encodedPayerData) {
       searchParams.append("payerdata", encodeURIComponent(encodedPayerData));
     }
+    if (data.maxPayments) {
+      searchParams.append("maxPayments", data.maxPayments);
+    }
     if (data.endDateTime) {
       searchParams.append("endDateTime", data.endDateTime);
     }
@@ -388,6 +391,30 @@ export function CreateSubscriptionForm() {
                 <input {...register("payerName")} className="zp-input" />
               </>
             )}
+
+          <label className="zp-label">
+            Maximum number of payments (Optional)
+          </label>
+          <input
+            {...register("maxPayments", {
+              validate: (value) => {
+                if (value && !Number.isInteger(Number(value))) {
+                  return "Please enter a whole number";
+                }
+                if (value && Number(value) <= 0) {
+                  return "Please enter a positive number";
+                }
+                return undefined;
+              },
+            })}
+            type="number"
+            min="1"
+            className="zp-input"
+            placeholder="e.g., 12 (leave empty for unlimited)"
+          />
+          {errors.maxPayments && (
+            <p className="zp-form-error">{errors.maxPayments.message}</p>
+          )}
 
           <label className="zp-label">End date and time (Optional)</label>
           <input

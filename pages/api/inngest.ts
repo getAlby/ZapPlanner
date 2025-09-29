@@ -79,6 +79,22 @@ const periodicZap = inngest.createFunction(
         return undefined;
       }
 
+      // Check if max payments limit has been reached
+      if (
+        subscription.maxPayments &&
+        subscription.numSuccessfulPayments >= subscription.maxPayments
+      ) {
+        logger.info(
+          "Subscription has reached maximum payments limit. Cancelling",
+          {
+            subscriptionId,
+            maxPayments: subscription.maxPayments,
+            numSuccessfulPayments: subscription.numSuccessfulPayments,
+          },
+        );
+        return undefined;
+      }
+
       // Check if end date has been reached
       if (subscription.endDateTime && new Date() >= subscription.endDateTime) {
         logger.info("Subscription has reached end date. Cancelling", {

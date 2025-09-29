@@ -19,6 +19,7 @@ type SubscriptionSummaryProps = {
     numFailedPayments?: number;
     retryCount?: number;
     payerData?: string;
+    maxPayments?: number;
     endDateTime?: Date;
   };
   showFirstPayment?: boolean;
@@ -119,6 +120,12 @@ export function SubscriptionSummary({
                 )
               : "Now"
           }
+        />
+      )}
+      {values.maxPayments && (
+        <SubscriptionSummaryItem
+          left="Maximum payments"
+          right={`${values.maxPayments} payments`}
         />
       )}
       {values.endDateTime && (

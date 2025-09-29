@@ -100,6 +100,9 @@ export function ConfirmSubscriptionForm({
               nextCronExecution,
               message: unconfirmedSubscription.message,
               payerData: unconfirmedSubscription.payerData,
+              maxPayments: unconfirmedSubscription.maxPayments
+                ? parseInt(unconfirmedSubscription.maxPayments)
+                : undefined,
               endDateTime: unconfirmedSubscription.endDateTime
                 ? new Date(unconfirmedSubscription.endDateTime)
                 : undefined,
