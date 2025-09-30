@@ -48,7 +48,7 @@ export function CreateSubscriptionForm() {
       cronExpression: process.env.NEXT_PUBLIC_DEFAULT_CRON_EXPRESSION || "",
       timeframe:
         (process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME as Timeframe) ||
-        "days",
+        "months", // Changed default to months
     },
   });
 
@@ -98,6 +98,14 @@ export function CreateSubscriptionForm() {
 
     if (data.useCron) {
       searchParams.append("cron", data.cronExpression);
+    } else if (data.timeframe === "months") {
+      // Handle monthly payments specially
+      const monthValue = parseInt(data.timeframeValue);
+      if (monthValue !== 1) {
+        throw new Error("only once per month is supported");
+      }
+      // Use cron expression for exactly once per month
+      searchParams.append("cron", "0 0 1 * *");
     } else {
       searchParams.append(
         "timeframe",
@@ -155,6 +163,7 @@ export function CreateSubscriptionForm() {
   }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
+
   const setSelectedTimeframe = useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
     [setValue],
@@ -290,7 +299,7 @@ export function CreateSubscriptionForm() {
                   },
                 })}
                 className="zp-input"
-                placeholder="0 10 * * 0 (Every Sunday at 10:00 AM UTC)"
+                placeholder="0 0 1 * * (Every month on the 1st at midnight UTC)"
               />
               {errors.cronExpression && (
                 <p className="zp-form-error">{errors.cronExpression.message}</p>
@@ -298,6 +307,10 @@ export function CreateSubscriptionForm() {
               <div className="text-sm text-gray-600">
                 <p>Examples:</p>
                 <ul className="list-disc list-inside space-y-1">
+                  <li>
+                    <code>0 0 1 * *</code> - First day of every month at
+                    midnight UTC
+                  </li>
                   <li>
                     <code>0 10 * * 0</code> - Every Sunday at 10:00 AM UTC
                   </li>
@@ -309,10 +322,6 @@ export function CreateSubscriptionForm() {
                   </li>
                   <li>
                     <code>0 12 * * *</code> - Every day at 12:00 PM UTC
-                  </li>
-                  <li>
-                    <code>0 0 1 * *</code> - First day of every month at
-                    midnight UTC
                   </li>
                   <li>
                     <code>0 0 * * 1#1</code> - First Monday of every month at
@@ -337,10 +346,21 @@ export function CreateSubscriptionForm() {
                 <p className="lg:flex-shrink-0">Repeat payment every</p>
                 <input
                   {...register("timeframeValue", {
-                    validate: (value) =>
-                      !isValidPositiveValue(parseInt(value))
-                        ? "Please enter a positive value"
-                        : undefined,
+                    validate: (value) => {
+                      if (!isValidPositiveValue(parseInt(value))) {
+                        return "Please enter a positive value";
+                      }
+
+                      // Multiple months cannot easily be done with cron
+                      if (
+                        watchedTimeframe === "months" &&
+                        parseInt(value) > 1
+                      ) {
+                        return "Multiple months not supported. Please use weeks instead (e.g., 8 weeks for 2 months)";
+                      }
+
+                      return undefined;
+                    },
                   })}
                   className={`zp-input w-full`}
                 />
