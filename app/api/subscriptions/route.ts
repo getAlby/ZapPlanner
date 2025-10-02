@@ -27,9 +27,13 @@ export async function POST(request: Request) {
     const { amount, nostrWalletConnectUrl, sleepDuration, cronExpression } =
       createSubscriptionRequest;
 
+    // Validate amount based on currency type
+    const isSatsCurrency = createSubscriptionRequest.currency === SATS_CURRENCY;
+    const numAmount = isSatsCurrency ? parseInt(amount) : parseFloat(amount);
+
     if (
       (!sleepDuration && !cronExpression) ||
-      !isValidPositiveValue(parseInt(amount)) ||
+      !isValidPositiveValue(numAmount) ||
       !isValidNostrWalletConnectUrl(nostrWalletConnectUrl)
     ) {
       return new Response("One or more invalid subscription fields", {
@@ -70,7 +74,8 @@ export async function POST(request: Request) {
       }
     }
 
-    let satoshi = +amount;
+    // Use the correctly parsed amount based on currency type
+    let satoshi = numAmount;
     if (
       createSubscriptionRequest.currency &&
       createSubscriptionRequest.currency !== SATS_CURRENCY
@@ -87,7 +92,7 @@ export async function POST(request: Request) {
       }
 
       satoshi = await fiat.getSatoshiValue({
-        amount: createSubscriptionRequest.amount,
+        amount: parseFloat(createSubscriptionRequest.amount),
         currency: createSubscriptionRequest.currency,
       });
     }
@@ -105,8 +110,8 @@ export async function POST(request: Request) {
 
     const subscription = await prismaClient.subscription.create({
       data: {
-        amount: parseInt(createSubscriptionRequest.amount),
-        currency: createSubscriptionRequest.currency,
+        amount: Math.round(satoshi),
+        currency: SATS_CURRENCY, // Always store as SATS since amount is in sats
         recipientLightningAddress:
           createSubscriptionRequest.recipientLightningAddress,
         message: createSubscriptionRequest.message,
