@@ -50,7 +50,7 @@ export function CreateSubscriptionForm() {
       cronExpression: process.env.NEXT_PUBLIC_DEFAULT_CRON_EXPRESSION || "",
       timeframe:
         (process.env.NEXT_PUBLIC_DEFAULT_SLEEP_TIMEFRAME as Timeframe) ||
-        "days",
+        "months", // Changed default to months
     },
   });
 
@@ -100,6 +100,14 @@ export function CreateSubscriptionForm() {
 
     if (data.useCron) {
       searchParams.append("cron", data.cronExpression);
+    } else if (data.timeframe === "months") {
+      // Handle monthly payments specially
+      const monthValue = parseInt(data.timeframeValue);
+      if (monthValue !== 1) {
+        throw new Error("only once per month is supported");
+      }
+      // Use cron expression for exactly once per month
+      searchParams.append("cron", "0 0 1 * *");
     } else {
       searchParams.append(
         "timeframe",
@@ -163,6 +171,7 @@ export function CreateSubscriptionForm() {
   }, [watchedAmount, watchedCurrency]);
 
   const watchedTimeframe = watch("timeframe");
+
   const setSelectedTimeframe = useCallback(
     (timeframe: Timeframe) => setValue("timeframe", timeframe),
     [setValue],
