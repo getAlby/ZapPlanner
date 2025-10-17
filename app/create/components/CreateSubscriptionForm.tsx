@@ -15,6 +15,8 @@ import {
   fiat,
 } from "@getalby/lightning-tools";
 import { SATS_CURRENCY } from "lib/constants";
+import { FrequencySelector } from "./FrequencySelector";
+import { AdvancedOptions } from "./AdvancedOptions";
 
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,
@@ -258,117 +260,14 @@ export function CreateSubscriptionForm() {
           {errors.amount && (
             <p className="zp-form-error">{errors.amount.message}</p>
           )}
-          <label className="zp-label">
-            Frequency<span className="text-red-500">*</span>
-          </label>
 
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="checkbox"
-              id="useCron"
-              {...register("useCron")}
-              className="checkbox"
+          {!watch("useCron") && (
+            <FrequencySelector
+              register={register}
+              errors={errors}
+              watchedTimeframe={watchedTimeframe}
+              onTimeframeChange={setSelectedTimeframe}
             />
-            <label className="label-text" htmlFor="useCron">
-              Use cron expression
-            </label>
-          </div>
-
-          {watch("useCron") ? (
-            <div className="space-y-2">
-              <label className="zp-label">Cron Expression</label>
-              <input
-                key="cronExpression"
-                {...register("cronExpression", {
-                  validate: (value) => {
-                    if (!value) return "Cron expression is required";
-                    const parts = value.split(" ");
-                    if (parts.length !== 5) {
-                      return "Cron expression must have 5 parts (minute hour day month weekday)";
-                    }
-                    if (
-                      process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !==
-                        "true" &&
-                      !/^[0-5]?[0-9] /.test(value)
-                    ) {
-                      return "Cron expression must repeat only once per hour";
-                    }
-                  },
-                })}
-                className="zp-input"
-                placeholder="0 10 * * 0 (Every Sunday at 10:00 AM UTC)"
-              />
-              {errors.cronExpression && (
-                <p className="zp-form-error">{errors.cronExpression.message}</p>
-              )}
-              <div className="text-sm text-gray-600">
-                <p>Examples:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>
-                    <code>0 10 * * 0</code> - Every Sunday at 10:00 AM UTC
-                  </li>
-                  <li>
-                    <code>0 23 * * 0</code> - Every Sunday at 11:00 PM UTC
-                  </li>
-                  <li>
-                    <code>0 9 * * 1</code> - Every Monday at 9:00 AM UTC
-                  </li>
-                  <li>
-                    <code>0 12 * * *</code> - Every day at 12:00 PM UTC
-                  </li>
-                  <li>
-                    <code>0 0 1 * *</code> - First day of every month at
-                    midnight UTC
-                  </li>
-                  <li>
-                    <code>0 0 * * 1#1</code> - First Monday of every month at
-                    midnight UTC
-                  </li>
-                </ul>
-                <p className="mt-2">
-                  <a
-                    href="https://crontab.guru/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    📅 Use crontab.guru for help
-                  </a>
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className={`flex justify-center gap-2 items-center`}>
-                <p className="lg:flex-shrink-0">Repeat payment every</p>
-                <input
-                  {...register("timeframeValue", {
-                    validate: (value) =>
-                      !isValidPositiveValue(parseInt(value))
-                        ? "Please enter a positive value"
-                        : undefined,
-                  })}
-                  className={`zp-input w-full`}
-                />
-                <select
-                  {...register("timeframe")}
-                  className="select select-bordered"
-                  onChange={(event) =>
-                    setSelectedTimeframe(event.target.value as Timeframe)
-                  }
-                  value={watchedTimeframe}
-                >
-                  {timeframes.map((timeframe) => (
-                    <option key={timeframe} value={timeframe}>
-                      {timeframe}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {errors.timeframeValue && (
-                <p className="zp-form-error">{errors.timeframeValue.message}</p>
-              )}
-            </>
           )}
 
           {lightningAddress &&
@@ -392,48 +291,11 @@ export function CreateSubscriptionForm() {
               </>
             )}
 
-          <label className="zp-label">
-            Maximum number of payments (Optional)
-          </label>
-          <input
-            {...register("maxPayments", {
-              validate: (value) => {
-                if (value && !Number.isInteger(Number(value))) {
-                  return "Please enter a whole number";
-                }
-                if (value && Number(value) <= 0) {
-                  return "Please enter a positive number";
-                }
-                return undefined;
-              },
-            })}
-            type="number"
-            min="1"
-            className="zp-input"
-            placeholder="e.g., 12 (leave empty for unlimited)"
+          <AdvancedOptions
+            register={register}
+            errors={errors}
+            useCron={watch("useCron")}
           />
-          {errors.maxPayments && (
-            <p className="zp-form-error">{errors.maxPayments.message}</p>
-          )}
-
-          <label className="zp-label">End date and time (Optional)</label>
-          <input
-            {...register("endDateTime", {
-              validate: (value) => {
-                if (value && new Date(value) <= new Date()) {
-                  return "End date must be in the future";
-                }
-                return undefined;
-              },
-            })}
-            type="datetime-local"
-            className="zp-input"
-            min={new Date().toISOString().slice(0, 16)}
-            placeholder="Leave empty for unlimited payments"
-          />
-          {errors.endDateTime && (
-            <p className="zp-form-error">{errors.endDateTime.message}</p>
-          )}
         </div>
       </Box>
       <Button type="submit" className="mt-8" disabled={isLoading}>

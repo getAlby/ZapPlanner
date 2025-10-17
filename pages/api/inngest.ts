@@ -89,7 +89,6 @@ const periodicZap = inngest.createFunction(
           {
             subscriptionId,
             maxPayments: subscription.maxPayments,
-            numSuccessfulPayments: subscription.numSuccessfulPayments,
           },
         );
         return undefined;
@@ -100,7 +99,6 @@ const periodicZap = inngest.createFunction(
         logger.info("Subscription has reached end date. Cancelling", {
           subscriptionId,
           endDateTime: subscription.endDateTime.toISOString(),
-          currentDateTime: new Date().toISOString(),
         });
         return undefined;
       }
