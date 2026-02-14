@@ -15,6 +15,8 @@ import {
   fiat,
 } from "@getalby/lightning-tools";
 import { SATS_CURRENCY } from "lib/constants";
+import { FrequencySelector } from "./FrequencySelector";
+import { AdvancedOptions } from "./AdvancedOptions";
 
 type CreateSubscriptionFormData = Omit<
   CreateSubscriptionRequest,
@@ -118,6 +120,12 @@ export function CreateSubscriptionForm() {
     }
     if (encodedPayerData) {
       searchParams.append("payerdata", encodeURIComponent(encodedPayerData));
+    }
+    if (data.maxPayments) {
+      searchParams.append("maxPayments", data.maxPayments);
+    }
+    if (data.endDateTime) {
+      searchParams.append("endDateTime", data.endDateTime);
     }
     setNavigating(true);
     push(`/confirm?${searchParams.toString()}`);
@@ -261,128 +269,14 @@ export function CreateSubscriptionForm() {
           {errors.amount && (
             <p className="zp-form-error">{errors.amount.message}</p>
           )}
-          <label className="zp-label">
-            Frequency<span className="text-red-500">*</span>
-          </label>
 
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="checkbox"
-              id="useCron"
-              {...register("useCron")}
-              className="checkbox"
+          {!watch("useCron") && (
+            <FrequencySelector
+              register={register}
+              errors={errors}
+              watchedTimeframe={watchedTimeframe}
+              onTimeframeChange={setSelectedTimeframe}
             />
-            <label className="label-text" htmlFor="useCron">
-              Use cron expression
-            </label>
-          </div>
-
-          {watch("useCron") ? (
-            <div className="space-y-2">
-              <label className="zp-label">Cron Expression</label>
-              <input
-                key="cronExpression"
-                {...register("cronExpression", {
-                  validate: (value) => {
-                    if (!value) return "Cron expression is required";
-                    const parts = value.split(" ");
-                    if (parts.length !== 5) {
-                      return "Cron expression must have 5 parts (minute hour day month weekday)";
-                    }
-                    if (
-                      process.env.NEXT_PUBLIC_ALLOW_SHORT_TIMEFRAMES !==
-                        "true" &&
-                      !/^[0-5]?[0-9] /.test(value)
-                    ) {
-                      return "Cron expression must repeat only once per hour";
-                    }
-                  },
-                })}
-                className="zp-input"
-                placeholder="0 0 1 * * (Every month on the 1st at midnight UTC)"
-              />
-              {errors.cronExpression && (
-                <p className="zp-form-error">{errors.cronExpression.message}</p>
-              )}
-              <div className="text-sm text-gray-600">
-                <p>Examples:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>
-                    <code>0 0 1 * *</code> - First day of every month at
-                    midnight UTC
-                  </li>
-                  <li>
-                    <code>0 10 * * 0</code> - Every Sunday at 10:00 AM UTC
-                  </li>
-                  <li>
-                    <code>0 23 * * 0</code> - Every Sunday at 11:00 PM UTC
-                  </li>
-                  <li>
-                    <code>0 9 * * 1</code> - Every Monday at 9:00 AM UTC
-                  </li>
-                  <li>
-                    <code>0 12 * * *</code> - Every day at 12:00 PM UTC
-                  </li>
-                  <li>
-                    <code>0 0 * * 1#1</code> - First Monday of every month at
-                    midnight UTC
-                  </li>
-                </ul>
-                <p className="mt-2">
-                  <a
-                    href="https://crontab.guru/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    📅 Use crontab.guru for help
-                  </a>
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className={`flex justify-center gap-2 items-center`}>
-                <p className="lg:flex-shrink-0">Repeat payment every</p>
-                <input
-                  {...register("timeframeValue", {
-                    validate: (value) => {
-                      if (!isValidPositiveValue(parseInt(value))) {
-                        return "Please enter a positive value";
-                      }
-
-                      // Multiple months cannot easily be done with cron
-                      if (
-                        watchedTimeframe === "months" &&
-                        parseInt(value) > 1
-                      ) {
-                        return "Multiple months not supported. Please use weeks instead (e.g., 8 weeks for 2 months)";
-                      }
-
-                      return undefined;
-                    },
-                  })}
-                  className={`zp-input w-full`}
-                />
-                <select
-                  {...register("timeframe")}
-                  className="select select-bordered"
-                  onChange={(event) =>
-                    setSelectedTimeframe(event.target.value as Timeframe)
-                  }
-                  value={watchedTimeframe}
-                >
-                  {timeframes.map((timeframe) => (
-                    <option key={timeframe} value={timeframe}>
-                      {timeframe}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {errors.timeframeValue && (
-                <p className="zp-form-error">{errors.timeframeValue.message}</p>
-              )}
-            </>
           )}
 
           {lightningAddress &&
@@ -405,6 +299,12 @@ export function CreateSubscriptionForm() {
                 <input {...register("payerName")} className="zp-input" />
               </>
             )}
+
+          <AdvancedOptions
+            register={register}
+            errors={errors}
+            useCron={watch("useCron")}
+          />
         </div>
       </Box>
       <Button type="submit" className="mt-8" disabled={isLoading}>
