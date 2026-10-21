@@ -12,7 +12,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --depot=false --no-cache --remote-only --build-secret DATABASE_URL="${{ secrets.DATABASE_URL }}" --build-secret PRISMA_FIELD_ENCRYPTION_KEY="${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}" --build-secret SENTRY_AUTH_TOKEN="${{ secrets.SENTRY_AUTH_TOKEN }}" --build-secret SENTRY_DSN="${{ secrets.SENTRY_DSN }}"
+      - name: Resolve fresh Node base image
+        id: node-base
+        run: |
+          docker pull node:22-alpine
+          docker run --rm node:22-alpine node --version
+          image=$(docker image inspect node:22-alpine --format '{{index .RepoDigests 0}}')
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+      # Keep the remote builder for the build-time database migration and secrets.
+      # --no-cache reruns build steps; the digest above ensures a fresh base.
+      - name: Build and deploy
+        env:
+          NODE_IMAGE: ${{ steps.node-base.outputs.image }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PRISMA_FIELD_ENCRYPTION_KEY: ${{ secrets.PRISMA_FIELD_ENCRYPTION_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: >-
+          flyctl deploy --depot=false --no-cache --remote-only
+          --build-arg NODE_IMAGE="$NODE_IMAGE"
+          --build-secret DATABASE_URL="$DATABASE_URL"
+          --build-secret PRISMA_FIELD_ENCRYPTION_KEY="$PRISMA_FIELD_ENCRYPTION_KEY"
+          --build-secret SENTRY_AUTH_TOKEN="$SENTRY_AUTH_TOKEN"
+          --build-secret SENTRY_DSN="$SENTRY_DSN"
   inngest:
     needs: deploy
     runs-on: ubuntu-latest
