@@ -19,10 +19,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 #RUN yarn build
 
-RUN --mount=type=secret,id=DATABASE_URL \
-    --mount=type=secret,id=PRISMA_FIELD_ENCRYPTION_KEY \
-    DATABASE_URL="$(cat /run/secrets/DATABASE_URL)" \
-    PRISMA_FIELD_ENCRYPTION_KEY="$(cat /run/secrets/PRISMA_FIELD_ENCRYPTION_KEY)" yarn db:migrate:deploy
+# Migrations run via release_command in fly.toml (the Depot builder can't reach the Fly private network)
 
 # Add `ARG` instructions below if you need `NEXT_PUBLIC_` variables
 
