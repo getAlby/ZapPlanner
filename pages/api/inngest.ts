@@ -78,6 +78,30 @@ const periodicZap = inngest.createFunction(
         });
         return undefined;
       }
+
+      // Check if max payments limit has been reached
+      if (
+        subscription.maxPayments &&
+        subscription.numSuccessfulPayments >= subscription.maxPayments
+      ) {
+        logger.info(
+          "Subscription has reached maximum payments limit. Cancelling",
+          {
+            subscriptionId,
+            maxPayments: subscription.maxPayments,
+          },
+        );
+        return undefined;
+      }
+
+      // Check if end date has been reached
+      if (subscription.endDateTime && new Date() >= subscription.endDateTime) {
+        logger.info("Subscription has reached end date. Cancelling", {
+          subscriptionId,
+          endDateTime: subscription.endDateTime.toISOString(),
+        });
+        return undefined;
+      }
       // safety check in case inngest fires unexpected event
       if (subscription.lastEventDateTime) {
         let expectedNextEvent: Date | undefined;
